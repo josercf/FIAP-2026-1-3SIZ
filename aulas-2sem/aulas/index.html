@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Microservice and Web Engineering - 2o Semestre 2026 | FIAP</title>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Montserrat', 'Segoe UI', Arial, sans-serif;
+      background: #0d0d0d;
+      color: #f5f5f5;
+      min-height: 100vh;
+    }
+    .top-accent {
+      height: 5px;
+      background: linear-gradient(90deg, #ED145B 0%, #ED145B 40%, #333 40%, #333 100%);
+    }
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 40px 30px;
+    }
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 40px;
+    }
+    .header img {
+      height: 45px;
+      opacity: 0.8;
+    }
+    .header-text h1 {
+      font-size: 1.6em;
+      font-weight: 800;
+      color: #fff;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+    }
+    .header-text h2 {
+      font-size: 0.9em;
+      font-weight: 400;
+      color: #ED145B;
+      margin-top: 5px;
+    }
+    .header-text h3 {
+      font-size: 0.75em;
+      font-weight: 300;
+      color: #888;
+      margin-top: 3px;
+    }
+    .semester-info {
+      background: #1a1a1a;
+      border-left: 4px solid #ED145B;
+      border-radius: 0 8px 8px 0;
+      padding: 15px 20px;
+      margin-bottom: 30px;
+      font-size: 0.85em;
+      color: #ccc;
+      line-height: 1.6;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+    }
+    thead th {
+      background: #ED145B;
+      color: #fff;
+      padding: 12px 15px;
+      text-align: left;
+      font-size: 0.8em;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    tbody td {
+      padding: 12px 15px;
+      border-bottom: 1px solid #222;
+      font-size: 0.85em;
+      vertical-align: middle;
+    }
+    tbody tr:hover {
+      background: #1a1a1a;
+    }
+    tbody tr.checkpoint td {
+      background: #1c1020;
+      border-left: 3px solid #ED145B;
+      font-weight: 600;
+      color: #ED145B;
+    }
+    tbody tr.feriado td {
+      background: #111;
+      color: #555;
+      font-style: italic;
+    }
+    tbody tr.gs td {
+      background: #111;
+      color: #666;
+    }
+    .date-col { width: 100px; color: #888; font-weight: 500; }
+    .num-col { width: 60px; text-align: center; }
+    .num-badge {
+      display: inline-block;
+      background: #ED145B;
+      color: #fff;
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      text-align: center;
+      line-height: 30px;
+      font-size: 0.8em;
+      font-weight: 700;
+    }
+    .num-badge.cp { background: #8B5CF6; }
+    .num-badge.off { background: #333; color: #666; }
+    .theme-col a {
+      color: #f5f5f5;
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    .theme-col a:hover {
+      color: #ED145B;
+    }
+    .tag {
+      display: inline-block;
+      font-size: 0.65em;
+      padding: 2px 8px;
+      border-radius: 3px;
+      margin-left: 8px;
+      font-weight: 600;
+      vertical-align: middle;
+    }
+    .tag-pratica { background: #0d3320; color: #34d399; }
+    .tag-cp { background: #2d1b4e; color: #a78bfa; }
+    .tag-feriado { background: #222; color: #666; }
+    .tag-gs { background: #1a1a00; color: #ca8a04; }
+    .footer {
+      margin-top: 40px;
+      padding-top: 20px;
+      border-top: 1px solid #222;
+      text-align: center;
+      font-size: 0.7em;
+      color: #555;
+      line-height: 1.6;
+    }
+    .bloco-label {
+      font-size: 0.7em;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: #ED145B;
+      margin: 30px 0 10px 0;
+      padding: 8px 0;
+      border-bottom: 1px solid #222;
+    }
+  </style>
+</head>
+<body>
+  <div class="top-accent"></div>
+  <div class="container">
+    <div class="header">
+      <div class="header-text">
+        <h1>Microservice and Web Engineering</h1>
+        <h2>2o Semestre 2026 - Turma 3SIZ</h2>
+        <h3>Prof. Jose Romualdo da Costa Filho</h3>
+      </div>
+      <img src="../assets/img/fiap-logo-graduacao.png" alt="FIAP">
+    </div>
+
+    <div class="semester-info">
+      <strong>Periodo:</strong> Fevereiro a Junho de 2026 &bull;
+      <strong>Horario:</strong> Tercas-feiras, 19h30 - 22h45 &bull;
+      <strong>Checkpoints:</strong> 3 avaliacoes individuais
+    </div>
+
+    <div class="bloco-label">Bloco 1 - Infraestrutura e Comunicacao</div>
+    <table>
+      <thead>
+        <tr><th class="date-col">Data</th><th class="num-col">#</th><th class="theme-col">Tema</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="date-col">10/02</td>
+          <td class="num-col"><span class="num-badge">01</span></td>
+          <td class="theme-col"><a href="aula01.html">Revisao + API Gateway & Proxy Reverso</a> <span class="tag tag-pratica">Hands-on</span></td>
+        </tr>
+        <tr class="feriado">
+          <td class="date-col">17/02</td>
+          <td class="num-col"><span class="num-badge off">--</span></td>
+          <td class="theme-col">Carnaval <span class="tag tag-feriado">Feriado</span></td>
+        </tr>
+        <tr>
+          <td class="date-col">24/02</td>
+          <td class="num-col"><span class="num-badge">02</span></td>
+          <td class="theme-col"><a href="aula02.html">Load Balancer, Rate Limiting & Throttling</a> <span class="tag tag-pratica">Hands-on</span></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="bloco-label">Bloco 2 - Dados e Qualidade</div>
+    <table>
+      <thead>
+        <tr><th class="date-col">Data</th><th class="num-col">#</th><th class="theme-col">Tema</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="date-col">03/03</td>
+          <td class="num-col"><span class="num-badge">03</span></td>
+          <td class="theme-col"><a href="aula03.html">Padroes de Resiliencia</a> <span class="tag tag-pratica">Hands-on</span></td>
+        </tr>
+        <tr>
+          <td class="date-col">10/03</td>
+          <td class="num-col"><span class="num-badge">04</span></td>
+          <td class="theme-col"><a href="aula04.html">Dados em Microsservicos</a> <span class="tag tag-pratica">Hands-on</span></td>
+        </tr>
+        <tr>
+          <td class="date-col">17/03</td>
+          <td class="num-col"><span class="num-badge">05</span></td>
+          <td class="theme-col"><a href="aula05.html">Testes de Unidade</a> <span class="tag tag-pratica">Hands-on</span></td>
+        </tr>
+        <tr>
+          <td class="date-col">24/03</td>
+          <td class="num-col"><span class="num-badge">06</span></td>
+          <td class="theme-col"><a href="aula06.html">Testes de Integracao</a> <span class="tag tag-pratica">Hands-on</span></td>
+        </tr>
+        <tr class="checkpoint">
+          <td class="date-col">31/03</td>
+          <td class="num-col"><span class="num-badge cp">CP</span></td>
+          <td class="theme-col">Checkpoint I <span class="tag tag-cp">Individual</span></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="bloco-label">Bloco 3 - Performance e Escalabilidade</div>
+    <table>
+      <thead>
+        <tr><th class="date-col">Data</th><th class="num-col">#</th><th class="theme-col">Tema</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="date-col">07/04</td>
+          <td class="num-col"><span class="num-badge">08</span></td>
+          <td class="theme-col"><a href="aula08.html">Cache com Redis</a> <span class="tag tag-pratica">Hands-on</span></td>
+        </tr>
+        <tr>
+          <td class="date-col">14/04</td>
+          <td class="num-col"><span class="num-badge">09</span></td>
+          <td class="theme-col"><a href="aula09.html">Processamento Distribuido</a> <span class="tag tag-pratica">Hands-on</span></td>
+        </tr>
+        <tr class="feriado">
+          <td class="date-col">21/04</td>
+          <td class="num-col"><span class="num-badge off">--</span></td>
+          <td class="theme-col">Tiradentes <span class="tag tag-feriado">Feriado</span></td>
+        </tr>
+        <tr class="checkpoint">
+          <td class="date-col">28/04</td>
+          <td class="num-col"><span class="num-badge cp">CP</span></td>
+          <td class="theme-col">Checkpoint II <span class="tag tag-cp">Individual</span></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="bloco-label">Bloco 4 - Validacao sob Pressao</div>
+    <table>
+      <thead>
+        <tr><th class="date-col">Data</th><th class="num-col">#</th><th class="theme-col">Tema</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="date-col">05/05</td>
+          <td class="num-col"><span class="num-badge">11</span></td>
+          <td class="theme-col"><a href="aula11.html">Testes de Carga</a> <span class="tag tag-pratica">Hands-on</span></td>
+        </tr>
+        <tr>
+          <td class="date-col">12/05</td>
+          <td class="num-col"><span class="num-badge">12</span></td>
+          <td class="theme-col"><a href="aula12.html">Testes de Interface</a> <span class="tag tag-pratica">Hands-on</span></td>
+        </tr>
+        <tr class="checkpoint">
+          <td class="date-col">19/05</td>
+          <td class="num-col"><span class="num-badge cp">CP</span></td>
+          <td class="theme-col">Checkpoint III <span class="tag tag-cp">Individual</span></td>
+        </tr>
+        <tr class="gs">
+          <td class="date-col">26/05</td>
+          <td class="num-col"><span class="num-badge off">--</span></td>
+          <td class="theme-col">Global Solutions <span class="tag tag-gs">GS</span></td>
+        </tr>
+        <tr class="gs">
+          <td class="date-col">02/06</td>
+          <td class="num-col"><span class="num-badge off">--</span></td>
+          <td class="theme-col">Global Solutions <span class="tag tag-gs">GS</span></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="bloco-label">Bloco 5 - Nuvem e Entrega Continua</div>
+    <table>
+      <thead>
+        <tr><th class="date-col">Data</th><th class="num-col">#</th><th class="theme-col">Tema</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="date-col">09/06</td>
+          <td class="num-col"><span class="num-badge">14</span></td>
+          <td class="theme-col"><a href="aula14.html">Orquestracao de Containers</a> <span class="tag tag-pratica">Hands-on</span></td>
+        </tr>
+        <tr>
+          <td class="date-col">16/06</td>
+          <td class="num-col"><span class="num-badge">15</span></td>
+          <td class="theme-col"><a href="aula15.html">Nuvem + Integracao Continua</a> <span class="tag tag-pratica">Hands-on</span></td>
+        </tr>
+        <tr>
+          <td class="date-col">23/06</td>
+          <td class="num-col"><span class="num-badge">16</span></td>
+          <td class="theme-col"><a href="aula16.html">Deploy Continuo + Infrastructure as Code</a> <span class="tag tag-pratica">Hands-on</span></td>
+        </tr>
+        <tr>
+          <td class="date-col">30/06</td>
+          <td class="num-col"><span class="num-badge">17</span></td>
+          <td class="theme-col"><a href="aula17.html">Vista de Prova + Encerramento</a></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="footer">
+      Copyright &copy; 2026 - Prof. Jose Romualdo da Costa Filho<br>
+      FIAP - Faculdade de Informatica e Administracao Paulista<br>
+      Sistemas de Informacao - Microservice and Web Engineering
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>AULA 02 - Load Balancer, Rate Limiting & Throttling | FIAP</title>
+  <link rel="stylesheet" href="../node_modules/reveal.js/dist/reveal.css" />
+  <link rel="stylesheet" href="../node_modules/reveal.js/dist/theme/white.css" />
+  <link rel="stylesheet" href="../node_modules/reveal.js/plugin/highlight/monokai.css" />
+  <link rel="stylesheet" href="../assets/css/fiap-theme.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+</head>
+<body>
+  <div class="reveal">
+    <div class="slides">
+
+      <!-- ==================== SLIDE: CAPA FIAP ==================== -->
+      <section class="cover-slide">
+        <img src="../assets/img/fiap-logo-graduacao.png" alt="FIAP Graduação" class="fiap-logo-full" />
+      </section>
+
+      <!-- ==================== SLIDE: TÍTULO DA AULA ==================== -->
+      <section class="title-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="title-card">
+          <div class="accent-bar"></div>
+          <h1>Sistemas de Informação</h1>
+          <h2>Microservice and Web Engineering</h2>
+          <h3>Prof. José Romualdo</h3>
+        </div>
+        <div class="lesson-bar">02 - Load Balancer, Rate Limiting &amp; Throttling</div>
+      </section>
+
+      <!-- ==================== SLIDE: AGENDA ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Agenda</h2>
+        </div>
+
+        <table>
+          <thead>
+            <tr><th>Bloco</th><th>Horário</th><th>Conteúdo</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><strong>Bloco 1</strong></td><td>19h30 – 21h00</td><td>Conceitos de Load Balancing, Health Checks e Sticky Sessions + Caso real Netflix</td></tr>
+            <tr><td><strong>Intervalo</strong></td><td>21h00 – 21h20</td><td>☕ Pausa</td></tr>
+            <tr><td><strong>Bloco 2</strong></td><td>21h20 – 22h45</td><td>Rate Limiting e Throttling + Exercício hands-on + Quiz</td></tr>
+          </tbody>
+        </table>
+
+        <div class="slide-footer">
+          <div class="footer-bar">02 - Load Balancer, Rate Limiting &amp; Throttling</div>
+          <div class="footer-page">3</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: BLOCO 1 - INTRO LOAD BALANCING ==================== -->
+      <section class="section-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="accent-bar"></div>
+        <h2>Bloco 1<br>Conceitos de Load Balancing</h2>
+        <div class="slide-footer">
+          <div class="footer-bar">02 - Load Balancer, Rate Limiting &amp; Throttling</div>
+          <div class="footer-page">4</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: O QUE É LOAD BALANCING ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>O que é Load Balancing?</h2>
+        </div>
+        <p>Load Balancing é uma técnica que distribui o tráfego de rede ou requisições entre múltiplos servidores para garantir alta disponibilidade, escalabilidade e desempenho.</p>
+        <ul>
+          <li>Previne sobrecarga em um único servidor</li>
+          <li>Aumenta a tolerância a falhas</li>
+          <li>Melhora a experiência do usuário</li>
+        </ul>
+        <div class="slide-footer">
+          <div class="footer-bar">02 - Load Balancer, Rate Limiting &amp; Throttling</div>
+          <div class="footer-page">5</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: ALGORITMOS DE LOAD BALANCING ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Algoritmos de Load Balancing</h2>
+        </div>
+        <ul>
+          <li><strong>Round Robin:</strong> distribui requisições sequencialmente entre servidores</li>
+          <li><strong>Least Connections:</strong> envia para o servidor com menos conexões ativas</li>
+          <li><strong>IP Hash:</strong> usa o IP do cliente para determinar o servidor</li>
+          <li><strong>Weighted:</strong> servidores recebem pesos para distribuir carga proporcional</li>
+        </ul>
+        <div class="slide-footer">
+          <div class="footer-bar">02 - Load Balancer, Rate Limiting &amp; Throttling</div>
+          <div class="footer-page">6</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: EXEMPLO ROUND ROBIN EM JAVA/Spring Boot ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Exemplo: Round Robin Simples em Java/Spring Boot</h2>
+        </div>
+        <pre><code class="language-java">
+// Lista de servidores
+List<String> servers = Arrays.asList("srv1", "srv2", "srv3");
+AtomicInteger index = new AtomicInteger(0);
+
+public String getNextServer() {
+  int i = index.getAndUpdate(n -> (n + 1) % servers.size());
+  return servers.get(i);
+}
+        </code></pre>
+        <div class="slide-footer">
+          <div class="footer-bar">02 - Load Balancer, Rate Limiting &amp; Throttling</div>
+          <div class="footer-page">7</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: HEALTH CHECKS ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Health Checks</h2>
+        </div>
+        <p>Health Checks são verificações periódicas feitas pelo Load Balancer para garantir que os servidores estejam ativos e aptos a receber requisições.</p>
+        <ul>
+          <li>Ping simples ou requisição HTTP</li>
+          <li>Detecta falhas e remove servidores indisponíveis</li>
+          <li>Garante alta disponibilidade</li>
+        </ul>
+        <div class="slide-footer">
+          <div class="footer-bar">02 - Load Balancer, Rate Limiting &amp; Throttling</div>
+          <div class="footer-page">8</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: SESSION AFFINITY / STICKY SESSIONS ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Session Affinity / Sticky Sessions</h2>
+        </div>
+        <p>Permite que um usuário seja sempre direcionado ao mesmo servidor durante a sessão para manter estado.</p>
+        <ul>
+          <li>Útil para aplicações que mantêm estado local</li>
+          <li>Implementação via cookies, IP ou tokens</li>
+          <li>Pode impactar balanceamento e escalabilidade</li>
+        </ul>
+        <div class="slide-footer">
+          <div class="footer-bar">02 - Load Balancer, Rate Limiting &amp; Throttling</div>
+          <div class="footer-page">9</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: CASO REAL NETFLIX ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Caso Real: Netflix - Distribuição de Tráfego</h2>
+        </div>
+        <p>Netflix usa Eureka para service discovery e Ribbon para client-side load balancing entre microsserviços.</p>
+        <ul>
+          <li><strong>Eureka:</strong> registro e localização dinâmica de serviços</li>
+          <li><strong>Ribbon:</strong> balanceamento de carga no lado do cliente com algoritmos configuráveis</li>
+          <li>Permite escalabilidade e resiliência em ambiente distribuído</li>
+        </ul>
+        <div class="slide-footer">
+          <div class="footer-bar">02 - Load Balancer, Rate Limiting &amp; Throttling</div>
+          <div class="footer-page">10</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: EXEMPLO RIBBON EM JAVA ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Exemplo Ribbon Client-Side Load Balancer (Java)</h2>
+        </div>
+        <pre><code class="language-java">
+@LoadBalanced
+@Bean
+public RestTemplate restTemplate() {
+  return new RestTemplate();
+}
+
+// Uso
+String url = "http://microservice/api/resource";
+ResponseEntity<String> response = restTemplate.getForEntity(url, String.class);
+        </code></pre>
+        <p>Ribbon escolhe a instância do microserviço automaticamente.</p>
+        <div class="slide-footer">
+          <div class="footer-bar">02 - Load Balancer, Rate Limiting &amp; Throttling</div>
+          <div class="footer-page">11</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: INTERVALO ==================== -->
+      <section class="break-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <h2>Intervalo</h2>
+        <h3>21h00 – 21h20</h3>
+        <p>☕ Aproveite a pausa para recarregar as energias!</p>
+        <div class="slide-footer">
+          <div class="footer-bar">02 - Load Balancer, Rate Limiting &amp; Throttling</div>
+          <div class="footer-page">12</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: BLOCO 2 - RATE LIMITING E THROTTLING ==================== -->
+      <section class="section-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="accent-bar"></div>
+        <h2>Bloco 2<br>Rate Limiting e Throttling</h2>
+        <div class="slide-footer">
+          <div class="footer-bar">02 - Load Balancer, Rate Limiting &amp; Throttling</div>
+          <div class="footer-page">13</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: O QUE É RATE LIMITING E THROTTLING ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>O que é Rate Limiting e Throttling?</h2>
+        </div>
+        <p><strong>Rate Limiting:</strong> Limita o número de requisições que um cliente pode fazer em um período de tempo.</p>
+        <p><strong>Throttling:</strong> Controla a taxa de requisições permitindo ou rejeitando conforme regras para evitar sobrecarga.</p>
+        <ul>
+          <li>Protege APIs contra abuso e ataques</li>
+          <li>Garante estabilidade e qualidade do serviço</li>
+        </ul>
+        <div class="slide-footer">
+          <div class="footer-bar">02 - Load Balancer, Rate Limiting &amp; Throttling</div>
+          <div class="footer-page">14</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: ALGORITMOS DE RATE LIMITING ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Algoritmos de Rate Limiting</h2>
+        </div>
+        <ul>
+          <li><strong>Token Bucket:</strong> Tokens são adicionados a um balde e consumidos por requisições, permitindo rajadas controladas</li>
+          <li><strong>Sliding Window:</strong> Janela de tempo móvel que contabiliza requisições para controlar taxa</li>
+        </ul>
+        <div class="slide-footer">
+          <div class="footer-bar">02 - Load Balancer, Rate Limiting &amp; Throttling</div>
+          <div class="footer-page">15</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: EXEMPLO TOKEN BUCKET EM NODE.JS ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Exemplo Token Bucket em Node.js</h2>
+        </div>
+        <pre><code class="language-javascript">
+const rateLimit = require('express-rate-limit');
+
+const limiter = rateLimit({
+  windowMs: 60 * 1000, // 1 minuto
+  max: 100, // limite de 100 requisições por IP
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+app.use(limiter);
+        </code></pre>
+        <div class="slide-footer">
+          <div class="footer-bar">02 - Load Balancer, Rate Limiting &amp; Throttling</div>
+          <div class="footer-page">16</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: EXEMPLO SLIDING WINDOW EM .NET ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Exemplo Sliding Window Middleware em .NET/C#</h2>
+        </div>
+        <pre><code class="language-csharp">
+public class SlidingWindowRateLimiterMiddleware
+{
+    private readonly RequestDelegate _next;
+    private static readonly MemoryCache Cache = new MemoryCache(new MemoryCacheOptions());
+
+    public SlidingWindowRateLimiterMiddleware(RequestDelegate next) => _next = next;
+
+    public async Task Invoke(HttpContext context)
+    {
+        var key = context.Connection.RemoteIpAddress.ToString();
+        var now = DateTime.UtcNow;
+
+        var timestamps = Cache.GetOrCreate(key, entry =>
+        {
+            entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(1);
+            return new List<DateTime>();
+        });
+
+        timestamps.RemoveAll(t => t < now.AddSeconds(-60));
+        if (timestamps.Count >= 100)
+        {
+            context.Response.StatusCode = 429;
+            await context.Response.WriteAsync("Too many requests");
+            return;
+        }
+
+        timestamps.Add(now);
+        await _next(context);
+    }
+}
+        </code></pre>
+        <div class="slide-footer">
+          <div class="footer-bar">02 - Load Balancer, Rate Limiting &amp; Throttling</div>
+          <div class="footer-page">17</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: RATE LIMITING COM NGINX ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Implementação Rate Limiting com Nginx</h2>
+        </div>
+        <pre><code class="language-nginx">
+http {
+  limit_req_zone $binary_remote_addr zone=one:10m rate=10r/s;
+
+  server {
+    location /api/ {
+      limit_req zone=one burst=20 nodelay;
+      proxy_pass http://backend;
+    }
+  }
+}
+        </code></pre>
+        <p>Configura limite de 10 requisições por segundo por IP com rajadas de até 20.</p>
+        <div class="slide-footer">
+          <div class="footer-bar">02 - Load Balancer, Rate Limiting &amp; Throttling</div>
+          <div class="footer-page">18</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: EXERCÍCIO PRÁTICO ==================== -->
+      <section class="exercise-slide content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Exercício Hands-On</h2>
+          <h3>Configurar Load Balancer com Docker Compose + 3 réplicas API Node.js</h3>
+        </div>
+        <div class="exercise-container">
+          <div class="exercise-steps">
+            <ol>
+              <li>Crie um serviço Node.js simples que retorne "Hello from <em>instance</em> #n"</li>
+              <li>Configure 3 réplicas deste serviço no <code>docker-compose.yml</code></li>
+              <li>Adicione um serviço de load balancer (ex: Nginx) que distribua requisições entre as réplicas</li>
+              <li>Teste acessando o LB e observe as respostas das diferentes instâncias</li>
+              <li>Experimente alterar o algoritmo de load balancing no Nginx (round robin, ip_hash)</li>
+            </ol>
+          </div>
+        </div>
+        <div class="slide-footer">
+          <div class="footer-bar">02 - Load Balancer, Rate Limiting &amp; Throttling</div>
+          <div class="footer-page">19</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: QUIZ 1 - ALGORITMOS DE LOAD BALANCING ==================== -->
+      <section class="quiz-slide content-slide" data-quiz="true">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Quiz 1: Algoritmos de Load Balancing</h2>
+        </div>
+        <form>
+          <p>Qual algoritmo de load balancing usa o IP do cliente para decidir qual servidor receberá a requisição?</p>
+          <label><input type="radio" name="q1" data-correct="false" /> Round Robin</label><br/>
+          <label><input type="radio" name="q1" data-correct="true" /> IP Hash</label><br/>
+          <label><input type="radio" name="q1" data-correct="false" /> Least Connections</label><br/>
+          <label><input type="radio" name="q1" data-correct="false" /> Weighted</label>
+        </form>
+        <div class="quiz-feedback" aria-live="polite"></div>
+        <div class="slide-footer">
+          <div class="footer-bar">02 - Load Balancer, Rate Limiting &amp; Throttling</div>
+          <div class="footer-page">20</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: QUIZ 2 - RATE LIMITING ==================== -->
+      <section class="quiz-slide content-slide" data-quiz="true">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Quiz 2: Rate Limiting</h2>
+        </div>
+        <form>
+          <p>Qual algoritmo de Rate Limiting permite rajadas controladas de requisições por meio de tokens?</p>
+          <label><input type="radio" name="q2" data-correct="true" /> Token Bucket</label><br/>
+          <label><input type="radio" name="q2" data-correct="false" /> Sliding Window</label><br/>
+          <label><input type="radio" name="q2" data-correct="false" /> Round Robin</label><br/>
+          <label><input type="radio" name="q2" data-correct="false" /> Least Connections</label>
+        </form>
+        <div class="quiz-feedback" aria-live="polite"></div>
+        <div class="slide-footer">
+          <div class="footer-bar">02 - Load Balancer, Rate Limiting &amp; Throttling</div>
+          <div class="footer-page">21</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: RESUMO FINAL ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Resumo</h2>
+        </div>
+        <ul>
+          <li>Load Balancing distribui carga para garantir alta disponibilidade e desempenho</li>
+          <li>Algoritmos como Round Robin, Least Connections e IP Hash têm usos específicos</li>
+          <li>Health Checks e Sticky Sessions são importantes para estabilidade e experiência</li>
+          <li>Rate Limiting e Throttling protegem APIs contra abuso e ajudam a gerenciar recursos</li>
+          <li>Implementações práticas com Nginx, Node.js e .NET são comuns no mercado</li>
+        </ul>
+        <div class="slide-footer">
+          <div class="footer-bar">02 - Load Balancer, Rate Limiting &amp; Throttling</div>
+          <div class="footer-page">22</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: DÚVIDAS OU CURIOSIDADES ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Dúvidas ou curiosidades?</h2>
+        </div>
+        <div style="display:flex; align-items:center; justify-content:center; flex:1; font-size:4em; color: var(--fiap-dark); font-weight:800; opacity:0.15; margin-top:40px;">
+          ?
+        </div>
+        <div class="slide-footer">
+          <div class="footer-bar">02 - Load Balancer, Rate Limiting &amp; Throttling</div>
+          <div class="footer-page">23</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: ENCERRAMENTO ==================== -->
+      <section class="end-slide">
+        <img src="../assets/img/fiap-logo-graduacao.png" alt="FIAP Graduação" style="max-width:350px;" />
+        <div class="copyright">
+          Copyright &copy; 2026<br />
+          Prof.º José Romualdo da Costa Filho<br /><br />
+          Todos direitos reservados. Reprodução ou divulgação total ou parcial<br />
+          deste documento é expressamente proibido sem o consentimento formal,<br />
+          por escrito, do Professor (autor).
+        </div>
+      </section>
+
+    </div>
+  </div>
+
+  <script src="../node_modules/reveal.js/dist/reveal.js"></script>
+  <script src="../node_modules/reveal.js/plugin/highlight/highlight.js"></script>
+  <script src="../assets/js/fiap-quiz.js"></script>
+  <script>
+    Reveal.initialize({
+      hash: true,
+      slideNumber: false,
+      width: 1280,
+      height: 720,
+      margin: 0,
+      minScale: 0.2,
+      maxScale: 2.0,
+      center: false,
+      transition: 'slide',
+      transitionSpeed: 'default',
+      scrollActivationWidth: null,
+      view: null,
+      plugins: [RevealHighlight]
+    });
+  </script>
+</body>
+</html>

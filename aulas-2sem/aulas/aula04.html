@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>AULA 04 - Dados em Microsservicos | FIAP</title>
+  <link rel="stylesheet" href="../node_modules/reveal.js/dist/reveal.css" />
+  <link rel="stylesheet" href="../node_modules/reveal.js/dist/theme/white.css" />
+  <link rel="stylesheet" href="../node_modules/reveal.js/plugin/highlight/monokai.css" />
+  <link rel="stylesheet" href="../assets/css/fiap-theme.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+</head>
+<body>
+  <div class="reveal">
+    <div class="slides">
+
+      <!-- ==================== SLIDE: CAPA FIAP ==================== -->
+      <section class="cover-slide">
+        <img src="../assets/img/fiap-logo-graduacao.png" alt="FIAP Graduação" class="fiap-logo-full" />
+      </section>
+
+      <!-- ==================== SLIDE: TÍTULO DA AULA ==================== -->
+      <section class="title-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="title-card">
+          <div class="accent-bar"></div>
+          <h1>Dados em Microsserviços</h1>
+          <h2>Microservice and Web Engineering</h2>
+          <h3>Prof. José Romualdo</h3>
+        </div>
+        <div class="lesson-bar">04 - Dados em Microsservicos</div>
+      </section>
+
+      <!-- ==================== SLIDE: AGENDA ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Agenda</h2>
+        </div>
+        <table>
+          <thead>
+            <tr><th>Bloco</th><th>Horário</th><th>Conteúdo</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><strong>Bloco 1</strong></td><td>19h30 – 21h00</td><td>Database per Service, Shared DB, Saga, Event Sourcing, CQRS, Caso real Noisy Neighbor</td></tr>
+            <tr><td><strong>Intervalo</strong></td><td>21h00 – 21h20</td><td>☕ Pausa</td></tr>
+            <tr><td><strong>Bloco 2</strong></td><td>21h20 – 22h45</td><td>Exercício prático: Fluxo Saga + Quiz</td></tr>
+          </tbody>
+        </table>
+        <div class="slide-footer">
+          <div class="footer-bar">04 - Dados em Microsservicos</div>
+          <div class="footer-page">3</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: SEÇÃO BLOCO 1 ==================== -->
+      <section class="section-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="accent-bar"></div>
+        <h2>Bloco 1:<br>Database per Service Pattern</h2>
+        <div class="slide-footer">
+          <div class="footer-bar">04 - Dados em Microsservicos</div>
+          <div class="footer-page">4</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: Database per Service Pattern ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Database per Service Pattern</h2>
+        </div>
+        <p>Cada microsserviço possui seu próprio banco de dados, garantindo independência e menor acoplamento.</p>
+        <ul>
+          <li>Isolamento entre serviços</li>
+          <li>Escalabilidade independente</li>
+          <li>Flexibilidade na escolha da tecnologia de BD</li>
+          <li>Desafios: consistência e transações distribuídas</li>
+        </ul>
+        <div class="slide-footer">
+          <div class="footer-bar">04 - Dados em Microsservicos</div>
+          <div class="footer-page">5</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: Shared Database (anti-pattern e quando faz sentido) ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Shared Database</h2>
+          <h3>Anti-pattern e Quando Faz Sentido</h3>
+        </div>
+        <p><strong>Anti-pattern:</strong> vários serviços acessam o mesmo banco, causando alto acoplamento e riscos de inconsistência.</p>
+        <p><strong>Quando pode ser usado:</strong></p>
+        <ul>
+          <li>Legado com tempo curto para migração</li>
+          <li>Ambientes controlados e pequenos</li>
+          <li>Quando a consistência forte é mandatória e difícil de se implementar de outra forma</li>
+        </ul>
+        <div class="slide-footer">
+          <div class="footer-bar">04 - Dados em Microsservicos</div>
+          <div class="footer-page">6</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: Saga Pattern (Orquestração vs Coreografia) ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Saga Pattern</h2>
+          <h3>Orquestração vs Coreografia</h3>
+        </div>
+        <p>Sagas são sequências de transações locais que mantêm a consistência eventual em microsserviços.</p>
+        <table>
+          <thead>
+            <tr><th>Orquestração</th><th>Coreografia</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Um serviço central controla o fluxo</td>
+              <td>Serviços reagem a eventos e decidem ações</td>
+            </tr>
+            <tr>
+              <td>Mais fácil de entender e monitorar</td>
+              <td>Mais flexível e desacoplado</td>
+            </tr>
+            <tr>
+              <td>Pode ser ponto único de falha</td>
+              <td>Difícil de rastrear e depurar</td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="slide-footer">
+          <div class="footer-bar">04 - Dados em Microsservicos</div>
+          <div class="footer-page">7</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: Event Sourcing ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Event Sourcing</h2>
+        </div>
+        <p>Técnica que armazena o estado do sistema como uma sequência de eventos imutáveis.</p>
+        <ul>
+          <li>Reconstroi o estado atual a partir do histórico de eventos</li>
+          <li>Facilita auditoria e debugging</li>
+          <li>Integração natural com sistemas baseados em eventos</li>
+          <li>Desafios: complexidade e volume de dados</li>
+        </ul>
+        <div class="slide-footer">
+          <div class="footer-bar">04 - Dados em Microsservicos</div>
+          <div class="footer-page">8</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: CQRS Distribuído ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>CQRS Distribuído</h2>
+          <h3>Command Query Responsibility Segregation</h3>
+        </div>
+        <p>Separação dos modelos de leitura e escrita para otimizar performance e escalabilidade.</p>
+        <ul>
+          <li>Escrita: foco em consistência e regras de negócio</li>
+          <li>Leitura: otimizada para consultas rápidas e específicas</li>
+          <li>Em microsserviços: replicação e sincronização de dados podem ser desafiadoras</li>
+        </ul>
+        <div class="slide-footer">
+          <div class="footer-bar">04 - Dados em Microsservicos</div>
+          <div class="footer-page">9</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: Caso real - Noisy Neighbor em aplicações multi-tenant ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Caso Real: Noisy Neighbor em aplicações multi-tenant</h2>
+        </div>
+        <p>Noisy Neighbor: quando um tenant consome recursos excessivamente, impactando os demais.</p>
+        <p>Salesforce usa estratégias avançadas de particionamento para isolar tenants:</p>
+        <ul>
+          <li>Isolamento por banco de dados dedicado ou schemas separados</li>
+          <li>Rate limiting e QoS para limitar impacto</li>
+          <li>Monitoramento contínuo e auto scaling</li>
+          <li>Uso de filas e caching para desacoplar cargas</li>
+        </ul>
+        <div class="slide-footer">
+          <div class="footer-bar">04 - Dados em Microsservicos</div>
+          <div class="footer-page">10</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: Exemplos práticos Database per Service ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Exemplos práticos: Database per Service</h2>
+        </div>
+        <p>Exemplo Java / Spring Boot: configuração de datasource para serviço de pedidos</p>
+        <pre><code class="language-java">
+// Exemplo datasource em application.yml
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/orderdb
+    username: user
+    password: pass
+        </code></pre>
+        <p>.NET/C# usando EF Core para contexto específico</p>
+        <pre><code class="language-csharp">
+public class OrderContext : DbContext
+{
+    public OrderContext(DbContextOptions&lt;OrderContext&gt; options) 
+        : base(options) { }
+
+    public DbSet&lt;Order&gt; Orders { get; set; }
+}
+        </code></pre>
+        <p>Node.js com Sequelize configurando conexão para estoque</p>
+        <pre><code class="language-javascript">
+const Sequelize = require('sequelize');
+const estoqueDB = new Sequelize('estoquedb', 'user', 'pass', {
+  host: 'localhost',
+  dialect: 'mysql'
+});
+        </code></pre>
+        <div class="slide-footer">
+          <div class="footer-bar">04 - Dados em Microsservicos</div>
+          <div class="footer-page">11</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: Quiz 1 - Saga Orquestração vs Coreografia ==================== -->
+      <section class="quiz-slide content-slide" data-correct="b" data-quiz-feedback="A resposta correta é B: Na orquestração, um serviço central controla o fluxo da saga, enquanto na coreografia, os serviços reagem a eventos." >
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Quiz: Saga Pattern</h2>
+          <h3>Qual a principal diferença entre orquestração e coreografia?</h3>
+        </div>
+        <form class="quiz-options">
+          <label><input type="radio" name="q1" value="a" /> A) Coreografia usa um serviço central para coordenar a saga.</label><br/>
+          <label><input type="radio" name="q1" value="b" /> B) Orquestração usa um serviço central para coordenar a saga.</label><br/>
+          <label><input type="radio" name="q1" value="c" /> C) Orquestração e Coreografia são sinônimos.</label><br/>
+          <label><input type="radio" name="q1" value="d" /> D) Coreografia exige banco de dados compartilhado.</label>
+        </form>
+        <div class="quiz-feedback"></div>
+        <div class="slide-footer">
+          <div class="footer-bar">04 - Dados em Microsservicos</div>
+          <div class="footer-page">12</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: Quiz 2 - Noisy Neighbor ==================== -->
+      <section class="quiz-slide content-slide" data-correct="a" data-quiz-feedback="Resposta correta: A. Noisy Neighbor ocorre quando um tenant usa recursos excessivamente afetando outros tenants." >
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Quiz: Noisy Neighbor</h2>
+          <h3>O que é o problema Noisy Neighbor em ambientes multi-tenant?</h3>
+        </div>
+        <form class="quiz-options">
+          <label><input type="radio" name="q2" value="a" /> A) Um tenant consome recursos excessivamente impactando os demais.</label><br/>
+          <label><input type="radio" name="q2" value="b" /> B) Um tenant fica isolado completamente sem acesso aos recursos.</label><br/>
+          <label><input type="radio" name="q2" value="c" /> C) Um tenant compartilha dados indevidamente com outros tenants.</label><br/>
+          <label><input type="radio" name="q2" value="d" /> D) Um tenant provoca falha total do sistema.</label>
+        </form>
+        <div class="quiz-feedback"></div>
+        <div class="slide-footer">
+          <div class="footer-bar">04 - Dados em Microsservicos</div>
+          <div class="footer-page">13</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: Intervalo ==================== -->
+      <section class="break-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <h2>Intervalo</h2>
+        <p>21h00 – 21h20<br>☕ Aproveite para descansar e se preparar para o próximo bloco.</p>
+        <div class="slide-footer">
+          <div class="footer-bar">04 - Dados em Microsservicos</div>
+          <div class="footer-page">14</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: SEÇÃO BLOCO 2 ==================== -->
+      <section class="section-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="accent-bar"></div>
+        <h2>Bloco 2:<br>Exercício Hands-on</h2>
+        <div class="slide-footer">
+          <div class="footer-bar">04 - Dados em Microsservicos</div>
+          <div class="footer-page">15</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: Exercício prático - Modelar fluxo Saga ==================== -->
+      <section class="exercise-slide content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Exercício: Modelar fluxo Saga para sistema e-commerce</h2>
+          <h3>Pedido → Pagamento → Estoque → Envio</h3>
+        </div>
+
+        <div class="exercise-container">
+          <p>Passos para o exercício:</p>
+          <ol class="exercise-steps">
+            <li>Desenhe o diagrama da saga, indicando as transações e compensações.</li>
+            <li>Defina se usará orquestração ou coreografia e justifique.</li>
+            <li>Escreva pseudocódigo para o fluxo do serviço de pagamento.</li>
+            <li>Inclua exemplos de mensagens/eventos usados na comunicação.</li>
+          </ol>
+          <p>Use os recursos da aula para apoiar sua modelagem.</p>
+        </div>
+
+        <div class="slide-footer">
+          <div class="footer-bar">04 - Dados em Microsservicos</div>
+          <div class="footer-page">16</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: Exemplo pseudocódigo Saga Orquestração ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Exemplo: Pseudocódigo Saga Orquestração para Pagamento</h2>
+        </div>
+        <pre><code class="language-javascript">
+// Orquestrador controla o fluxo da saga
+async function processOrderSaga(orderId) {
+  try {
+    await pedidoService.createOrder(orderId);
+    await pagamentoService.processPayment(orderId);
+    await estoqueService.reserveStock(orderId);
+    await envioService.scheduleShipment(orderId);
+    await orquestrador.confirmSaga(orderId);
+  } catch (error) {
+    await orquestrador.compensateSaga(orderId);
+  }
+}
+        </code></pre>
+        <div class="slide-footer">
+          <div class="footer-bar">04 - Dados em Microsservicos</div>
+          <div class="footer-page">17</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: Exemplo pseudocódigo Saga Coreografia ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Exemplo: Pseudocódigo Saga Coreografia para Pagamento</h2>
+        </div>
+        <pre><code class="language-javascript">
+// Serviço Pagamento escuta evento PedidoCriado
+pedidoService.on('PedidoCriado', async (order) =&gt; {
+  try {
+    await pagamentoService.processPayment(order.id);
+    pagamentoService.emit('PagamentoRealizado', { orderId: order.id });
+  } catch (err) {
+    pagamentoService.emit('PagamentoFalhou', { orderId: order.id });
+  }
+});
+        </code></pre>
+        <p>Outros serviços escutam esses eventos e agem conforme necessário.</p>
+        <div class="slide-footer">
+          <div class="footer-bar">04 - Dados em Microsservicos</div>
+          <div class="footer-page">18</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: Caso real Salesforce e particionamento ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Caso Real: Isolamento de Tenants na Salesforce</h2>
+        </div>
+        <p>Salesforce usa múltiplas estratégias para garantir isolamento e performance: </p>
+        <ul>
+          <li><strong>Particionamento por tenant:</strong> bancos de dados separados ou schemas isolados</li>
+          <li><strong>Rate limiting:</strong> controla uso excessivo de recursos</li>
+          <li><strong>Uso de caches locais e globais:</strong> diminui latência e carga</li>
+          <li><strong>Monitoramento e alertas:</strong> detecta e mitiga noisy neighbors</li>
+        </ul>
+        <div class="slide-footer">
+          <div class="footer-bar">04 - Dados em Microsservicos</div>
+          <div class="footer-page">19</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: Quiz 3 - Escolha do padrão Saga ==================== -->
+      <section class="quiz-slide content-slide" data-correct="c" data-quiz-feedback="Correto! Orquestração centraliza o controle da saga, coreografia distribui o controle entre serviços." >
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Quiz: Quando usar Orquestração no Saga Pattern?</h2>
+        </div>
+        <form class="quiz-options">
+          <label><input type="radio" name="q3" value="a" /> A) Quando quer mais desacoplamento e flexibilidade</label><br/>
+          <label><input type="radio" name="q3" value="b" /> B) Quando o sistema é baseado só em eventos</label><br/>
+          <label><input type="radio" name="q3" value="c" /> C) Quando deseja controle centralizado e monitoramento facilitado</label><br/>
+          <label><input type="radio" name="q3" value="d" /> D) Quando não precisa de compensações</label>
+        </form>
+        <div class="quiz-feedback"></div>
+        <div class="slide-footer">
+          <div class="footer-bar">04 - Dados em Microsservicos</div>
+          <div class="footer-page">20</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: Dúvidas ou curiosidades? ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Dúvidas ou curiosidades?</h2>
+        </div>
+        <div style="display:flex; align-items:center; justify-content:center; flex:1; font-size:4em; color: var(--fiap-dark); font-weight:800; opacity:0.15; margin-top:40px;">
+          ?
+        </div>
+        <div class="slide-footer">
+          <div class="footer-bar">04 - Dados em Microsservicos</div>
+          <div class="footer-page">21</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: ENCERRAMENTO ==================== -->
+      <section class="end-slide">
+        <img src="../assets/img/fiap-logo-graduacao.png" alt="FIAP Graduação" style="max-width:350px;" />
+        <div class="copyright">
+          Copyright &copy; 2026<br />
+          Prof.º José Romualdo da Costa Filho<br /><br />
+          Todos direitos reservados. Reprodução ou divulgação total ou parcial<br />
+          deste documento é expressamente proibido sem o consentimento formal,<br />
+          por escrito, do Professor (autor).
+        </div>
+      </section>
+
+    </div>
+  </div>
+
+  <script src="../node_modules/reveal.js/dist/reveal.js"></script>
+  <script src="../node_modules/reveal.js/plugin/highlight/highlight.js"></script>
+  <script src="../assets/js/fiap-quiz.js"></script>
+  <script>
+    Reveal.initialize({
+      hash: true,
+      slideNumber: false,
+      width: 1280,
+      height: 720,
+      margin: 0,
+      minScale: 0.2,
+      maxScale: 2.0,
+      center: false,
+      transition: 'slide',
+      transitionSpeed: 'default',
+      scrollActivationWidth: null,
+      view: null,
+      plugins: [RevealHighlight]
+    });
+  </script>
+</body>
+</html>

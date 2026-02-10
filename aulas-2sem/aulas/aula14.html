@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Aula 14 – Orquestração de Containers | FIAP</title>
+  <link rel="stylesheet" href="../node_modules/reveal.js/dist/reveal.css" />
+  <link rel="stylesheet" href="../node_modules/reveal.js/dist/theme/white.css" />
+  <link rel="stylesheet" href="../node_modules/reveal.js/plugin/highlight/monokai.css" />
+  <link rel="stylesheet" href="../assets/css/fiap-theme.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+</head>
+<body>
+  <div class="reveal">
+    <div class="slides">
+
+      <!-- ==================== SLIDE: CAPA FIAP ==================== -->
+      <section class="cover-slide">
+        <img src="../assets/img/fiap-logo-graduacao.png" alt="FIAP Graduação" class="fiap-logo-full" />
+      </section>
+
+      <!-- ==================== SLIDE: TÍTULO DA AULA ==================== -->
+      <section class="title-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="title-card">
+          <div class="accent-bar"></div>
+          <h1>Sistemas de Informação</h1>
+          <h2>Orquestração de Containers</h2>
+          <h3>Prof. José Romualdo</h3>
+        </div>
+        <div class="lesson-bar">AULA 14 – Orquestração de Containers</div>
+      </section>
+
+      <!-- ==================== SLIDE: AGENDA ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Agenda</h2>
+        </div>
+
+        <table>
+          <thead>
+            <tr><th>Bloco</th><th>Horário</th><th>Conteúdo</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><strong>Bloco 1</strong></td><td>19h30 – 21h00</td><td>Docker Swarm, Introdução a Kubernetes, Helm Charts básico e caso real Globo.com</td></tr>
+            <tr><td><strong>Intervalo</strong></td><td>21h00 – 21h20</td><td>☕ Pausa</td></tr>
+            <tr><td><strong>Bloco 2</strong></td><td>21h20 – 22h45</td><td>Exercício prático com Docker Swarm + Quiz sobre Kubernetes e Docker Swarm</td></tr>
+          </tbody>
+        </table>
+
+        <div class="slide-footer">
+          <div class="footer-bar">14 – Orquestração de Containers</div>
+          <div class="footer-page">3</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: SEÇÃO DO BLOCO 1 ==================== -->
+      <section class="section-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="accent-bar"></div>
+        <h2>Bloco 1</h2>
+        <h3>Docker Swarm, Kubernetes e Helm Charts</h3>
+        <div class="slide-footer">
+          <div class="footer-bar">14 – Orquestração de Containers</div>
+          <div class="footer-page">4</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: Docker Swarm - Introdução ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Docker Swarm</h2>
+          <h3>Visão Geral</h3>
+        </div>
+        <p>Docker Swarm é a solução nativa do Docker para orquestração de containers, possibilitando a criação, gerenciamento e escalonamento de clusters Docker.</p>
+        <ul>
+          <li><strong>Services:</strong> Definem a aplicação e o conjunto de containers que serão executados.</li>
+          <li><strong>Replicas:</strong> Número de instâncias do serviço em execução para garantir disponibilidade.</li>
+          <li><strong>Rolling Updates:</strong> Atualizações contínuas sem downtime, substituindo containers gradualmente.</li>
+          <li><strong>Overlay Networks:</strong> Redes virtuais que interligam containers em diferentes hosts.</li>
+        </ul>
+        <div class="slide-footer">
+          <div class="footer-bar">14 – Orquestração de Containers</div>
+          <div class="footer-page">5</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: Docker Swarm - Exemplo de Serviço ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Docker Swarm</h2>
+          <h3>Exemplo: Criar serviço com 3 réplicas</h3>
+        </div>
+        <pre><code class="language-bash">docker service create --name webapp --replicas 3 -p 80:80 nginx:latest</code></pre>
+        <p>Este comando cria um serviço chamado <code>webapp</code> com 3 réplicas do container Nginx, expondo a porta 80.</p>
+        <div class="slide-footer">
+          <div class="footer-bar">14 – Orquestração de Containers</div>
+          <div class="footer-page">6</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: Docker Swarm - Rolling Update ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Docker Swarm</h2>
+          <h3>Rolling Update</h3>
+        </div>
+        <p>Atualização gradual do serviço para uma nova imagem sem downtime.</p>
+        <pre><code class="language-bash">docker service update --image nginx:1.21 webapp</code></pre>
+        <p>O Swarm atualiza as réplicas uma a uma, garantindo alta disponibilidade do serviço.</p>
+        <div class="slide-footer">
+          <div class="footer-bar">14 – Orquestração de Containers</div>
+          <div class="footer-page">7</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: Introdução a Kubernetes ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Introdução a Kubernetes</h2>
+          <h3>Componentes básicos</h3>
+        </div>
+        <ul>
+          <li><strong>Pods:</strong> Menor unidade de deploy, contém um ou mais containers que compartilham recursos.</li>
+          <li><strong>Services:</strong> Abstração para expor Pods como serviços estáveis e acessíveis.</li>
+          <li><strong>Deployments:</strong> Controlam atualizações e escalabilidade dos Pods.</li>
+          <li><strong>ConfigMaps:</strong> Armazenam dados de configuração não sensíveis para os containers.</li>
+          <li><strong>Secrets:</strong> Armazenam dados sensíveis, como senhas e tokens, de forma segura.</li>
+        </ul>
+        <div class="slide-footer">
+          <div class="footer-bar">14 – Orquestração de Containers</div>
+          <div class="footer-page">8</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: Kubernetes - Exemplo de Pod ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Kubernetes</h2>
+          <h3>Exemplo de definição de Pod (YAML)</h3>
+        </div>
+        <pre><code class="language-yaml">apiVersion: v1
+kind: Pod
+metadata:
+  name: meu-pod
+spec:
+  containers:
+  - name: app
+    image: node:14-alpine
+    ports:
+    - containerPort: 3000
+</code></pre>
+        <div class="slide-footer">
+          <div class="footer-bar">14 – Orquestração de Containers</div>
+          <div class="footer-page">9</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: Kubernetes - Deployment e Rolling Update ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Kubernetes</h2>
+          <h3>Deployment e Rolling Update</h3>
+        </div>
+        <p>Deployment gerencia réplicas e atualizações automáticas de Pods.</p>
+        <pre><code class="language-yaml">apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app-deployment
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: meu-app
+  template:
+    metadata:
+      labels:
+        app: meu-app
+    spec:
+      containers:
+      - name: app
+        image: meuapp:v1
+        ports:
+        - containerPort: 8080
+</code></pre>
+        <p>Para atualizar, basta alterar a imagem e aplicar o YAML, Kubernetes fará rolling update.</p>
+        <div class="slide-footer">
+          <div class="footer-bar">14 – Orquestração de Containers</div>
+          <div class="footer-page">10</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: Kubernetes - ConfigMaps e Secrets ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Kubernetes</h2>
+          <h3>ConfigMaps e Secrets</h3>
+        </div>
+        <p>Permitem separar configurações e dados sensíveis do container.</p>
+        <pre><code class="language-yaml">apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-config
+data:
+  LOG_LEVEL: "DEBUG"
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: app-secret
+type: Opaque
+data:
+  DB_PASSWORD: c2VuaGExMjM=  # base64 encoded senha123
+</code></pre>
+        <p>Pod pode consumir ConfigMaps e Secrets via variáveis de ambiente ou volumes.</p>
+        <div class="slide-footer">
+          <div class="footer-bar">14 – Orquestração de Containers</div>
+          <div class="footer-page">11</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: Helm Charts Básico ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Helm Charts</h2>
+          <h3>Gerenciamento simplificado de aplicações Kubernetes</h3>
+        </div>
+        <p>Helm é um gerenciador de pacotes para Kubernetes que facilita deploy, upgrade e rollback de aplicações.</p>
+        <ul>
+          <li><strong>Chart:</strong> Pacote que contém templates e configurações para deployar uma aplicação.</li>
+          <li><strong>Values.yaml:</strong> Arquivo para parametrizar o Chart.</li>
+          <li><strong>Releases:</strong> Instâncias deployadas de um Chart.</li>
+        </ul>
+        <pre><code class="language-bash">helm install meu-app ./chart-meu-app
+helm upgrade meu-app ./chart-meu-app</code></pre>
+        <div class="slide-footer">
+          <div class="footer-bar">14 – Orquestração de Containers</div>
+          <div class="footer-page">12</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: Caso Real Globo.com ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Caso Real: Globo.com</h2>
+          <h3>Migração de monolito para Kubernetes</h3>
+        </div>
+        <p>A Globo.com enfrentou desafios comuns na migração de sua plataforma monolítica para arquitetura baseada em Kubernetes:</p>
+        <ul>
+          <li><strong>Desafios:</strong> Reestruturação da aplicação, adaptação de pipelines CI/CD, e gerenciamento do estado da aplicação.</li>
+          <li><strong>Lições aprendidas:</strong> Importância do uso de ConfigMaps e Secrets, monitoramento ativo, e automação com Helm Charts.</li>
+          <li><strong>Resultado:</strong> Melhor escalabilidade, resiliência e agilidade no desenvolvimento.</li>
+        </ul>
+        <div class="slide-footer">
+          <div class="footer-bar">14 – Orquestração de Containers</div>
+          <div class="footer-page">13</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: Intervalo ==================== -->
+      <section class="break-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="slide-title-area" style="text-align:center;">
+          <div class="accent-bar"></div>
+          <h2>Intervalo</h2>
+          <h3>21h00 – 21h20</h3>
+          <p>☕ Aproveite para descansar e se preparar para o próximo bloco.</p>
+        </div>
+        <div class="slide-footer">
+          <div class="footer-bar">14 – Orquestração de Containers</div>
+          <div class="footer-page">14</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: SEÇÃO BLOCO 2 ==================== -->
+      <section class="section-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="accent-bar"></div>
+        <h2>Bloco 2</h2>
+        <h3>Exercício prático e Quiz</h3>
+        <div class="slide-footer">
+          <div class="footer-bar">14 – Orquestração de Containers</div>
+          <div class="footer-page">15</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: Exercício Hands-on ==================== -->
+      <section class="content-slide exercise-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Exercício Prático</h2>
+          <h3>Deploy de aplicação com Docker Swarm</h3>
+        </div>
+
+        <div class="exercise-container">
+          <p><strong>Objetivos:</strong></p>
+          <ul>
+            <li>Criar um serviço com 3 réplicas.</li>
+            <li>Executar um rolling update para atualizar a imagem do serviço.</li>
+            <li>Testar a alta disponibilidade do serviço durante o update.</li>
+          </ul>
+          <p><strong>Passos:</strong></p>
+          <ol class="exercise-steps">
+            <li>Inicie o swarm (se ainda não iniciado): <code>docker swarm init</code></li>
+            <li>Crie o serviço com 3 réplicas usando a imagem <code>nginx:latest</code>:</li>
+            <pre><code class="language-bash">docker service create --name exercicio-webapp --replicas 3 -p 8080:80 nginx:latest</code></pre>
+            <li>Verifique o status do serviço e réplicas:</li>
+            <pre><code class="language-bash">docker service ls
+docker service ps exercicio-webapp</code></pre>
+            <li>Atualize o serviço para a imagem <code>nginx:1.21</code> com rolling update:</li>
+            <pre><code class="language-bash">docker service update --image nginx:1.21 exercicio-webapp</code></pre>
+            <li>Testar a disponibilidade acessando <code>http://localhost:8080</code> durante a atualização.</li>
+            <li>Repita a verificação do status do serviço para confirmar a atualização:</li>
+            <pre><code class="language-bash">docker service ps exercicio-webapp</code></pre>
+            <li>Finalize o exercício removendo o serviço:</li>
+            <pre><code class="language-bash">docker service rm exercicio-webapp</code></pre>
+          </ol>
+        </div>
+
+        <div class="slide-footer">
+          <div class="footer-bar">14 – Orquestração de Containers</div>
+          <div class="footer-page">16</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: Quiz 1 ==================== -->
+      <section class="content-slide quiz-slide" data-quiz="1">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Quiz</h2>
+          <h3>Kubernetes Pods vs Containers</h3>
+        </div>
+        <p>Qual das alternativas melhor descreve a relação entre Pods e Containers no Kubernetes?</p>
+        <ul class="quiz-options">
+          <li data-correct="false">Um Pod é um container isolado que roda sozinho.</li>
+          <li data-correct="true">Um Pod pode conter um ou mais containers que compartilham recursos.</li>
+          <li data-correct="false">Containers são agrupados em Services, e Pods são unidades lógicas.</li>
+          <li data-correct="false">Pods e Containers são sinônimos no Kubernetes.</li>
+        </ul>
+        <div class="quiz-feedback" data-feedback-correct="Correto! Pods podem conter múltiplos containers que compartilham rede, armazenamento e contexto." data-feedback-incorrect="Resposta incorreta. Lembre-se que um Pod pode conter múltiplos containers que compartilham recursos."></div>
+        <div class="slide-footer">
+          <div class="footer-bar">14 – Orquestração de Containers</div>
+          <div class="footer-page">17</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: Quiz 2 ==================== -->
+      <section class="content-slide quiz-slide" data-quiz="2">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Quiz</h2>
+          <h3>Quando usar Docker Swarm vs Kubernetes?</h3>
+        </div>
+        <p>Qual cenário é mais adequado para escolher Docker Swarm em vez de Kubernetes?</p>
+        <ul class="quiz-options">
+          <li data-correct="false">Quando precisa de orquestração complexa e alta escalabilidade em multinuvem.</li>
+          <li data-correct="true">Para clusters simples com menor curva de aprendizado e integração nativa com Docker.</li>
+          <li data-correct="false">Quando é necessário gerenciamento sofisticado de volumes e rede nativa do Kubernetes.</li>
+          <li data-correct="false">Se a organização já usa Helm Charts amplamente.</li>
+        </ul>
+        <div class="quiz-feedback" data-feedback-correct="Correto! Docker Swarm é indicado para soluções simples e rápidas, com fácil integração ao Docker." data-feedback-incorrect="Resposta incorreta. Docker Swarm é mais simples, Kubernetes é recomendado para ambientes mais complexos." ></div>
+        <div class="slide-footer">
+          <div class="footer-bar">14 – Orquestração de Containers</div>
+          <div class="footer-page">18</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: Conteúdo extra - Exemplo Java/Spring Boot ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Exemplo Java/Spring Boot</h2>
+          <h3>Deployment em Kubernetes</h3>
+        </div>
+        <pre><code class="language-yaml">apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: springboot-app
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: springboot
+  template:
+    metadata:
+      labels:
+        app: springboot
+    spec:
+      containers:
+      - name: springboot
+        image: minha-imagem/springboot-app:1.0
+        ports:
+        - containerPort: 8080
+        envFrom:
+        - configMapRef:
+            name: springboot-config
+        - secretRef:
+            name: springboot-secret
+</code></pre>
+        <div class="slide-footer">
+          <div class="footer-bar">14 – Orquestração de Containers</div>
+          <div class="footer-page">19</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: Conteúdo extra - Exemplo .NET/C# ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Exemplo .NET / C#</h2>
+          <h3>Dockerfile e Deployment básico</h3>
+        </div>
+        <pre><code class="language-dockerfile">FROM mcr.microsoft.com/dotnet/aspnet:6.0 AS base
+WORKDIR /app
+EXPOSE 80
+
+FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
+WORKDIR /src
+COPY ["MyApp/MyApp.csproj", "MyApp/"]
+RUN dotnet restore "MyApp/MyApp.csproj"
+COPY . .
+WORKDIR "/src/MyApp"
+RUN dotnet build "MyApp.csproj" -c Release -o /app/build
+
+FROM build AS publish
+RUN dotnet publish "MyApp.csproj" -c Release -o /app/publish
+
+FROM base AS final
+WORKDIR /app
+COPY --from=publish /app/publish .
+ENTRYPOINT ["dotnet", "MyApp.dll"]
+</code></pre>
+        <pre><code class="language-yaml">apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dotnet-app
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: dotnetapp
+  template:
+    metadata:
+      labels:
+        app: dotnetapp
+    spec:
+      containers:
+      - name: dotnet
+        image: minha-imagem/dotnet-app:latest
+        ports:
+        - containerPort: 80
+</code></pre>
+        <div class="slide-footer">
+          <div class="footer-bar">14 – Orquestração de Containers</div>
+          <div class="footer-page">20</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: Conteúdo extra - Exemplo Node.js ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Exemplo Node.js</h2>
+          <h3>Dockerfile e Kubernetes Deployment</h3>
+        </div>
+        <pre><code class="language-dockerfile">FROM node:16-alpine
+WORKDIR /app
+COPY package*.json ./
+RUN npm install --production
+COPY . .
+EXPOSE 3000
+CMD ["node", "index.js"]
+</code></pre>
+        <pre><code class="language-yaml">apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nodejs-app
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: nodejsapp
+  template:
+    metadata:
+      labels:
+        app: nodejsapp
+    spec:
+      containers:
+      - name: nodejs
+        image: minha-imagem/nodejs-app:latest
+        ports:
+        - containerPort: 3000
+</code></pre>
+        <div class="slide-footer">
+          <div class="footer-bar">14 – Orquestração de Containers</div>
+          <div class="footer-page">21</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: Recapitulação Bloco 1 ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Recapitulação</h2>
+          <h3>Principais conceitos do Bloco 1</h3>
+        </div>
+        <ul>
+          <li>Docker Swarm: Serviços, réplicas, rolling updates, redes overlay.</li>
+          <li>Kubernetes: Pods, Services, Deployments, ConfigMaps e Secrets.</li>
+          <li>Helm Charts: Facilita o deploy e gerenciamento em Kubernetes.</li>
+          <li>Caso real Globo.com: desafios e lições na migração para Kubernetes.</li>
+        </ul>
+        <div class="slide-footer">
+          <div class="footer-bar">14 – Orquestração de Containers</div>
+          <div class="footer-page">22</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: Recapitulação Bloco 2 ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Recapitulação</h2>
+          <h3>Principais conceitos do Bloco 2</h3>
+        </div>
+        <ul>
+          <li>Hands-on: Deploy e rolling update com Docker Swarm.</li>
+          <li>Quiz para fixação sobre Kubernetes Pods e Docker Swarm.</li>
+          <li>Exemplos práticos com Java/Spring Boot, .NET/C# e Node.js.</li>
+        </ul>
+        <div class="slide-footer">
+          <div class="footer-bar">14 – Orquestração de Containers</div>
+          <div class="footer-page">23</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: Dúvidas ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Dúvidas ou curiosidades?</h2>
+        </div>
+
+        <div style="display:flex; align-items:center; justify-content:center; flex:1; font-size:4em; color: var(--fiap-dark); font-weight:800; opacity:0.15; margin-top:40px;">
+          ?
+        </div>
+
+        <div class="slide-footer">
+          <div class="footer-bar">14 – Orquestração de Containers</div>
+          <div class="footer-page">24</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: ENCERRAMENTO ==================== -->
+      <section class="end-slide">
+        <img src="../assets/img/fiap-logo-graduacao.png" alt="FIAP Graduação" style="max-width:350px;" />
+        <div class="copyright">
+          Copyright &copy; 2026<br />
+          Prof.º José Romualdo da Costa Filho<br /><br />
+          Todos direitos reservados. Reprodução ou divulgação total ou parcial<br />
+          deste documento é expressamente proibido sem o consentimento formal,<br />
+          por escrito, do Professor (autor).
+        </div>
+      </section>
+
+    </div>
+  </div>
+
+  <script src="../node_modules/reveal.js/dist/reveal.js"></script>
+  <script src="../node_modules/reveal.js/plugin/highlight/highlight.js"></script>
+  <script src="../assets/js/fiap-quiz.js"></script>
+  <script>
+    Reveal.initialize({
+      hash: true,
+      slideNumber: false,
+      width: 1280,
+      height: 720,
+      margin: 0,
+      minScale: 0.2,
+      maxScale: 2.0,
+      center: false,
+      transition: 'slide',
+      transitionSpeed: 'default',
+      scrollActivationWidth: null,
+      view: null,
+      plugins: [RevealHighlight]
+    });
+  </script>
+</body>
+</html>

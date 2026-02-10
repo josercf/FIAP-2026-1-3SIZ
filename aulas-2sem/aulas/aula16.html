@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>AULA 16 - Deploy Continuo + Infrastructure as Code | FIAP</title>
+  <link rel="stylesheet" href="../node_modules/reveal.js/dist/reveal.css" />
+  <link rel="stylesheet" href="../node_modules/reveal.js/dist/theme/white.css" />
+  <link rel="stylesheet" href="../node_modules/reveal.js/plugin/highlight/monokai.css" />
+  <link rel="stylesheet" href="../assets/css/fiap-theme.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+</head>
+<body>
+  <div class="reveal">
+    <div class="slides">
+      
+      <!-- ==================== SLIDE: CAPA FIAP ==================== -->
+      <section class="cover-slide">
+        <img src="../assets/img/fiap-logo-graduacao.png" alt="FIAP Graduação" class="fiap-logo-full" />
+      </section>
+
+      <!-- ==================== SLIDE: TÍTULO DA AULA ==================== -->
+      <section class="title-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="title-card">
+          <div class="accent-bar"></div>
+          <h1>AULA 16</h1>
+          <h2>Deploy Continuo + Infrastructure as Code</h2>
+          <h3>Prof. José Romualdo</h3>
+          <h4>Data: 23/06/2026</h4>
+        </div>
+        <div class="lesson-bar">16 - Deploy Continuo + Infrastructure as Code</div>
+      </section>
+
+      <!-- ==================== SLIDE: AGENDA ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Agenda</h2>
+        </div>
+        <table>
+          <thead>
+            <tr><th>Bloco</th><th>Horário</th><th>Conteúdo</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><strong>Bloco 1</strong></td><td>19h30 – 21h00</td><td>CD - estratégias de deploy, Infrastructure as Code, GitOps, Caso real Nubank</td></tr>
+            <tr><td><strong>Intervalo</strong></td><td>21h00 – 21h20</td><td>☕ Pausa</td></tr>
+            <tr><td><strong>Bloco 2</strong></td><td>21h20 – 22h45</td><td>Exercício Terraform + Quiz sobre Blue-Green, Canary e benefícios de IaC</td></tr>
+          </tbody>
+        </table>
+        <div class="slide-footer">
+          <div class="footer-bar">16 - Deploy Continuo + Infrastructure as Code</div>
+          <div class="footer-page">3</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: SEÇÃO BLOCO 1 ==================== -->
+      <section class="section-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="accent-bar"></div>
+        <h2>Bloco 1<br>Deploy Contínuo e Infrastructure as Code</h2>
+        <div class="slide-footer">
+          <div class="footer-bar">16 - Deploy Continuo + Infrastructure as Code</div>
+          <div class="footer-page">4</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: CD - Introdução ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Continuous Deployment (CD)</h2>
+        </div>
+        <p>Deploy Contínuo é a prática de automatizar o lançamento de software para ambientes de produção com segurança e rapidez.</p>
+        <p>Permite entregas frequentes, reduzindo riscos e aumentando a eficiência do time.</p>
+        <div class="slide-footer">
+          <div class="footer-bar">16 - Deploy Continuo + Infrastructure as Code</div>
+          <div class="footer-page">5</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: Estratégias de Deploy - Visão Geral ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Estratégias de Deploy</h2>
+        </div>
+        <ul>
+          <li><strong>Blue-Green</strong>: Dois ambientes idênticos, um ativo e outro preparado para deploy.</li>
+          <li><strong>Canary</strong>: Deploy gradual para pequenos grupos de usuários para validação.</li>
+          <li><strong>Rolling</strong>: Atualização gradual do ambiente, substituindo instâncias aos poucos.</li>
+          <li><strong>Recreate</strong>: Desliga o sistema antigo e sobe o novo, com downtime.</li>
+        </ul>
+        <div class="slide-footer">
+          <div class="footer-bar">16 - Deploy Continuo + Infrastructure as Code</div>
+          <div class="footer-page">6</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: Blue-Green Deployment ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Blue-Green Deployment</h2>
+        </div>
+        <p>Dois ambientes idênticos: Blue (ativo) e Green (novo deploy).</p>
+        <p>Após testes, o tráfego é redirecionado para o Green, tornando-o ativo.</p>
+        <p>Garante rollback rápido e zero downtime.</p>
+        <img src="../assets/img/blue-green-diagram.png" alt="Blue-Green Deployment Diagram" style="width:60%; margin: 20px auto; display:block;" />
+        <div class="slide-footer">
+          <div class="footer-bar">16 - Deploy Continuo + Infrastructure as Code</div>
+          <div class="footer-page">7</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: Canary Deployment ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Canary Deployment</h2>
+        </div>
+        <p>Deploy gradual para uma pequena parte dos usuários (canário).</p>
+        <p>Monitoramento detalhado para identificar falhas antes do rollout completo.</p>
+        <p>Reduz riscos de falhas em produção.</p>
+        <img src="../assets/img/canary-diagram.png" alt="Canary Deployment Diagram" style="width:60%; margin: 20px auto; display:block;" />
+        <div class="slide-footer">
+          <div class="footer-bar">16 - Deploy Continuo + Infrastructure as Code</div>
+          <div class="footer-page">8</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: Rolling e Recreate Deployment ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Rolling e Recreate Deployment</h2>
+        </div>
+        <ul>
+          <li><strong>Rolling:</strong> Atualiza instâncias gradualmente sem downtime total.</li>
+          <li><strong>Recreate:</strong> Para o sistema antigo e inicia o novo, causando downtime.</li>
+        </ul>
+        <p>Rolling é preferido para sistemas críticos com alta disponibilidade.</p>
+        <div class="slide-footer">
+          <div class="footer-bar">16 - Deploy Continuo + Infrastructure as Code</div>
+          <div class="footer-page">9</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: Infrastructure as Code (IaC) ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Infrastructure as Code (IaC)</h2>
+        </div>
+        <p>Prática de gerenciar infraestrutura via código declarativo ou imperativo.</p>
+        <p>Permite versionamento, automação e replicação de ambientes com segurança.</p>
+        <p>Principais ferramentas:</p>
+        <ul>
+          <li><strong>Terraform</strong> (HCL)</li>
+          <li><strong>Ansible</strong> (YAML)</li>
+          <li><strong>Bicep</strong> (Azure)</li>
+        </ul>
+        <div class="slide-footer">
+          <div class="footer-bar">16 - Deploy Continuo + Infrastructure as Code</div>
+          <div class="footer-page">10</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: Terraform - HCL ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Terraform - HCL (HashiCorp Configuration Language)</h2>
+        </div>
+        <p>Ferramenta declarativa para provisionar infraestrutura em múltiplos provedores.</p>
+        <pre><code class="language-hcl">provider "azurerm" {
+  features {}
+}
+
+resource "azurerm_resource_group" "rg" {
+  name     = "fiap-rg"
+  location = "East US"
+}</code></pre>
+        <div class="slide-footer">
+          <div class="footer-bar">16 - Deploy Continuo + Infrastructure as Code</div>
+          <div class="footer-page">11</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: Ansible - YAML ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Ansible - YAML</h2>
+        </div>
+        <p>Ferramenta de automação para configuração e deployment usando playbooks YAML.</p>
+        <pre><code class="language-yaml">- hosts: webservers
+  become: yes
+  tasks:
+    - name: Instalar nginx
+      apt:
+        name: nginx
+        state: present</code></pre>
+        <div class="slide-footer">
+          <div class="footer-bar">16 - Deploy Continuo + Infrastructure as Code</div>
+          <div class="footer-page">12</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: Bicep - Azure ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Bicep - Azure</h2>
+        </div>
+        <p>Linguagem declarativa de alto nível para Azure Resource Manager (ARM).</p>
+        <pre><code class="language-bicep">resource appServicePlan 'Microsoft.Web/serverfarms@2020-06-01' = {
+  name: 'fiapAppServicePlan'
+  location: 'eastus'
+  sku: {
+    name: 'B1'
+    tier: 'Basic'
+  }
+}</code></pre>
+        <div class="slide-footer">
+          <div class="footer-bar">16 - Deploy Continuo + Infrastructure as Code</div>
+          <div class="footer-page">13</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: GitOps - Conceito ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>GitOps</h2>
+        </div>
+        <p>Prática onde o Git é a fonte única da verdade para infraestrutura e aplicações.</p>
+        <p>Automatiza deploys e sincroniza estado do ambiente com o repositório Git.</p>
+        <p>Ferramentas populares:</p>
+        <ul>
+          <li>ArgoCD</li>
+          <li>Flux</li>
+        </ul>
+        <div class="slide-footer">
+          <div class="footer-bar">16 - Deploy Continuo + Infrastructure as Code</div>
+          <div class="footer-page">14</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: ArgoCD e Flux ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>ArgoCD e Flux</h2>
+        </div>
+        <p><strong>ArgoCD:</strong> Ferramenta declarativa para Kubernetes, sincroniza estado do Git com cluster.</p>
+        <p><strong>Flux:</strong> Automatiza entrega contínua Kubernetes, monitora repositórios Git.</p>
+        <img src="../assets/img/argo-flux.png" alt="ArgoCD e Flux" style="width:65%; margin:20px auto; display:block;" />
+        <div class="slide-footer">
+          <div class="footer-bar">16 - Deploy Continuo + Infrastructure as Code</div>
+          <div class="footer-page">15</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: Caso Real - Nubank ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Caso Real: Nubank</h2>
+        </div>
+        <p>O Nubank realiza mais de 100 deploys por dia com segurança e estabilidade usando CD e IaC.</p>
+        <p>Utilizam estratégias Canary e Blue-Green para minimizar riscos.</p>
+        <p>Automatizam infraestrutura com Terraform e GitOps para garantir consistência.</p>
+        <img src="../assets/img/nubank-deploy.jpg" alt="Nubank Deploy" style="width:60%; margin: 20px auto; display:block; border-radius:12px;" />
+        <div class="slide-footer">
+          <div class="footer-bar">16 - Deploy Continuo + Infrastructure as Code</div>
+          <div class="footer-page">16</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: QUIZ 1 - Estratégias de Deploy ==================== -->
+      <section class="quiz-slide content-slide" data-correct="b" data-quiz-feedback="Resposta correta! Canary permite deploy gradual para minimizar riscos.">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Quiz 1: Deploy Gradual</h2>
+        </div>
+        <p>Qual estratégia de deploy permite lançar uma nova versão para apenas uma pequena parte dos usuários inicialmente?</p>
+        <ol type="a">
+          <li>a) Blue-Green</li>
+          <li>b) Canary</li>
+          <li>c) Recreate</li>
+          <li>d) Rolling</li>
+        </ol>
+        <div class="quiz-feedback"></div>
+        <div class="slide-footer">
+          <div class="footer-bar">16 - Deploy Continuo + Infrastructure as Code</div>
+          <div class="footer-page">17</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: BREAK - Intervalo ==================== -->
+      <section class="break-slide">
+        <div style="font-size:3em; font-weight:700; color: var(--fiap-dark); text-align:center; margin-top: 100px;">
+          Intervalo<br><br>21h00 – 21h20<br><br>☕ Aproveite para descansar!
+        </div>
+        <div class="slide-footer">
+          <div class="footer-bar">16 - Deploy Continuo + Infrastructure as Code</div>
+          <div class="footer-page">18</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: SEÇÃO BLOCO 2 ==================== -->
+      <section class="section-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="accent-bar"></div>
+        <h2>Bloco 2<br>Exercício e Quiz</h2>
+        <div class="slide-footer">
+          <div class="footer-bar">16 - Deploy Continuo + Infrastructure as Code</div>
+          <div class="footer-page">19</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: Exercício Hands-On - Terraform ==================== -->
+      <section class="exercise-slide content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Exercício Hands-On</h2>
+          <h3>Crie um template Terraform básico para provisionar um App Service no Azure</h3>
+        </div>
+        <div class="exercise-container">
+          <p>Passos para o exercício:</p>
+          <ol class="exercise-steps">
+            <li>Defina o provider Azure no arquivo <code>main.tf</code>.</li>
+            <li>Crie um resource group chamado <code>fiap-rg</code>.</li>
+            <li>Configure um App Service Plan básico.</li>
+            <li>Declare o recurso do App Service vinculado ao App Service Plan e Resource Group.</li>
+            <li>Valide e aplique o template localmente ou via Azure CLI.</li>
+          </ol>
+          <p>Exemplo inicial para começar:</p>
+          <pre><code class="language-hcl">provider "azurerm" {
+  features {}
+}
+
+resource "azurerm_resource_group" "fiap" {
+  name     = "fiap-rg"
+  location = "eastus"
+}</code></pre>
+          <p>Continue definindo o <code>azurerm_app_service_plan</code> e <code>azurerm_app_service</code>.</p>
+        </div>
+        <div class="slide-footer">
+          <div class="footer-bar">16 - Deploy Continuo + Infrastructure as Code</div>
+          <div class="footer-page">20</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: Quiz 2 - Blue-Green vs Canary ==================== -->
+      <section class="quiz-slide content-slide" data-correct="a" data-quiz-feedback="Exato! Blue-Green usa dois ambientes paralelos para deploy seguro.">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Quiz 2: Blue-Green vs Canary</h2>
+        </div>
+        <p>Qual estratégia de deploy envolve alternar o tráfego entre dois ambientes idênticos?</p>
+        <ol type="a">
+          <li>a) Blue-Green</li>
+          <li>b) Canary</li>
+          <li>c) Rolling</li>
+          <li>d) Recreate</li>
+        </ol>
+        <div class="quiz-feedback"></div>
+        <div class="slide-footer">
+          <div class="footer-bar">16 - Deploy Continuo + Infrastructure as Code</div>
+          <div class="footer-page">21</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: Quiz 3 - Benefícios da IaC ==================== -->
+      <section class="quiz-slide content-slide" data-correct="c" data-quiz-feedback="Correto! IaC traz automação, versionamento e consistência para infraestrutura.">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Quiz 3: Benefícios da Infrastructure as Code</h2>
+        </div>
+        <p>Qual dos seguintes NÃO é um benefício comum da prática de IaC?</p>
+        <ol type="a">
+          <li>a) Versionamento da infraestrutura</li>
+          <li>b) Aumento da automação</li>
+          <li>c) Aumento do downtime durante deploy</li>
+          <li>d) Consistência entre ambientes</li>
+        </ol>
+        <div class="quiz-feedback"></div>
+        <div class="slide-footer">
+          <div class="footer-bar">16 - Deploy Continuo + Infrastructure as Code</div>
+          <div class="footer-page">22</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: Dúvidas e Finalização ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Dúvidas ou curiosidades?</h2>
+        </div>
+        <div style="display:flex; align-items:center; justify-content:center; flex:1; font-size:4em; color: var(--fiap-dark); font-weight:800; opacity:0.15; margin-top:40px;">
+          ?
+        </div>
+        <div class="slide-footer">
+          <div class="footer-bar">16 - Deploy Continuo + Infrastructure as Code</div>
+          <div class="footer-page">23</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: ENCERRAMENTO ==================== -->
+      <section class="end-slide">
+        <img src="../assets/img/fiap-logo-graduacao.png" alt="FIAP Graduação" style="max-width:350px;" />
+        <div class="copyright">
+          Copyright &copy; 2026<br />
+          Prof.º José Romualdo da Costa Filho<br /><br />
+          Todos direitos reservados. Reprodução ou divulgação total ou parcial<br />
+          deste documento é expressamente proibido sem o consentimento formal,<br />
+          por escrito, do Professor (autor).
+        </div>
+      </section>
+
+    </div>
+  </div>
+
+  <script src="../node_modules/reveal.js/dist/reveal.js"></script>
+  <script src="../node_modules/reveal.js/plugin/highlight/highlight.js"></script>
+  <script src="../assets/js/fiap-quiz.js"></script>
+  <script>
+    Reveal.initialize({
+      hash: true,
+      slideNumber: false,
+      width: 1280,
+      height: 720,
+      margin: 0,
+      minScale: 0.2,
+      maxScale: 2.0,
+      center: false,
+      transition: 'slide',
+      transitionSpeed: 'default',
+      scrollActivationWidth: null,
+      view: null,
+      plugins: [RevealHighlight]
+    });
+  </script>
+</body>
+</html>

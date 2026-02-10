@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>AULA 17 - Vista de Prova + Encerramento | FIAP</title>
+  <link rel="stylesheet" href="../node_modules/reveal.js/dist/reveal.css" />
+  <link rel="stylesheet" href="../node_modules/reveal.js/dist/theme/white.css" />
+  <link rel="stylesheet" href="../node_modules/reveal.js/plugin/highlight/monokai.css" />
+  <link rel="stylesheet" href="../assets/css/fiap-theme.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+</head>
+<body>
+  <div class="reveal">
+    <div class="slides">
+
+      <!-- ==================== SLIDE: CAPA FIAP ==================== -->
+      <section class="cover-slide">
+        <img src="../assets/img/fiap-logo-graduacao.png" alt="FIAP Graduação" class="fiap-logo-full" />
+      </section>
+
+      <!-- ==================== SLIDE: TÍTULO DA AULA ==================== -->
+      <section class="title-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="title-card">
+          <div class="accent-bar"></div>
+          <h1>Sistemas de Informação</h1>
+          <h2>Vista de Prova + Encerramento</h2>
+          <h3>Prof. José Romualdo</h3>
+        </div>
+        <div class="lesson-bar">AULA 17 - Vista de Prova + Encerramento</div>
+      </section>
+
+      <!-- ==================== SLIDE: AGENDA ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Agenda</h2>
+        </div>
+
+        <table>
+          <thead>
+            <tr><th>Bloco</th><th>Horário</th><th>Conteúdo</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><strong>Bloco 1</strong></td><td>19h30 – 21h00</td><td>Revisão geral do semestre + Vista de prova dos checkpoints + Discussão de dúvidas</td></tr>
+            <tr><td><strong>Intervalo</strong></td><td>21h00 – 21h20</td><td>☕ Pausa</td></tr>
+            <tr><td><strong>Bloco 2</strong></td><td>21h20 – 22h45</td><td>Tendências futuras + Encerramento + Feedback + Quiz de revisão geral</td></tr>
+          </tbody>
+        </table>
+
+        <div class="slide-footer">
+          <div class="footer-bar">17 - Vista de Prova + Encerramento</div>
+          <div class="footer-page">3</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: BLOCO 1 - SEÇÃO ==================== -->
+      <section class="section-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="accent-bar"></div>
+        <h2>Bloco 1<br>Revisão Geral do Semestre</h2>
+        <div class="slide-footer">
+          <div class="footer-bar">17 - Vista de Prova + Encerramento</div>
+          <div class="footer-page">4</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: MAPA MENTAL DO SEMESTRE ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Mapa Mental dos Temas</h2>
+        </div>
+
+        <p style="font-size:1.1em; margin-bottom:1em;">
+          Conexão dos principais temas estudados ao longo do semestre:
+        </p>
+        <ul style="font-size:1.1em; line-height:1.6em;">
+          <li><strong>API Gateway</strong> → <strong>Load Balancer (LB)</strong> → <strong>Resiliência</strong> → <strong>Dados</strong></li>
+          <li><strong>Testes</strong> → <strong>Cache</strong> → <strong>Filas</strong> → <strong>Carga</strong></li>
+          <li><strong>Interface</strong> → <strong>Containers</strong> → <strong>Nuvem</strong> → <strong>CI/CD</strong></li>
+        </ul>
+
+        <img src="../assets/img/mapa-mental-semestre.png" alt="Mapa Mental dos Temas do Semestre" style="width:80%; margin-top:1rem; border-radius:8px; box-shadow: 0 0 10px #ccc;" />
+
+        <div class="slide-footer">
+          <div class="footer-bar">17 - Vista de Prova + Encerramento</div>
+          <div class="footer-page">5</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: DETALHES - API GATEWAY & LB ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Conceitos Chave: API Gateway & Load Balancer</h2>
+        </div>
+
+        <p><strong>API Gateway:</strong> Ponto único de entrada para microserviços, responsável por roteamento, autenticação, e agregação de chamadas.</p>
+        <p><strong>Load Balancer:</strong> Distribui requisições entre múltiplas instâncias para garantir alta disponibilidade e escalabilidade.</p>
+
+        <pre><code class="language-java">
+// Exemplo simples de API Gateway com Spring Cloud Gateway
+@Bean
+public RouteLocator customRouteLocator(RouteLocatorBuilder builder) {
+  return builder.routes()
+    .route("lb_route", r -> r.path("/api/**")
+      .uri("lb://MICROSERVICE"))
+    .build();
+}
+        </code></pre>
+
+        <div class="slide-footer">
+          <div class="footer-bar">17 - Vista de Prova + Encerramento</div>
+          <div class="footer-page">6</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: RESILIÊNCIA & DADOS ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Resiliência & Dados</h2>
+        </div>
+
+        <p><strong>Resiliência:</strong> Técnicas para garantir a continuidade do serviço, como circuit breaker e retries.</p>
+        <p><strong>Gerenciamento de Dados:</strong> Estratégias para persistência, replicação e consistência em sistemas distribuídos.</p>
+
+        <pre><code class="language-csharp">
+// Exemplo Polly para resiliência em .NET
+var policy = Policy.Handle<HttpRequestException>()
+  .CircuitBreaker(2, TimeSpan.FromMinutes(1));
+
+await policy.ExecuteAsync(() => httpClient.GetAsync("https://api.exemplo.com"));
+        </code></pre>
+
+        <div class="slide-footer">
+          <div class="footer-bar">17 - Vista de Prova + Encerramento</div>
+          <div class="footer-page">7</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: TESTES, CACHE & FILAS ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Testes, Cache & Filas</h2>
+        </div>
+
+        <ul>
+          <li><strong>Testes:</strong> Unitários, integração, contrato e end-to-end para garantir qualidade.</li>
+          <li><strong>Cache:</strong> Acelera respostas usando armazenamento temporário, ex: Redis.</li>
+          <li><strong>Filas:</strong> Comunicação assíncrona entre serviços para desacoplamento e escalabilidade.</li>
+        </ul>
+
+        <pre><code class="language-javascript">
+// Exemplo Node.js com Redis cache
+const redis = require('redis');
+const client = redis.createClient();
+
+async function getUser(id) {
+  const cache = await client.get(`user:${id}`);
+  if(cache) return JSON.parse(cache);
+  const user = await fetchUserFromDb(id);
+  await client.set(`user:${id}`, JSON.stringify(user), {EX: 3600});
+  return user;
+}
+        </code></pre>
+
+        <div class="slide-footer">
+          <div class="footer-bar">17 - Vista de Prova + Encerramento</div>
+          <div class="footer-page">8</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: CARGA, INTERFACE, CONTAINERS ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Carga, Interface & Containers</h2>
+        </div>
+
+        <p><strong>Gerenciamento de Carga:</strong> Estratégias para balancear e limitar requisições.</p>
+        <p><strong>Interface:</strong> Design UX/UI e APIs REST/GraphQL para consumo eficiente.</p>
+        <p><strong>Containers:</strong> Docker e Kubernetes para empacotamento e orquestração.</p>
+
+        <pre><code class="language-yaml">
+# Exemplo básico de Pod no Kubernetes
+apiVersion: v1
+kind: Pod
+metadata:
+  name: exemplo-pod
+spec:
+  containers:
+  - name: app-node
+    image: node:14
+    ports:
+    - containerPort: 3000
+        </code></pre>
+
+        <div class="slide-footer">
+          <div class="footer-bar">17 - Vista de Prova + Encerramento</div>
+          <div class="footer-page">9</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: NUVEM & CI/CD ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Nuvem & CI/CD</h2>
+        </div>
+
+        <p><strong>Nuvem:</strong> Utilização de provedores como AWS, Azure, GCP para infraestrutura elástica.</p>
+        <p><strong>CI/CD:</strong> Integração contínua e entrega contínua para automação de builds e deploys.</p>
+
+        <pre><code class="language-yaml">
+# Exemplo GitHub Actions para CI/CD simples
+name: CI
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Build and Test
+      run: |
+        dotnet build
+        dotnet test
+        </code></pre>
+
+        <div class="slide-footer">
+          <div class="footer-bar">17 - Vista de Prova + Encerramento</div>
+          <div class="footer-page">10</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: VISTA DE PROVA DOS CHECKPOINTS ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Vista de Prova dos Checkpoints</h2>
+        </div>
+
+        <p>Revisão dos principais pontos de avaliação do semestre, com análise de questões, respostas esperadas e dicas para a prova final.</p>
+
+        <ul>
+          <li>Entendimento de padrões arquiteturais (API Gateway, Load Balancer, Resiliência)</li>
+          <li>Implementação prática (exemplos em Spring Boot, .NET e Node.js)</li>
+          <li>Testes automatizados e práticas DevOps (CI/CD, Containers)</li>
+          <li>Conhecimento sobre mensageria e cache para desempenho</li>
+        </ul>
+
+        <div class="slide-footer">
+          <div class="footer-bar">17 - Vista de Prova + Encerramento</div>
+          <div class="footer-page">11</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: DISCUSSÃO DE DÚVIDAS ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Discussão de Dúvidas</h2>
+        </div>
+
+        <p>Este espaço é destinado para esclarecer dúvidas sobre os conteúdos do semestre, dúvidas técnicas e conceituais, e troca de experiências.</p>
+
+        <div style="display:flex; align-items:center; justify-content:center; flex:1; font-size:4em; color: var(--fiap-dark); font-weight:800; opacity:0.15; margin-top:40px;">
+          ?
+        </div>
+
+        <div class="slide-footer">
+          <div class="footer-bar">17 - Vista de Prova + Encerramento</div>
+          <div class="footer-page">12</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: INTERVALO ==================== -->
+      <section class="break-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <h2>Intervalo</h2>
+        <p>21h00 – 21h20</p>
+        <p>☕ Aproveite para descansar e se preparar para o próximo bloco.</p>
+        <div class="slide-footer">
+          <div class="footer-bar">17 - Vista de Prova + Encerramento</div>
+          <div class="footer-page">13</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: BLOCO 2 - SEÇÃO ==================== -->
+      <section class="section-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="accent-bar"></div>
+        <h2>Bloco 2<br>Tendências Futuras & Encerramento</h2>
+        <div class="slide-footer">
+          <div class="footer-bar">17 - Vista de Prova + Encerramento</div>
+          <div class="footer-page">14</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: TENDÊNCIAS FUTURAS - SERVICE MESH ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Service Mesh com Istio e Linkerd</h2>
+        </div>
+
+        <p>Service Mesh é uma camada dedicada à comunicação entre microserviços, oferecendo observabilidade, segurança e gerenciamento de tráfego.</p>
+
+        <p><strong>Istio</strong> e <strong>Linkerd</strong> são as ferramentas líderes, facilitando políticas, telemetria e resiliência.</p>
+
+        <pre><code class="language-yaml">
+# Exemplo básico configuração Istio VirtualService
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: reviews
+spec:
+  hosts:
+  - reviews.prod.svc.cluster.local
+  http:
+  - route:
+    - destination:
+        host: reviews
+        subset: v1
+        </code></pre>
+
+        <div class="slide-footer">
+          <div class="footer-bar">17 - Vista de Prova + Encerramento</div>
+          <div class="footer-page">15</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: SERVERLESS e FaaS ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Serverless & Function as a Service (FaaS)</h2>
+        </div>
+
+        <p>Execução de funções sem gerenciar servidores, pagando somente pelo tempo de execução.</p>
+        <p>Exemplo: AWS Lambda, Azure Functions, Google Cloud Functions.</p>
+
+        <pre><code class="language-javascript">
+// Exemplo AWS Lambda handler em Node.js
+exports.handler = async (event) => {
+  return {
+    statusCode: 200,
+    body: JSON.stringify('Hello from Lambda!'),
+  };
+};
+        </code></pre>
+
+        <div class="slide-footer">
+          <div class="footer-bar">17 - Vista de Prova + Encerramento</div>
+          <div class="footer-page">16</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: IA APLICADA A DEVOPS / AIOPS ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>IA Aplicada a DevOps / AIOps</h2>
+        </div>
+
+        <p>Uso de Inteligência Artificial para automação, monitoramento preditivo e análise de logs em ambientes DevOps.</p>
+
+        <p>Ferramentas como <em>Dynatrace</em>, <em>Splunk</em> e <em>Elastic Stack</em> estão integrando IA para melhorar eficiência.</p>
+
+        <div class="slide-footer">
+          <div class="footer-bar">17 - Vista de Prova + Encerramento</div>
+          <div class="footer-page">17</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: PLATFORM ENGINEERING ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Platform Engineering</h2>
+        </div>
+
+        <p>Construção e manutenção de plataformas internas para automatizar e padronizar o desenvolvimento, operações e segurança.</p>
+
+        <p>Foca em prover ferramentas self-service para desenvolvedores e times de operações.</p>
+
+        <div class="slide-footer">
+          <div class="footer-bar">17 - Vista de Prova + Encerramento</div>
+          <div class="footer-page">18</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: eBPF ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>eBPF (Extended Berkeley Packet Filter)</h2>
+        </div>
+
+        <p>Tecnologia Linux que permite executar código em kernel de forma segura, usada para observabilidade, segurança e networking avançado.</p>
+
+        <p>Exemplo de uso: monitoramento de sistema sem impacto significativo de performance.</p>
+
+        <div class="slide-footer">
+          <div class="footer-bar">17 - Vista de Prova + Encerramento</div>
+          <div class="footer-page">19</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: WebAssembly ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>WebAssembly (Wasm)</h2>
+        </div>
+
+        <p>Formato binário que permite executar código nativo dentro de navegadores e servidores com alta performance.</p>
+
+        <p>Aplicações em edge computing, segurança e computação em nuvem.</p>
+
+        <pre><code class="language-js">
+// Exemplo simples carregando módulo Wasm em Node.js
+const fs = require('fs');
+const wasmBuffer = fs.readFileSync('./module.wasm');
+
+WebAssembly.instantiate(wasmBuffer).then(wasmModule => {
+  console.log(wasmModule.instance.exports.exportedFunction());
+});
+        </code></pre>
+
+        <div class="slide-footer">
+          <div class="footer-bar">17 - Vista de Prova + Encerramento</div>
+          <div class="footer-page">20</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: EXERCÍCIO HANDS-ON ==================== -->
+      <section class="content-slide exercise-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Exercício Hands-on</h2>
+          <h3>Implementando Resiliência com Circuit Breaker em Spring Boot</h3>
+        </div>
+
+        <div class="exercise-container">
+          <p>Objetivo: implementar o padrão Circuit Breaker usando Resilience4j no serviço Spring Boot.</p>
+          <div class="exercise-steps">
+            <ol>
+              <li>Adicione a dependência do Resilience4j no <code>pom.xml</code>.</li>
+              <li>Configure o Circuit Breaker na classe de configuração.</li>
+              <li>Anote o método que realiza chamadas externas com <code>@CircuitBreaker</code>.</li>
+              <li>Teste o comportamento simulando falhas.</li>
+            </ol>
+          </div>
+          <pre><code class="language-xml">
+<!-- pom.xml -->
+&lt;dependency&gt;
+  &lt;groupId&gt;io.github.resilience4j&lt;/groupId&gt;
+  &lt;artifactId&gt;resilience4j-spring-boot2&lt;/artifactId&gt;
+  &lt;version&gt;1.7.1&lt;/version&gt;
+&lt;/dependency&gt;
+          </code></pre>
+          <pre><code class="language-java">
+@Configuration
+public class ResilienceConfig {
+  @Bean
+  public Customizer&lt;CircuitBreakerConfigBuilder&gt; defaultCustomizer() {
+    return builder -> builder
+      .failureRateThreshold(50)
+      .waitDurationInOpenState(Duration.ofSeconds(10));
+  }
+}
+          </code></pre>
+          <pre><code class="language-java">
+@Service
+public class ExternalService {
+  @CircuitBreaker(name = "backendService", fallbackMethod = "fallback")
+  public String callExternalApi() {
+    // lógica da chamada externa
+  }
+
+  public String fallback(Throwable t) {
+    return "Fallback response";
+  }
+}
+          </code></pre>
+        </div>
+
+        <div class="slide-footer">
+          <div class="footer-bar">17 - Vista de Prova + Encerramento</div>
+          <div class="footer-page">21</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: QUIZ 1 ==================== -->
+      <section class="content-slide quiz-slide" data-correct="b" data-quiz-feedback="Resposta correta! O API Gateway é o ponto único de entrada para microserviços.">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Quiz de Revisão 1</h2>
+          <h3>Qual é o principal papel do API Gateway?</h3>
+        </div>
+
+        <form class="quiz-form">
+          <label><input type="radio" name="q1" value="a" /> Gerenciar banco de dados dos microserviços</label><br/>
+          <label><input type="radio" name="q1" value="b" /> Ser o ponto único de entrada para requisições</label><br/>
+          <label><input type="radio" name="q1" value="c" /> Orquestrar containers na nuvem</label><br/>
+          <label><input type="radio" name="q1" value="d" /> Implementar testes automatizados</label>
+        </form>
+
+        <div class="quiz-feedback"></div>
+
+        <div class="slide-footer">
+          <div class="footer-bar">17 - Vista de Prova + Encerramento</div>
+          <div class="footer-page">22</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: QUIZ 2 ==================== -->
+      <section class="content-slide quiz-slide" data-correct="c" data-quiz-feedback="Correto! Serverless executa código sem a necessidade de gerenciar servidores.">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Quiz de Revisão 2</h2>
+          <h3>O que é Serverless?</h3>
+        </div>
+
+        <form class="quiz-form">
+          <label><input type="radio" name="q2" value="a" /> Plataforma para executar containers em cluster</label><br/>
+          <label><input type="radio" name="q2" value="b" /> Banco de dados NoSQL</label><br/>
+          <label><input type="radio" name="q2" value="c" /> Execução de funções sem gerenciamento de servidores</label><br/>
+          <label><input type="radio" name="q2" value="d" /> Sistema de fila para mensagens</label>
+        </form>
+
+        <div class="quiz-feedback"></div>
+
+        <div class="slide-footer">
+          <div class="footer-bar">17 - Vista de Prova + Encerramento</div>
+          <div class="footer-page">23</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: QUIZ 3 ==================== -->
+      <section class="content-slide quiz-slide" data-correct="a" data-quiz-feedback="Resposta correta! eBPF permite executar código no kernel para observabilidade e segurança.">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Quiz de Revisão 3</h2>
+          <h3>Qual a função do eBPF?</h3>
+        </div>
+
+        <form class="quiz-form">
+          <label><input type="radio" name="q3" value="a" /> Executar código no kernel Linux para observabilidade e segurança</label><br/>
+          <label><input type="radio" name="q3" value="b" /> Orquestrar containers em cluster Kubernetes</label><br/>
+          <label><input type="radio" name="q3" value="c" /> Gerenciar funções Serverless na nuvem</label><br/>
+          <label><input type="radio" name="q3" value="d" /> Prover plataforma para Machine Learning</label>
+        </form>
+
+        <div class="quiz-feedback"></div>
+
+        <div class="slide-footer">
+          <div class="footer-bar">17 - Vista de Prova + Encerramento</div>
+          <div class="footer-page">24</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: ENCERRAMENTO ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Encerramento e Feedback</h2>
+        </div>
+
+        <p>Agradecemos a participação de todos no semestre!</p>
+        <p>Recomendações para estudos futuros:</p>
+        <ul>
+          <li>Aprofundar em Service Mesh e segurança em microserviços</li>
+          <li>Explorar Serverless e arquiteturas orientadas a eventos</li>
+          <li>Investir em automação com IA aplicada a DevOps</li>
+          <li>Praticar hands-on com containers, Kubernetes e CI/CD</li>
+        </ul>
+
+        <p>Por favor, compartilhem seu feedback para melhorar as próximas aulas.</p>
+
+        <div class="slide-footer">
+          <div class="footer-bar">17 - Vista de Prova + Encerramento</div>
+          <div class="footer-page">25</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: FIM ==================== -->
+      <section class="end-slide">
+        <img src="../assets/img/fiap-logo-graduacao.png" alt="FIAP Graduação" style="max-width:350px;" />
+        <div class="copyright">
+          Copyright &copy; 2026<br />
+          Prof.º José Romualdo da Costa Filho<br /><br />
+          Todos direitos reservados. Reprodução ou divulgação total ou parcial<br />
+          deste documento é expressamente proibido sem o consentimento formal,<br />
+          por escrito, do Professor (autor).
+        </div>
+      </section>
+
+    </div>
+  </div>
+
+  <script src="../node_modules/reveal.js/dist/reveal.js"></script>
+  <script src="../node_modules/reveal.js/plugin/highlight/highlight.js"></script>
+  <script src="../assets/js/fiap-quiz.js"></script>
+  <script>
+    Reveal.initialize({
+      hash: true,
+      slideNumber: false,
+      width: 1280,
+      height: 720,
+      margin: 0,
+      minScale: 0.2,
+      maxScale: 2.0,
+      center: false,
+      transition: 'slide',
+      transitionSpeed: 'default',
+      scrollActivationWidth: null,
+      view: null,
+      plugins: [RevealHighlight]
+    });
+  </script>
+</body>
+</html>

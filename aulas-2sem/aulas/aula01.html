@@ -1,0 +1,743 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Aula 01 – Revisão + API Gateway & Proxy Reverso | FIAP</title>
+  <link rel="stylesheet" href="../node_modules/reveal.js/dist/reveal.css">
+  <link rel="stylesheet" href="../node_modules/reveal.js/dist/theme/white.css">
+  <link rel="stylesheet" href="../node_modules/reveal.js/plugin/highlight/monokai.css">
+  <link rel="stylesheet" href="../assets/css/fiap-theme.css">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="reveal">
+    <div class="slides">
+
+      <!-- ==================== SLIDE: CAPA FIAP ==================== -->
+      <section class="cover-slide">
+        <img src="../assets/img/fiap-logo-graduacao.png" alt="FIAP Graduação" class="fiap-logo-full">
+      </section>
+
+      <!-- ==================== SLIDE: TÍTULO DA AULA ==================== -->
+      <section class="title-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header">
+        <div class="title-card">
+          <div class="accent-bar"></div>
+          <h1>Sistemas de Informação</h1>
+          <h2>Microservice and Web Engineering</h2>
+          <h3>Prof. José Romualdo</h3>
+        </div>
+        <div class="lesson-bar">AULA 01 – Revisão + API Gateway & Proxy Reverso</div>
+      </section>
+
+      <!-- ==================== SLIDE: AGENDA ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header">
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Agenda</h2>
+        </div>
+
+        <table>
+          <thead>
+            <tr><th>Bloco</th><th>Horário</th><th>Conteúdo</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><strong>Bloco 1</strong></td><td>19h30 – 21h00</td><td>Revisão do 1º semestre + Introdução a API Gateway</td></tr>
+            <tr><td><strong>Intervalo</strong></td><td>21h00 – 21h20</td><td>☕ Pausa</td></tr>
+            <tr><td><strong>Bloco 2</strong></td><td>21h20 – 22h45</td><td>Proxy Reverso + Exercício prático com Nginx + Quiz</td></tr>
+          </tbody>
+        </table>
+
+        <div class="slide-footer">
+          <div class="footer-bar">01 – Revisão + API Gateway & Proxy Reverso</div>
+          <div class="footer-page">3</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: REVISÃO - O QUE VIMOS ==================== -->
+      <section class="section-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header">
+        <div class="accent-bar"></div>
+        <h2>Revisão do<br>1º Semestre</h2>
+        <div class="slide-footer"><div class="footer-page">4</div></div>
+      </section>
+
+      <!-- ==================== SLIDE: REVISÃO CONTEÚDO ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header">
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>O que aprendemos?</h2>
+        </div>
+
+        <div class="concept-cards">
+          <div class="concept-card">
+            <h4>Fundamentos Web</h4>
+            <p>HTTP, Cliente-Servidor, DNS, Modelo OSI, Protocolos</p>
+          </div>
+          <div class="concept-card">
+            <h4>REST API</h4>
+            <p>Verbos HTTP, Status Codes, JSON/XML/YAML, cURL, Postman</p>
+          </div>
+          <div class="concept-card">
+            <h4>Git & Versionamento</h4>
+            <p>Repositórios, branches, commits, pull requests</p>
+          </div>
+          <div class="concept-card">
+            <h4>Data Contracts</h4>
+            <p>OpenAPI/Swagger, documentação de APIs</p>
+          </div>
+          <div class="concept-card">
+            <h4>Padrão MVC</h4>
+            <p>Model-View-Controller, separação de responsabilidades</p>
+          </div>
+          <div class="concept-card">
+            <h4>Docker</h4>
+            <p>Imagens, containers, volumes, redes, Dockerfile</p>
+          </div>
+        </div>
+
+        <div class="slide-footer">
+          <div class="footer-bar">01 – Revisão + API Gateway & Proxy Reverso</div>
+          <div class="footer-page">5</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: CRONOGRAMA DO SEMESTRE ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header">
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>O que veremos neste semestre?</h2>
+        </div>
+
+        <table>
+          <thead>
+            <tr><th>Mês</th><th>Temas</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><strong>Fevereiro</strong></td><td>API Gateway, Proxy Reverso, Load Balancer, Rate Limiting</td></tr>
+            <tr><td><strong>Março</strong></td><td>Padrões de Resiliência, Dados em Microsserviços, Testes (Unidade e Integração)</td></tr>
+            <tr><td><strong>Abril</strong></td><td>Cache (Redis), Processamento Distribuído (Filas)</td></tr>
+            <tr><td><strong>Maio</strong></td><td>Testes de Carga, Testes de Interface</td></tr>
+            <tr><td><strong>Junho</strong></td><td>Orquestração (Kubernetes), Nuvem (Azure), CI/CD, IaC</td></tr>
+          </tbody>
+        </table>
+
+        <div class="callout">
+          <p><strong>Checkpoints:</strong> 31/03 (CP I) · 28/04 (CP II) · 19/05 (CP III) — Todos individuais</p>
+        </div>
+
+        <div class="slide-footer">
+          <div class="footer-bar">01 – Revisão + API Gateway & Proxy Reverso</div>
+          <div class="footer-page">6</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: CONTEXTO - POR QUE GATEWAY ==================== -->
+      <section class="section-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header">
+        <div class="accent-bar"></div>
+        <h2>API Gateway &<br>Proxy Reverso</h2>
+        <div class="slide-footer"><div class="footer-page">7</div></div>
+      </section>
+
+      <!-- ==================== SLIDE: O PROBLEMA ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header">
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>O Problema: Comunicação Direta</h2>
+        </div>
+
+        <p>Em uma arquitetura de microsserviços, o cliente precisa conhecer o endereço de cada serviço individualmente. Isso gera diversos problemas:</p>
+
+        <div class="concept-cards">
+          <div class="concept-card">
+            <h4>Acoplamento</h4>
+            <p>O cliente precisa saber a localização exata de cada microsserviço</p>
+          </div>
+          <div class="concept-card">
+            <h4>Cross-cutting concerns</h4>
+            <p>Autenticação, logging e rate limiting precisam ser replicados em cada serviço</p>
+          </div>
+          <div class="concept-card">
+            <h4>Segurança</h4>
+            <p>Cada serviço fica exposto diretamente à internet</p>
+          </div>
+          <div class="concept-card">
+            <h4>Evolução</h4>
+            <p>Mudar a estrutura interna dos serviços impacta diretamente os clientes</p>
+          </div>
+        </div>
+
+        <div class="slide-footer">
+          <div class="footer-bar">01 – Revisão + API Gateway & Proxy Reverso</div>
+          <div class="footer-page">8</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: O QUE É API GATEWAY ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header">
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>O que é um API Gateway?</h2>
+        </div>
+
+        <p>O <strong>API Gateway</strong> é um ponto de entrada único para todas as requisições dos clientes em uma arquitetura de microsserviços. Ele atua como um intermediário inteligente entre o mundo externo e os serviços internos.</p>
+
+        <div class="flow-diagram">
+          <div class="flow-item">Cliente<br>(Browser/App)</div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-item" style="background: var(--fiap-pink);">API Gateway</div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-item">Serviço A</div>
+          <div class="flow-arrow" style="margin-left:-10px; margin-top:30px;">↘</div>
+          <div class="flow-item">Serviço B</div>
+        </div>
+
+        <div class="callout">
+          <p><strong>Analogia:</strong> O API Gateway funciona como a recepção de um hotel — o hóspede não precisa saber onde fica a cozinha, a lavanderia ou a manutenção. Ele fala com a recepção e ela direciona o pedido.</p>
+        </div>
+
+        <div class="slide-footer">
+          <div class="footer-bar">01 – Revisão + API Gateway & Proxy Reverso</div>
+          <div class="footer-page">9</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: RESPONSABILIDADES DO GATEWAY ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header">
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Responsabilidades do API Gateway</h2>
+        </div>
+
+        <table>
+          <thead>
+            <tr><th>Responsabilidade</th><th>Descrição</th><th>Exemplo</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><strong>Roteamento</strong></td><td>Direciona requisições para o serviço correto</td><td><code>/api/pedidos → Serviço de Pedidos</code></td></tr>
+            <tr><td><strong>Autenticação</strong></td><td>Valida tokens JWT, API Keys</td><td>Verifica o header <code>Authorization</code></td></tr>
+            <tr><td><strong>Rate Limiting</strong></td><td>Limita número de requisições por cliente</td><td>Máx. 100 req/min por IP</td></tr>
+            <tr><td><strong>Logging</strong></td><td>Registra todas as requisições centralmente</td><td>Request ID, tempo de resposta</td></tr>
+            <tr><td><strong>Transformação</strong></td><td>Adapta payloads entre cliente e serviço</td><td>Agrega respostas de múltiplos serviços</td></tr>
+            <tr><td><strong>Cache</strong></td><td>Armazena respostas frequentes</td><td>Cache de catálogo de produtos</td></tr>
+          </tbody>
+        </table>
+
+        <div class="slide-footer">
+          <div class="footer-bar">01 – Revisão + API Gateway & Proxy Reverso</div>
+          <div class="footer-page">10</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: PROXY REVERSO ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header">
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Proxy Reverso vs Proxy Direto</h2>
+        </div>
+
+        <div class="side-by-side">
+          <div class="side">
+            <h4>Proxy Direto (Forward Proxy)</h4>
+            <p>Fica entre o <strong>cliente</strong> e a internet. O cliente sabe que está usando um proxy.</p>
+            <ul>
+              <li>Anonimiza o cliente</li>
+              <li>Filtra conteúdo (firewall corporativo)</li>
+              <li>Cache de saída</li>
+            </ul>
+            <p><em>Ex.: Proxy corporativo, VPN</em></p>
+          </div>
+          <div class="side">
+            <h4>Proxy Reverso (Reverse Proxy)</h4>
+            <p>Fica entre a internet e os <strong>servidores</strong>. O cliente não sabe que existe um proxy.</p>
+            <ul>
+              <li>Protege os servidores</li>
+              <li>Distribui carga (Load Balancing)</li>
+              <li>Terminação SSL</li>
+            </ul>
+            <p><em>Ex.: Nginx, Traefik, HAProxy</em></p>
+          </div>
+        </div>
+
+        <div class="slide-footer">
+          <div class="footer-bar">01 – Revisão + API Gateway & Proxy Reverso</div>
+          <div class="footer-page">11</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: NGINX ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header">
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Nginx como Proxy Reverso</h2>
+        </div>
+
+        <p>O <strong>Nginx</strong> é um dos servidores web e proxy reverso mais utilizados no mundo. Sua arquitetura orientada a eventos o torna extremamente eficiente para lidar com milhares de conexões simultâneas.</p>
+
+        <pre><code class="language-nginx"># nginx.conf - Exemplo de Proxy Reverso
+upstream api_pedidos {
+    server pedidos-service:8080;
+}
+
+upstream api_produtos {
+    server produtos-service:8081;
+}
+
+server {
+    listen 80;
+    server_name api.meusite.com;
+
+    location /api/pedidos {
+        proxy_pass http://api_pedidos;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+    }
+
+    location /api/produtos {
+        proxy_pass http://api_produtos;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+    }
+}</code></pre>
+
+        <div class="slide-footer">
+          <div class="footer-bar">01 – Revisão + API Gateway & Proxy Reverso</div>
+          <div class="footer-page">12</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: TRAEFIK ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header">
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Traefik: Proxy Reverso Cloud-Native</h2>
+        </div>
+
+        <p>O <strong>Traefik</strong> é um proxy reverso moderno que se integra nativamente com Docker, Kubernetes e outros orquestradores. Ele descobre serviços automaticamente — sem necessidade de configuração manual de rotas.</p>
+
+        <div class="side-by-side">
+          <div class="side">
+            <h4>Vantagens</h4>
+            <ul>
+              <li>Auto-discovery de serviços via Docker labels</li>
+              <li>Certificados SSL automáticos (Let's Encrypt)</li>
+              <li>Dashboard de monitoramento integrado</li>
+              <li>Middlewares configuráveis (auth, rate limit, headers)</li>
+            </ul>
+          </div>
+          <div class="side">
+            <h4>docker-compose.yml</h4>
+            <pre><code class="language-yaml">services:
+  traefik:
+    image: traefik:v3.0
+    ports:
+      - "80:80"
+      - "8080:8080"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    command:
+      - "--providers.docker=true"
+      - "--api.insecure=true"
+
+  api-pedidos:
+    image: minha-api:latest
+    labels:
+      - "traefik.http.routers.pedidos.rule=PathPrefix(`/api/pedidos`)"</code></pre>
+          </div>
+        </div>
+
+        <div class="slide-footer">
+          <div class="footer-bar">01 – Revisão + API Gateway & Proxy Reverso</div>
+          <div class="footer-page">13</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: COMPARAÇÃO SOLUÇÕES ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header">
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Comparação: Soluções de API Gateway</h2>
+        </div>
+
+        <table>
+          <thead>
+            <tr><th>Solução</th><th>Tipo</th><th>Melhor para</th><th>Destaques</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><strong>Nginx</strong></td><td>Proxy Reverso / LB</td><td>Alta performance, configuração manual</td><td>Leve, rápido, amplamente adotado</td></tr>
+            <tr><td><strong>Traefik</strong></td><td>Proxy Cloud-Native</td><td>Docker / Kubernetes</td><td>Auto-discovery, SSL automático</td></tr>
+            <tr><td><strong>Kong</strong></td><td>API Gateway</td><td>APIs em produção</td><td>Plugins, analytics, portal de dev</td></tr>
+            <tr><td><strong>Azure API Management</strong></td><td>Gateway Gerenciado</td><td>Ecossistema Microsoft</td><td>Integração Azure, políticas, portal</td></tr>
+            <tr><td><strong>Ocelot</strong></td><td>Gateway .NET</td><td>Microsserviços .NET</td><td>Leve, configuração via JSON</td></tr>
+            <tr><td><strong>Spring Cloud Gateway</strong></td><td>Gateway Java</td><td>Microsserviços Spring</td><td>Reativo, filtros, predicates</td></tr>
+          </tbody>
+        </table>
+
+        <div class="slide-footer">
+          <div class="footer-bar">01 – Revisão + API Gateway & Proxy Reverso</div>
+          <div class="footer-page">14</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: CASO REAL ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header">
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Caso Real: Netflix Zuul → Spring Cloud Gateway</h2>
+        </div>
+
+        <p>A <strong>Netflix</strong> foi pioneira no uso de API Gateways com o <strong>Zuul</strong>, que processava bilhões de requisições por dia. Em 2018, migraram para o <strong>Zuul 2</strong> (assíncrono) e a comunidade Spring criou o <strong>Spring Cloud Gateway</strong> como alternativa reativa.</p>
+
+        <div class="callout">
+          <p><strong>Problema real:</strong> Com mais de 1.000 microsserviços, a Netflix precisava de um ponto central para roteamento, autenticação, canary deployments e resiliência. Sem um gateway, cada serviço teria que implementar tudo isso individualmente.</p>
+        </div>
+
+        <div class="concept-cards">
+          <div class="concept-card">
+            <h4>Canary Deployment</h4>
+            <p>O gateway direciona 5% do tráfego para a nova versão antes do rollout completo</p>
+          </div>
+          <div class="concept-card">
+            <h4>A/B Testing</h4>
+            <p>Diferentes versões da API servidas para diferentes grupos de usuários</p>
+          </div>
+        </div>
+
+        <div class="slide-footer">
+          <div class="footer-bar">01 – Revisão + API Gateway & Proxy Reverso</div>
+          <div class="footer-page">15</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: INTERVALO ==================== -->
+      <section class="break-slide">
+        <h2>☕ Intervalo</h2>
+        <p>Voltamos às 21h20</p>
+      </section>
+
+      <!-- ==================== SLIDE: BLOCO 2 - PRÁTICA ==================== -->
+      <section class="section-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header">
+        <div class="accent-bar"></div>
+        <h2>Exercício Prático</h2>
+        <div class="slide-footer"><div class="footer-page">17</div></div>
+      </section>
+
+      <!-- ==================== SLIDE: EXERCÍCIO ==================== -->
+      <section class="exercise-slide content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header">
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Hands-on: Nginx como Proxy Reverso com Docker</h2>
+        </div>
+
+        <div class="exercise-container">
+          <h3>🎯 Objetivo</h3>
+          <p>Configurar o Nginx como proxy reverso para rotear requisições para duas APIs diferentes rodando em containers Docker.</p>
+
+          <ol class="exercise-steps">
+            <li>Crie uma pasta <code>exercicio-gateway</code> e dentro dela crie o <code>docker-compose.yml</code></li>
+            <li>Configure dois serviços simples usando a imagem <code>hashicorp/http-echo</code>: um retornando "Serviço A" na porta 5001 e outro "Serviço B" na porta 5002</li>
+            <li>Crie o arquivo <code>nginx.conf</code> com rotas: <code>/servico-a</code> → container A e <code>/servico-b</code> → container B</li>
+            <li>Adicione o Nginx como serviço no docker-compose, mapeando a porta 80 e montando o <code>nginx.conf</code></li>
+            <li>Execute <code>docker compose up -d</code> e teste com <code>curl http://localhost/servico-a</code></li>
+            <li><strong>Desafio:</strong> Adicione um header customizado <code>X-Gateway: fiap-proxy</code> nas respostas</li>
+          </ol>
+        </div>
+
+        <div class="slide-footer">
+          <div class="footer-bar">01 – Revisão + API Gateway & Proxy Reverso</div>
+          <div class="footer-page">18</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: SOLUÇÃO DOCKER-COMPOSE ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header">
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Solução: docker-compose.yml</h2>
+        </div>
+
+        <pre><code class="language-yaml">version: '3.8'
+services:
+  servico-a:
+    image: hashicorp/http-echo
+    command: ["-text=Resposta do Serviço A", "-listen=:5001"]
+    networks:
+      - gateway-net
+
+  servico-b:
+    image: hashicorp/http-echo
+    command: ["-text=Resposta do Serviço B", "-listen=:5002"]
+    networks:
+      - gateway-net
+
+  nginx-gateway:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      - servico-a
+      - servico-b
+    networks:
+      - gateway-net
+
+networks:
+  gateway-net:
+    driver: bridge</code></pre>
+
+        <div class="slide-footer">
+          <div class="footer-bar">01 – Revisão + API Gateway & Proxy Reverso</div>
+          <div class="footer-page">19</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: SOLUÇÃO NGINX.CONF ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header">
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Solução: nginx.conf</h2>
+        </div>
+
+        <pre><code class="language-nginx">upstream servico_a {
+    server servico-a:5001;
+}
+
+upstream servico_b {
+    server servico-b:5002;
+}
+
+server {
+    listen 80;
+
+    # Header customizado em todas as respostas (desafio)
+    add_header X-Gateway "fiap-proxy" always;
+
+    location /servico-a {
+        proxy_pass http://servico_a/;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    }
+
+    location /servico-b {
+        proxy_pass http://servico_b/;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    }
+}</code></pre>
+
+        <div class="callout">
+          <p><strong>Teste:</strong> <code>curl -i http://localhost/servico-a</code> — observe o header <code>X-Gateway: fiap-proxy</code> na resposta!</p>
+        </div>
+
+        <div class="slide-footer">
+          <div class="footer-bar">01 – Revisão + API Gateway & Proxy Reverso</div>
+          <div class="footer-page">20</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: QUIZ 1 ==================== -->
+      <section class="quiz-slide content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header">
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Quiz</h2>
+        </div>
+
+        <div class="quiz-container">
+          <div class="quiz-question">Qual é a principal diferença entre um Proxy Direto (Forward Proxy) e um Proxy Reverso (Reverse Proxy)?</div>
+          <ul class="quiz-options">
+            <li data-correct="false">
+              <span class="option-letter">A</span>
+              O Proxy Direto é mais rápido que o Proxy Reverso
+            </li>
+            <li data-correct="false">
+              <span class="option-letter">B</span>
+              O Proxy Reverso só funciona com HTTPS, enquanto o Direto funciona com HTTP
+            </li>
+            <li data-correct="true">
+              <span class="option-letter">C</span>
+              O Proxy Direto protege o cliente, enquanto o Proxy Reverso protege os servidores
+            </li>
+            <li data-correct="false">
+              <span class="option-letter">D</span>
+              Não há diferença — são apenas nomes diferentes para a mesma tecnologia
+            </li>
+          </ul>
+          <div class="quiz-feedback"
+               data-correct-msg="O Forward Proxy fica entre o cliente e a internet (protege o cliente), enquanto o Reverse Proxy fica entre a internet e os servidores (protege os servidores)."
+               data-incorrect-msg="A diferença fundamental está na posição: Forward Proxy protege o cliente (ex.: VPN corporativa), Reverse Proxy protege os servidores (ex.: Nginx na frente de microsserviços).">
+          </div>
+        </div>
+
+        <div class="slide-footer">
+          <div class="footer-bar">01 – Revisão + API Gateway & Proxy Reverso</div>
+          <div class="footer-page">21</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: QUIZ 2 ==================== -->
+      <section class="quiz-slide content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header">
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Quiz</h2>
+        </div>
+
+        <div class="quiz-container">
+          <div class="quiz-question">Em uma arquitetura de microsserviços, qual NÃO é uma responsabilidade típica de um API Gateway?</div>
+          <ul class="quiz-options">
+            <li data-correct="false">
+              <span class="option-letter">A</span>
+              Roteamento de requisições para o serviço correto
+            </li>
+            <li data-correct="true">
+              <span class="option-letter">B</span>
+              Executar a lógica de negócio dos microsserviços
+            </li>
+            <li data-correct="false">
+              <span class="option-letter">C</span>
+              Rate Limiting e Throttling
+            </li>
+            <li data-correct="false">
+              <span class="option-letter">D</span>
+              Autenticação e validação de tokens
+            </li>
+          </ul>
+          <div class="quiz-feedback"
+               data-correct-msg="O API Gateway é responsável por cross-cutting concerns (roteamento, auth, rate limiting). A lógica de negócio deve permanecer nos microsserviços — o gateway não deve se tornar um 'monolito inteligente'."
+               data-incorrect-msg="Cuidado! O API Gateway NÃO deve conter lógica de negócio. Ele cuida de roteamento, autenticação, rate limiting e logging. A lógica de negócio pertence aos microsserviços.">
+          </div>
+        </div>
+
+        <div class="slide-footer">
+          <div class="footer-bar">01 – Revisão + API Gateway & Proxy Reverso</div>
+          <div class="footer-page">22</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: HOMEWORK ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header">
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Para a próxima aula</h2>
+        </div>
+
+        <div class="concept-cards">
+          <div class="concept-card">
+            <h4>📖 Leitura</h4>
+            <p>Pesquisar sobre algoritmos de Load Balancing: Round Robin, Least Connections, IP Hash, Weighted</p>
+          </div>
+          <div class="concept-card">
+            <h4>💻 Prática</h4>
+            <p>Adicionar um terceiro serviço (Serviço C) ao exercício de hoje e configurar a rota no Nginx</p>
+          </div>
+        </div>
+
+        <div class="callout">
+          <p><strong>Próxima aula (24/02):</strong> Load Balancer, Rate Limiting & Throttling — vamos escalar o exercício de hoje com múltiplas instâncias e distribuição de carga.</p>
+        </div>
+
+        <div class="slide-footer">
+          <div class="footer-bar">01 – Revisão + API Gateway & Proxy Reverso</div>
+          <div class="footer-page">23</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: FIM ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header">
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Dúvidas ou curiosidades?</h2>
+        </div>
+
+        <div style="display:flex; align-items:center; justify-content:center; flex:1; font-size:4em; color: var(--fiap-dark); font-weight:800; opacity:0.15; margin-top:40px;">
+          ?
+        </div>
+
+        <div class="slide-footer">
+          <div class="footer-bar">01 – Revisão + API Gateway & Proxy Reverso</div>
+          <div class="footer-page">24</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: ENCERRAMENTO ==================== -->
+      <section class="end-slide">
+        <img src="../assets/img/fiap-logo-graduacao.png" alt="FIAP Graduação" style="max-width:350px;">
+        <div class="copyright">
+          Copyright &copy; 2026<br>
+          Prof.º José Romualdo da Costa Filho<br><br>
+          Todos direitos reservados. Reprodução ou divulgação total ou parcial<br>
+          deste documento é expressamente proibido sem o consentimento formal,<br>
+          por escrito, do Professor (autor).
+        </div>
+      </section>
+
+    </div>
+  </div>
+
+  <script src="../node_modules/reveal.js/dist/reveal.js"></script>
+  <script src="../node_modules/reveal.js/plugin/highlight/highlight.js"></script>
+  <script src="../assets/js/fiap-quiz.js"></script>
+  <script>
+    Reveal.initialize({
+      hash: true,
+      slideNumber: false,
+      width: 1280,
+      height: 720,
+      margin: 0,
+      minScale: 0.2,
+      maxScale: 2.0,
+      center: false,
+      transition: 'slide',
+      transitionSpeed: 'default',
+      scrollActivationWidth: null,
+      view: null,
+      plugins: [RevealHighlight]
+    });
+  </script>
+</body>
+</html>

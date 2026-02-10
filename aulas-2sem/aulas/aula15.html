@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AULA 15 - Nuvem + Integracao Continua | FIAP</title>
+  <link rel="stylesheet" href="../node_modules/reveal.js/dist/reveal.css">
+  <link rel="stylesheet" href="../node_modules/reveal.js/dist/theme/white.css">
+  <link rel="stylesheet" href="../node_modules/reveal.js/plugin/highlight/monokai.css">
+  <link rel="stylesheet" href="../assets/css/fiap-theme.css">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="reveal">
+    <div class="slides">
+
+      <!-- ==================== SLIDE: CAPA FIAP ==================== -->
+      <section class="cover-slide">
+        <img src="../assets/img/fiap-logo-graduacao.png" alt="FIAP Graduação" class="fiap-logo-full">
+      </section>
+
+      <!-- ==================== SLIDE: TÍTULO DA AULA ==================== -->
+      <section class="title-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header">
+        <div class="title-card">
+          <div class="accent-bar"></div>
+          <h1>Nuvem + Integração Contínua</h1>
+          <h2>AULA 15 - 16/06/2026</h2>
+          <h3>Prof. José Romualdo</h3>
+        </div>
+        <div class="lesson-bar">15 - Nuvem + Integracao Continua</div>
+      </section>
+
+      <!-- ==================== SLIDE: AGENDA ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header">
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Agenda</h2>
+        </div>
+
+        <table>
+          <thead>
+            <tr><th>Bloco</th><th>Horário</th><th>Conteúdo</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><strong>Bloco 1</strong></td><td>19h30 – 21h00</td><td>Cloud Computing, CNCF Landscape, Azure, Pipelines CI, SonarQube, Caso real Itaú</td></tr>
+            <tr><td><strong>Intervalo</strong></td><td>21h00 – 21h20</td><td>☕ Pausa</td></tr>
+            <tr><td><strong>Bloco 2</strong></td><td>21h20 – 22h45</td><td>Exercício pipeline CI com GitHub Actions + Quiz</td></tr>
+          </tbody>
+        </table>
+
+        <div class="slide-footer">
+          <div class="footer-bar">15 - Nuvem + Integracao Continua</div>
+          <div class="footer-page">3</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: SEÇÃO BLOCO 1 ==================== -->
+      <section class="section-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header">
+        <div class="accent-bar"></div>
+        <h2>Bloco 1<br>Cloud Computing & Integração Contínua</h2>
+        <div class="slide-footer">
+          <div class="footer-bar">15 - Nuvem + Integracao Continua</div>
+          <div class="footer-page">4</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: Cloud Computing - Modelos ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header">
+        <div class="slide-title-area"><div class="accent-bar"></div><h2>Modelos de Cloud Computing</h2></div>
+
+        <ul>
+          <li><strong>IaaS</strong> (Infrastructure as a Service) - Infraestrutura como serviço: servidores, storage, rede na nuvem</li>
+          <li><strong>PaaS</strong> (Platform as a Service) - Plataforma pronta para desenvolvimento e deploy</li>
+          <li><strong>FaaS / Serverless</strong> - Funções executadas sob demanda, sem gerenciar servidores</li>
+          <li><strong>SaaS</strong> (Software as a Service) - Aplicações completas entregues pela nuvem</li>
+        </ul>
+
+        <div class="slide-footer">
+          <div class="footer-bar">15 - Nuvem + Integracao Continua</div>
+          <div class="footer-page">5</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: CNCF Landscape ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header">
+        <div class="slide-title-area"><div class="accent-bar"></div><h2>CNCF Landscape</h2></div>
+
+        <p>A Cloud Native Computing Foundation (CNCF) mantém um ecossistema vasto de projetos para computação nativa na nuvem.</p>
+
+        <ul>
+          <li><strong>Kubernetes</strong> - Orquestração de containers</li>
+          <li><strong>Prometheus</strong> - Monitoramento</li>
+          <li><strong>Envoy</strong> - Proxy e service mesh</li>
+          <li><strong>Helm</strong> - Gerenciamento de pacotes Kubernetes</li>
+          <li><em>...e muitos outros projetos para cloud native</em></li>
+        </ul>
+
+        <div class="slide-footer">
+          <div class="footer-bar">15 - Nuvem + Integracao Continua</div>
+          <div class="footer-page">6</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: Microsoft Azure - Serviços ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header">
+        <div class="slide-title-area"><div class="accent-bar"></div><h2>Microsoft Azure - Serviços Principais</h2></div>
+
+        <ul>
+          <li><strong>App Service:</strong> Hospedagem de aplicações web escaláveis (.NET, Java, Node.js, etc.)</li>
+          <li><strong>AKS (Azure Kubernetes Service):</strong> Kubernetes gerenciado na nuvem</li>
+          <li><strong>Azure Functions:</strong> Execução serverless para funções e eventos</li>
+          <li><strong>Azure DevOps:</strong> Plataforma completa para CI/CD, repositórios e gerenciamento de projetos</li>
+        </ul>
+
+        <div class="slide-footer">
+          <div class="footer-bar">15 - Nuvem + Integracao Continua</div>
+          <div class="footer-page">7</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: Pipelines de CI ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header">
+        <div class="slide-title-area"><div class="accent-bar"></div><h2>Pipelines de Integração Contínua (CI)</h2></div>
+
+        <p>Automatizam build, testes e deploy para garantir qualidade e agilidade no desenvolvimento.</p>
+        <ul>
+          <li><strong>Azure DevOps Pipelines:</strong> Pipelines completas integradas à plataforma Azure DevOps</li>
+          <li><strong>GitHub Actions:</strong> Workflows flexíveis integrados ao GitHub para CI/CD</li>
+          <li><strong>SonarQube:</strong> Ferramenta para análise estática e qualidade de código</li>
+        </ul>
+
+        <div class="slide-footer">
+          <div class="footer-bar">15 - Nuvem + Integracao Continua</div>
+          <div class="footer-page">8</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: Caso Real - Pipeline Itaú ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header">
+        <div class="slide-title-area"><div class="accent-bar"></div><h2>Caso Real: Pipeline de CI do Itaú com Azure DevOps</h2></div>
+
+        <p>O Itaú utiliza Azure DevOps para gerenciar seus pipelines de CI, garantindo qualidade e velocidade no desenvolvimento de aplicações financeiras críticas.</p>
+        <ul>
+          <li>Build automatizado de microserviços Java e .NET</li>
+          <li>Testes unitários e integração executados automaticamente</li>
+          <li>Análise estática com SonarQube para manter a qualidade do código</li>
+          <li>Deploy automatizado para ambientes de homologação e produção via Azure Pipelines</li>
+        </ul>
+
+        <div class="slide-footer">
+          <div class="footer-bar">15 - Nuvem + Integracao Continua</div>
+          <div class="footer-page">9</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: Quiz IaaS vs PaaS vs FaaS ==================== -->
+      <section class="quiz-slide content-slide" data-quiz-question="Qual das opções abaixo representa uma característica do FaaS (Function as a Service)?" data-correct="execução sob demanda sem gerenciar servidores" data-quiz-feedback="Correto! FaaS permite executar funções sob demanda sem precisar gerenciar servidores diretamente.">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header">
+        <div class="slide-title-area"><div class="accent-bar"></div><h2>Quiz: IaaS vs PaaS vs FaaS</h2></div>
+
+        <p>Qual das opções abaixo representa uma característica do <strong>FaaS (Function as a Service)</strong>?</p>
+        <ul>
+          <li><button class="quiz-option">Provisionamento de infraestrutura virtual</button></li>
+          <li><button class="quiz-option">Hospedagem de aplicação web completa</button></li>
+          <li><button class="quiz-option">Execução sob demanda sem gerenciar servidores</button></li>
+          <li><button class="quiz-option">Software pronto para uso final</button></li>
+        </ul>
+
+        <div class="quiz-feedback"></div>
+
+        <div class="slide-footer">
+          <div class="footer-bar">15 - Nuvem + Integracao Continua</div>
+          <div class="footer-page">10</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: Boas práticas em CI ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header">
+        <div class="slide-title-area"><div class="accent-bar"></div><h2>Boas Práticas em Integração Contínua</h2></div>
+
+        <ul>
+          <li>Automatizar o build e testes para cada commit</li>
+          <li>Incluir análise estática de código (ex: SonarQube)</li>
+          <li>Manter pipelines rápidas para feedback imediato</li>
+          <li>Versionar configurações de pipeline junto ao código</li>
+          <li>Integrar com ambientes de homologação para testes integrados</li>
+        </ul>
+
+        <div class="slide-footer">
+          <div class="footer-bar">15 - Nuvem + Integracao Continua</div>
+          <div class="footer-page">11</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: Azure DevOps Pipeline Exemplo YAML ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header">
+        <div class="slide-title-area"><div class="accent-bar"></div><h2>Exemplo de Pipeline YAML no Azure DevOps</h2></div>
+
+        <pre><code class="language-yaml">trigger:
+  branches:
+    include:
+      - main
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+steps:
+- task: Maven@3
+  inputs:
+    mavenPomFile: 'pom.xml'
+    goals: 'clean package'
+- task: PublishBuildArtifacts@1
+  inputs:
+    PathtoPublish: 'target'
+    ArtifactName: 'drop'
+</code></pre>
+
+        <div class="slide-footer">
+          <div class="footer-bar">15 - Nuvem + Integracao Continua</div>
+          <div class="footer-page">12</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: Exemplo GitHub Actions ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header">
+        <div class="slide-title-area"><div class="accent-bar"></div><h2>Exemplo de GitHub Actions para Node.js</h2></div>
+
+        <pre><code class="language-yaml">name: Node.js CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Use Node.js 16.x
+      uses: actions/setup-node@v3
+      with:
+        node-version: '16'
+    - run: npm install
+    - run: npm test
+</code></pre>
+
+        <div class="slide-footer">
+          <div class="footer-bar">15 - Nuvem + Integracao Continua</div>
+          <div class="footer-page">13</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: SonarQube para Qualidade ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header">
+        <div class="slide-title-area"><div class="accent-bar"></div><h2>SonarQube para Análise Estática e Qualidade de Código</h2></div>
+
+        <p>SonarQube é uma ferramenta que analisa código fonte para detectar bugs, vulnerabilidades e code smells.</p>
+        <ul>
+          <li>Suporte a múltiplas linguagens: Java, C#, JavaScript, entre outras</li>
+          <li>Integração com pipelines de CI para bloqueio automático em falhas</li>
+          <li>Relatórios detalhados com métricas e tendências de qualidade</li>
+        </ul>
+
+        <div class="slide-footer">
+          <div class="footer-bar">15 - Nuvem + Integracao Continua</div>
+          <div class="footer-page">14</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: Exemplo SonarQube no pipeline YAML ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header">
+        <div class="slide-title-area"><div class="accent-bar"></div><h2>Integrando SonarQube no Azure DevOps Pipeline</h2></div>
+
+        <pre><code class="language-yaml">steps:
+- task: SonarQubePrepare@5
+  inputs:
+    SonarQube: 'SonarQubeServiceConnection'
+    scannerMode: 'MSBuild'
+    projectKey: 'myProjectKey'
+    projectName: 'My Project'
+- task: VSBuild@1
+  inputs:
+    solution: '**/*.sln'
+- task: SonarQubeAnalyze@5
+- task: SonarQubePublish@5
+  inputs:
+    pollingTimeoutSec: '300'
+</code></pre>
+
+        <div class="slide-footer">
+          <div class="footer-bar">15 - Nuvem + Integracao Continua</div>
+          <div class="footer-page">15</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: Section Intervalo ==================== -->
+      <section class="break-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header">
+        <h2>Intervalo</h2>
+        <h3>21h00 – 21h20</h3>
+        <p>☕ Aproveite para descansar!</p>
+
+        <div class="slide-footer">
+          <div class="footer-bar">15 - Nuvem + Integracao Continua</div>
+          <div class="footer-page">16</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: SEÇÃO BLOCO 2 ==================== -->
+      <section class="section-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header">
+        <div class="accent-bar"></div>
+        <h2>Bloco 2<br>Exercício Prático + Quiz</h2>
+        <div class="slide-footer">
+          <div class="footer-bar">15 - Nuvem + Integracao Continua</div>
+          <div class="footer-page">17</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: Exercício Hands-on ==================== -->
+      <section class="exercise-slide content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header">
+        <div class="slide-title-area"><div class="accent-bar"></div><h2>Exercício: Criar Pipeline CI com GitHub Actions</h2></div>
+
+        <div class="exercise-container">
+          <h3>Objetivo:</h3>
+          <p>Configurar um pipeline CI no GitHub Actions para seu projeto que execute:</p>
+          <ol class="exercise-steps">
+            <li>Build do projeto (exemplo Java, .NET ou Node.js)</li>
+            <li>Execução dos testes automatizados</li>
+            <li>Análise estática de código usando SonarCloud ou SonarQube</li>
+            <li>Gerar feedback automático no PR</li>
+          </ol>
+          <p><em>Dica:</em> Utilize os exemplos YAML apresentados nos slides anteriores como base.</p>
+        </div>
+
+        <div class="slide-footer">
+          <div class="footer-bar">15 - Nuvem + Integracao Continua</div>
+          <div class="footer-page">18</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: Quiz 2 - IaaS vs PaaS vs FaaS ==================== -->
+      <section class="quiz-slide content-slide" data-quiz-question="Qual dos modelos cloud abaixo oferece uma plataforma pronta para desenvolvimento e deploy sem gerenciar a infraestrutura subjacente?" data-correct="PaaS" data-quiz-feedback="Exato! PaaS oferece uma plataforma pronta para desenvolvimento sem se preocupar com infraestrutura.">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header">
+        <div class="slide-title-area"><div class="accent-bar"></div><h2>Quiz: Modelos de Cloud</h2></div>
+
+        <p>Qual dos modelos cloud abaixo oferece uma plataforma pronta para desenvolvimento e deploy sem gerenciar a infraestrutura subjacente?</p>
+        <ul>
+          <li><button class="quiz-option">IaaS</button></li>
+          <li><button class="quiz-option">PaaS</button></li>
+          <li><button class="quiz-option">FaaS</button></li>
+          <li><button class="quiz-option">SaaS</button></li>
+        </ul>
+
+        <div class="quiz-feedback"></div>
+
+        <div class="slide-footer">
+          <div class="footer-bar">15 - Nuvem + Integracao Continua</div>
+          <div class="footer-page">19</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: Quiz 3 - Boas práticas CI ==================== -->
+      <section class="quiz-slide content-slide" data-quiz-question="Qual das opções a seguir é uma boa prática para pipelines de CI?" data-correct="Incluir análise estática de código para detectar bugs cedo" data-quiz-feedback="Correto! Análise estática ajuda a detectar bugs e vulnerabilidades logo no início do processo.">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header">
+        <div class="slide-title-area"><div class="accent-bar"></div><h2>Quiz: Boas Práticas em CI</h2></div>
+
+        <p>Qual das opções a seguir é uma boa prática para pipelines de CI?</p>
+        <ul>
+          <li><button class="quiz-option">Ignorar falhas de teste para acelerar deploy</button></li>
+          <li><button class="quiz-option">Executar build apenas uma vez por semana</button></li>
+          <li><button class="quiz-option">Incluir análise estática de código para detectar bugs cedo</button></li>
+          <li><button class="quiz-option">Não versionar o arquivo de pipeline</button></li>
+        </ul>
+
+        <div class="quiz-feedback"></div>
+
+        <div class="slide-footer">
+          <div class="footer-bar">15 - Nuvem + Integracao Continua</div>
+          <div class="footer-page">20</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: Exemplo Código Java Spring Boot CI ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header">
+        <div class="slide-title-area"><div class="accent-bar"></div><h2>Exemplo: Pipeline CI para Java Spring Boot</h2></div>
+
+        <pre><code class="language-yaml">name: Java CI
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Set up JDK 17
+      uses: actions/setup-java@v3
+      with:
+        java-version: '17'
+    - name: Build with Maven
+      run: mvn clean package --file pom.xml
+    - name: Run tests
+      run: mvn test
+    - name: SonarQube Scan
+      uses: sonarsource/sonarcloud-github-action@v1
+      with:
+        projectBaseDir: '.'
+</code></pre>
+
+        <div class="slide-footer">
+          <div class="footer-bar">15 - Nuvem + Integracao Continua</div>
+          <div class="footer-page">21</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: Exemplo Código C# .NET CI ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header">
+        <div class="slide-title-area"><div class="accent-bar"></div><h2>Exemplo: Pipeline CI para .NET C#</h2></div>
+
+        <pre><code class="language-yaml">trigger:
+- main
+
+pool:
+  vmImage: 'windows-latest'
+
+steps:
+- task: UseDotNet@2
+  inputs:
+    packageType: 'sdk'
+    version: '6.0.x'
+- script: dotnet build --configuration Release
+  displayName: 'Build project'
+- script: dotnet test --no-build --verbosity normal
+  displayName: 'Run tests'
+- task: SonarQubePrepare@5
+  inputs:
+    SonarQube: 'SonarQubeServiceConnection'
+    scannerMode: 'MSBuild'
+    projectKey: 'dotnet-project'
+    projectName: 'DotNet Project'
+- task: SonarQubeAnalyze@5
+- task: SonarQubePublish@5
+  inputs:
+    pollingTimeoutSec: '300'
+</code></pre>
+
+        <div class="slide-footer">
+          <div class="footer-bar">15 - Nuvem + Integracao Continua</div>
+          <div class="footer-page">22</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: Exemplo Código Node.js CI ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header">
+        <div class="slide-title-area"><div class="accent-bar"></div><h2>Exemplo: Pipeline CI para Node.js</h2></div>
+
+        <pre><code class="language-yaml">name: Node.js CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '16'
+    - run: npm install
+    - run: npm test
+    - name: SonarCloud Scan
+      uses: sonarsource/sonarcloud-github-action@v1
+      with:
+        projectBaseDir: '.'
+</code></pre>
+
+        <div class="slide-footer">
+          <div class="footer-bar">15 - Nuvem + Integracao Continua</div>
+          <div class="footer-page">23</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: Dúvidas e Encerramento ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header">
+        <div class="slide-title-area"><div class="accent-bar"></div><h2>Dúvidas ou curiosidades?</h2></div>
+
+        <div style="display:flex; align-items:center; justify-content:center; flex:1; font-size:4em; color: var(--fiap-dark); font-weight:800; opacity:0.15; margin-top:40px;">
+          ?
+        </div>
+
+        <div class="slide-footer">
+          <div class="footer-bar">15 - Nuvem + Integracao Continua</div>
+          <div class="footer-page">24</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: ENCERRAMENTO ==================== -->
+      <section class="end-slide">
+        <img src="../assets/img/fiap-logo-graduacao.png" alt="FIAP Graduação" style="max-width:350px;">
+        <div class="copyright">
+          Copyright &copy; 2026<br>
+          Prof.º José Romualdo da Costa Filho<br><br>
+          Todos direitos reservados. Reprodução ou divulgação total ou parcial<br>
+          deste documento é expressamente proibido sem o consentimento formal,<br>
+          por escrito, do Professor (autor).
+        </div>
+      </section>
+
+    </div>
+  </div>
+
+  <script src="../node_modules/reveal.js/dist/reveal.js"></script>
+  <script src="../node_modules/reveal.js/plugin/highlight/highlight.js"></script>
+  <script src="../assets/js/fiap-quiz.js"></script>
+  <script>
+    Reveal.initialize({
+      hash: true,
+      slideNumber: false,
+      width: 1280,
+      height: 720,
+      margin: 0,
+      minScale: 0.2,
+      maxScale: 2.0,
+      center: false,
+      transition: 'slide',
+      transitionSpeed: 'default',
+      scrollActivationWidth: null,
+      view: null,
+      plugins: [RevealHighlight]
+    });
+  </script>
+</body>
+</html>

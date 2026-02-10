@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AULA 11 - Testes de Carga | FIAP</title>
+  <link rel="stylesheet" href="../node_modules/reveal.js/dist/reveal.css">
+  <link rel="stylesheet" href="../node_modules/reveal.js/dist/theme/white.css">
+  <link rel="stylesheet" href="../node_modules/reveal.js/plugin/highlight/monokai.css">
+  <link rel="stylesheet" href="../assets/css/fiap-theme.css">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="reveal">
+    <div class="slides">
+
+      <!-- ==================== SLIDE: CAPA FIAP ==================== -->
+      <section class="cover-slide">
+        <img src="../assets/img/fiap-logo-graduacao.png" alt="FIAP Graduação" class="fiap-logo-full">
+      </section>
+
+      <!-- ==================== SLIDE: TÍTULO DA AULA ==================== -->
+      <section class="title-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header">
+        <div class="title-card">
+          <div class="accent-bar"></div>
+          <h1>Testes de Carga</h1>
+          <h2>Performance e Resiliência de Sistemas</h2>
+          <h3>Prof. José Romualdo</h3>
+          <h4>Data: 05/05/2026</h4>
+        </div>
+        <div class="lesson-bar">11 - Testes de Carga</div>
+      </section>
+
+      <!-- ==================== SLIDE: AGENDA ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header">
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Agenda</h2>
+        </div>
+
+        <table>
+          <thead>
+            <tr><th>Bloco</th><th>Horário</th><th>Conteúdo</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><strong>Bloco 1</strong></td><td>19h30 – 21h00</td><td>Tipos de Teste de Performance, Métricas Fundamentais, Ferramenta K6 e Caso Real</td></tr>
+            <tr><td><strong>Intervalo</strong></td><td>21h00 – 21h20</td><td>☕ Pausa</td></tr>
+            <tr><td><strong>Bloco 2</strong></td><td>21h20 – 22h45</td><td>Exercício prático com K6 + Quiz interativo</td></tr>
+          </tbody>
+        </table>
+
+        <div class="slide-footer">
+          <div class="footer-bar">11 - Testes de Carga</div>
+          <div class="footer-page">3</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: SEÇÃO BLOCO 1 ==================== -->
+      <section class="section-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header">
+        <div class="accent-bar"></div>
+        <h2>Bloco 1<br>Tipos de Teste de Performance e Métricas</h2>
+        <div class="slide-footer">
+          <div class="footer-bar">11 - Testes de Carga</div>
+          <div class="footer-page">4</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: TIPOS DE TESTE DE PERFORMANCE ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header">
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Tipos de Teste de Performance</h2>
+        </div>
+
+        <ul>
+          <li><strong>Teste de Carga:</strong> Avaliar o comportamento do sistema sob carga esperada.</li>
+          <li><strong>Teste de Stress:</strong> Avaliar limites máximos e falhas do sistema.</li>
+          <li><strong>Teste Spike:</strong> Impacto de picos abruptos de carga.</li>
+          <li><strong>Teste Soak / Endurance:</strong> Avaliar estabilidade com carga prolongada.</li>
+        </ul>
+
+        <div class="slide-footer">
+          <div class="footer-bar">11 - Testes de Carga</div>
+          <div class="footer-page">5</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: MÉTRICAS FUNDAMENTAIS ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header">
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Métricas Fundamentais de Performance</h2>
+        </div>
+
+        <table>
+          <tbody>
+            <tr><td><strong>Throughput / RPS (Requests per Second)</strong></td><td>Quantidade de requisições processadas por segundo.</td></tr>
+            <tr><td><strong>Latência P50 / P95 / P99</strong></td><td>Tempo máximo para responder a X% das requisições (medianas e percentis).</td></tr>
+            <tr><td><strong>Error Rate</strong></td><td>Percentual de requisições que falharam.</td></tr>
+            <tr><td><strong>Saturação</strong></td><td>Nível de utilização de recursos (CPU, memória, conexões).</td></tr>
+          </tbody>
+        </table>
+
+        <div class="slide-footer">
+          <div class="footer-bar">11 - Testes de Carga</div>
+          <div class="footer-page">6</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: FERRAMENTA K6 ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header">
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Ferramenta K6 para Testes de Carga</h2>
+        </div>
+
+        <p>K6 é uma ferramenta open source da Grafana Labs para testes de performance e carga.</p>
+        <ul>
+          <li>Scripts em JavaScript para definir cenários de teste.</li>
+          <li>Suporte a ramp-up, ramp-down e testes contínuos.</li>
+          <li>Integração com Grafana para visualização de métricas.</li>
+        </ul>
+
+        <div style="margin-top:1em;">
+          <img src="../assets/img/k6-logo.png" alt="K6 Logo" style="width:150px;">
+        </div>
+
+        <div class="slide-footer">
+          <div class="footer-bar">11 - Testes de Carga</div>
+          <div class="footer-page">7</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: CASO REAL ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header">
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Caso Real: Black Friday e Sistemas em Colapso</h2>
+        </div>
+
+        <p>Todo ano no período da Black Friday, sistemas sofrem com picos intensos de acessos, revelando gargalos típicos:</p>
+        <ul>
+          <li><strong>Conexões ao Banco de Dados:</strong> Limites máximos causam filas e erros.</li>
+          <li><strong>Memory Leaks:</strong> Consumo crescente de memória pode causar travamentos.</li>
+          <li><strong>Thread Starvation:</strong> Threads bloqueadas impedem processamento eficiente.</li>
+        </ul>
+
+        <p>Esses problemas causam lentidão, erros e indisponibilidade, afetando vendas e reputação.</p>
+
+        <div class="slide-footer">
+          <div class="footer-bar">11 - Testes de Carga</div>
+          <div class="footer-page">8</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: EXEMPLO JAVA/Spring Boot ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header">
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Exemplo: Monitoramento de Métricas em Spring Boot</h2>
+        </div>
+
+        <pre><code class="language-java">
+// Configuração de métrica customizada em Spring Boot Actuator
+@Bean
+public Timer requestTimer(MeterRegistry registry) {
+    return Timer.builder("http.server.requests.latency")
+        .publishPercentiles(0.5, 0.95, 0.99)
+        .register(registry);
+}
+        </code></pre>
+
+        <p>Permite medir latências P50, P95 e P99 para identificar gargalos.</p>
+
+        <div class="slide-footer">
+          <div class="footer-bar">11 - Testes de Carga</div>
+          <div class="footer-page">9</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: EXEMPLO .NET/C# ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header">
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Exemplo: Captura de Métricas com .NET Core</h2>
+        </div>
+
+        <pre><code class="language-csharp">
+// Middleware para medir tempo de requisição
+app.Use(async (context, next) =&gt; {
+    var stopwatch = Stopwatch.StartNew();
+    await next();
+    stopwatch.Stop();
+    var latency = stopwatch.ElapsedMilliseconds;
+    // Log ou envio para sistema de monitoramento
+});
+        </code></pre>
+
+        <p>Monitorar latência e erros ajuda a identificar saturação e falhas.</p>
+
+        <div class="slide-footer">
+          <div class="footer-bar">11 - Testes de Carga</div>
+          <div class="footer-page">10</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: EXEMPLO NODE.JS ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header">
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Exemplo: Script Básico K6 em Node.js (JS)</h2>
+        </div>
+
+        <pre><code class="language-js">
+// k6 script para teste de carga simples
+import http from 'k6/http';
+import { sleep } from 'k6';
+
+export let options = {
+  stages: [
+    { duration: '1m', target: 20 },
+    { duration: '3m', target: 50 },
+    { duration: '1m', target: 0 },
+  ],
+};
+
+export default function () {
+  http.get('https://api.exemplo.com/endpoint');
+  sleep(1);
+}
+        </code></pre>
+
+        <p>Define ramp-up e ramp-down para simular carga progressiva.</p>
+
+        <div class="slide-footer">
+          <div class="footer-bar">11 - Testes de Carga</div>
+          <div class="footer-page">11</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: QUIZ 1 ==================== -->
+      <section class="quiz-slide content-slide" data-correct="P95" data-quiz-id="quiz1">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header">
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Quiz: Métricas de Latência</h2>
+        </div>
+
+        <p>Qual métrica indica o tempo máximo que 95% das requisições levam para serem processadas?</p>
+
+        <ul class="quiz-options">
+          <li>P50</li>
+          <li>P95</li>
+          <li>P99</li>
+          <li>Throughput</li>
+        </ul>
+
+        <div class="quiz-feedback"></div>
+
+        <div class="slide-footer">
+          <div class="footer-bar">11 - Testes de Carga</div>
+          <div class="footer-page">12</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: SEÇÃO INTERVALO ==================== -->
+      <section class="break-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header">
+        <div class="break-message">
+          <h2>Intervalo</h2>
+          <p>21h00 – 21h20</p>
+          <p>☕ Aproveite para descansar e recarregar</p>
+        </div>
+        <div class="slide-footer">
+          <div class="footer-bar">11 - Testes de Carga</div>
+          <div class="footer-page">13</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: SEÇÃO BLOCO 2 ==================== -->
+      <section class="section-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header">
+        <div class="accent-bar"></div>
+        <h2>Bloco 2<br>Exercício Prático e Quiz</h2>
+        <div class="slide-footer">
+          <div class="footer-bar">11 - Testes de Carga</div>
+          <div class="footer-page">14</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: EXERCÍCIO HANDS-ON ==================== -->
+      <section class="exercise-slide content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header">
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Exercício: Criar Script K6 para Teste de Carga Progressivo</h2>
+        </div>
+
+        <div class="exercise-container">
+          <h3>Passos:</h3>
+          <ol class="exercise-steps">
+            <li>Escreva um script K6 em JavaScript para testar a API <code>https://api.exemplo.com/data</code>.</li>
+            <li>Implemente um ramp-up progressivo de 0 a 50 usuários virtuais em 3 minutos.</li>
+            <li>Execute o teste localmente usando <code>k6 run script.js</code>.</li>
+            <li>Analise os resultados no terminal, observando latências P95 e taxa de erros.</li>
+            <li>Identifique possíveis gargalos baseados nos dados coletados.</li>
+          </ol>
+          <p><strong>Dica:</strong> Use o exemplo básico de script K6 apresentado no slide anterior como base.</p>
+        </div>
+
+        <div class="slide-footer">
+          <div class="footer-bar">11 - Testes de Carga</div>
+          <div class="footer-page">15</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: EXEMPLO DE SCRIPT K6 ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header">
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Exemplo de Script K6 para Exercício</h2>
+        </div>
+
+        <pre><code class="language-js">
+// script.js
+import http from 'k6/http';
+import { sleep } from 'k6';
+
+export let options = {
+  stages: [
+    { duration: '3m', target: 50 }, // ramp-up para 50 usuários
+  ],
+};
+
+export default function () {
+  http.get('https://api.exemplo.com/data');
+  sleep(1);
+}
+        </code></pre>
+
+        <div class="slide-footer">
+          <div class="footer-bar">11 - Testes de Carga</div>
+          <div class="footer-page">16</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: QUIZ 2 ==================== -->
+      <section class="quiz-slide content-slide" data-correct="Teste de Stress" data-quiz-id="quiz2">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header">
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Quiz: Diferença entre Teste de Carga e Stress</h2>
+        </div>
+
+        <p>Qual a principal diferença entre um teste de carga e um teste de stress?</p>
+
+        <ul class="quiz-options">
+          <li>Teste de Carga avalia limites máximos; Teste de Stress avalia carga normal.</li>
+          <li>Teste de Stress avalia limites máximos; Teste de Carga avalia carga esperada.</li>
+          <li>Ambos são iguais e usados para o mesmo propósito.</li>
+          <li>Teste de Carga é só para medir latência, Teste de Stress só para erros.</li>
+        </ul>
+
+        <div class="quiz-feedback"></div>
+
+        <div class="slide-footer">
+          <div class="footer-bar">11 - Testes de Carga</div>
+          <div class="footer-page">17</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: QUIZ 3 ==================== -->
+      <section class="quiz-slide content-slide" data-correct="P99" data-quiz-id="quiz3">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header">
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Quiz: Percentil de Latência mais Crítico</h2>
+        </div>
+
+        <p>Qual percentil de latência geralmente é mais crítico para identificar problemas graves de performance?</p>
+
+        <ul class="quiz-options">
+          <li>P50</li>
+          <li>P75</li>
+          <li>P95</li>
+          <li>P99</li>
+        </ul>
+
+        <div class="quiz-feedback"></div>
+
+        <div class="slide-footer">
+          <div class="footer-bar">11 - Testes de Carga</div>
+          <div class="footer-page">18</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: CONSIDERAÇÕES FINAIS SOBRE TESTES DE CARGA ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header">
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Considerações Finais</h2>
+        </div>
+
+        <ul>
+          <li>Testes de carga são essenciais para garantir a escalabilidade e estabilidade.</li>
+          <li>Monitorar métricas chave ajuda a antecipar problemas antes do ambiente produtivo.</li>
+          <li>Automatizar testes e integrar com CI/CD melhora a qualidade contínua.</li>
+          <li>Ferramentas como K6 e Grafana facilitam análise e visualização dos resultados.</li>
+        </ul>
+
+        <div class="slide-footer">
+          <div class="footer-bar">11 - Testes de Carga</div>
+          <div class="footer-page">19</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: CASO REAL - SOLUÇÕES ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header">
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Caso Real: Soluções para Gargalos Black Friday</h2>
+        </div>
+
+        <ul>
+          <li><strong>Connection Pooling:</strong> Otimizar conexões ao banco com pools dimensionados.</li>
+          <li><strong>Monitoramento de Memory Leaks:</strong> Usar ferramentas de profiling e alertas.</li>
+          <li><strong>Thread Management:</strong> Ajustar thread pools e evitar bloqueios desnecessários.</li>
+          <li><strong>Escalabilidade Horizontal:</strong> Distribuir carga em múltiplas instâncias.</li>
+        </ul>
+
+        <div class="slide-footer">
+          <div class="footer-bar">11 - Testes de Carga</div>
+          <div class="footer-page">20</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: DÚVIDAS E CONTATO ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header">
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Dúvidas ou Curiosidades?</h2>
+        </div>
+
+        <div style="display:flex; align-items:center; justify-content:center; flex:1; font-size:4em; color: var(--fiap-dark); font-weight:800; opacity:0.15; margin-top:40px;">
+          ?
+        </div>
+
+        <div class="slide-footer">
+          <div class="footer-bar">11 - Testes de Carga</div>
+          <div class="footer-page">21</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: ENCERRAMENTO ==================== -->
+      <section class="end-slide">
+        <img src="../assets/img/fiap-logo-graduacao.png" alt="FIAP Graduação" style="max-width:350px;">
+        <div class="copyright">
+          Copyright &copy; 2026<br>
+          Prof.º José Romualdo da Costa Filho<br><br>
+          Todos direitos reservados. Reprodução ou divulgação total ou parcial<br>
+          deste documento é expressamente proibido sem o consentimento formal,<br>
+          por escrito, do Professor (autor).
+        </div>
+      </section>
+
+    </div>
+  </div>
+
+  <script src="../node_modules/reveal.js/dist/reveal.js"></script>
+  <script src="../node_modules/reveal.js/plugin/highlight/highlight.js"></script>
+  <script src="../assets/js/fiap-quiz.js"></script>
+  <script>
+    Reveal.initialize({
+      hash: true,
+      slideNumber: false,
+      width: 1280,
+      height: 720,
+      margin: 0,
+      minScale: 0.2,
+      maxScale: 2.0,
+      center: false,
+      transition: 'slide',
+      transitionSpeed: 'default',
+      scrollActivationWidth: null,
+      view: null,
+      plugins: [RevealHighlight]
+    });
+  </script>
+</body>
+</html>

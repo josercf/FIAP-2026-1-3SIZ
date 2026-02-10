@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Aula 03 – Padrões de Resiliência | FIAP</title>
+  <link rel="stylesheet" href="../node_modules/reveal.js/dist/reveal.css" />
+  <link rel="stylesheet" href="../node_modules/reveal.js/dist/theme/white.css" />
+  <link rel="stylesheet" href="../node_modules/reveal.js/plugin/highlight/monokai.css" />
+  <link rel="stylesheet" href="../assets/css/fiap-theme.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+</head>
+<body>
+  <div class="reveal">
+    <div class="slides">
+
+      <!-- ==================== SLIDE: CAPA FIAP ==================== -->
+      <section class="cover-slide">
+        <img src="../assets/img/fiap-logo-graduacao.png" alt="FIAP Graduação" class="fiap-logo-full" />
+      </section>
+
+      <!-- ==================== SLIDE: TÍTULO DA AULA ==================== -->
+      <section class="title-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="title-card">
+          <div class="accent-bar"></div>
+          <h1>Sistemas de Informação</h1>
+          <h2>Microservice and Web Engineering</h2>
+          <h3>Prof. José Romualdo</h3>
+        </div>
+        <div class="lesson-bar">03 – Padrões de Resiliência</div>
+      </section>
+
+      <!-- ==================== SLIDE: AGENDA ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Agenda</h2>
+        </div>
+
+        <table>
+          <thead>
+            <tr><th>Bloco</th><th>Horário</th><th>Conteúdo</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><strong>Bloco 1</strong></td><td>19h30 – 21h00</td><td>Circuit Breaker, Retry, Bulkhead, Fallback e bibliotecas</td></tr>
+            <tr><td><strong>Intervalo</strong></td><td>21h00 – 21h20</td><td>☕ Pausa</td></tr>
+            <tr><td><strong>Bloco 2</strong></td><td>21h20 – 22h45</td><td>Exercício prático com Polly em .NET + Quiz</td></tr>
+          </tbody>
+        </table>
+
+        <div class="slide-footer">
+          <div class="footer-bar">03 – Padrões de Resiliência</div>
+          <div class="footer-page">3</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: SEÇÃO CIRCUIT BREAKER ==================== -->
+      <section class="section-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="accent-bar"></div>
+        <h2>Bloco 1<br>Padrões de Resiliência</h2>
+        <div class="slide-footer">
+          <div class="footer-bar">03 – Padrões de Resiliência</div>
+          <div class="footer-page">4</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: CIRCUIT BREAKER - INTRODUÇÃO ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="slide-title-area"><div class="accent-bar"></div><h2>Circuit Breaker</h2></div>
+
+        <p>O Circuit Breaker é um padrão utilizado para evitar falhas em cascata em sistemas distribuídos. Ele monitora falhas e corta chamadas a serviços instáveis para permitir recuperação.</p>
+        <ul>
+          <li><strong>Estados:</strong> Closed, Open, Half-Open</li>
+          <li><strong>Closed:</strong> Chamadas são permitidas normalmente.</li>
+          <li><strong>Open:</strong> Chamadas falham imediatamente para evitar overload.</li>
+          <li><strong>Half-Open:</strong> Testa se o serviço voltou ao normal com chamadas limitadas.</li>
+        </ul>
+
+        <div class="slide-footer">
+          <div class="footer-bar">03 – Padrões de Resiliência</div>
+          <div class="footer-page">5</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: STATES DIAGRAM CIRCUIT BREAKER ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="slide-title-area"><div class="accent-bar"></div><h2>Estados do Circuit Breaker</h2></div>
+
+        <img src="../assets/img/circuit-breaker-states.png" alt="Estados do Circuit Breaker" style="max-width:600px; margin: 0 auto; display:block;" />
+
+        <p>Este diagrama ilustra a transição entre os estados Closed, Open e Half-Open.</p>
+
+        <div class="slide-footer">
+          <div class="footer-bar">03 – Padrões de Resiliência</div>
+          <div class="footer-page">6</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: RETRY COM EXPONENCIAL BACKOFF ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="slide-title-area"><div class="accent-bar"></div><h2>Retry com Exponential Backoff</h2></div>
+
+        <p>O padrão Retry tenta executar novamente uma operação que falhou, aumentando o tempo entre tentativas para reduzir a pressão no sistema.</p>
+        <ul>
+          <li>Incrementa o intervalo de espera exponencialmente (ex: 1s, 2s, 4s, 8s)</li>
+          <li>Evita sobrecarregar serviços instáveis</li>
+          <li>Combinado com Circuit Breaker, aumenta a resiliência</li>
+        </ul>
+
+        <pre><code class="language-csharp">
+// Exemplo básico com Polly (.NET)
+var retryPolicy = Policy
+    .Handle&lt;Exception&gt;()
+    .WaitAndRetryAsync(new[] {
+        TimeSpan.FromSeconds(1),
+        TimeSpan.FromSeconds(2),
+        TimeSpan.FromSeconds(4)
+    });
+await retryPolicy.ExecuteAsync(() =&gt; ChamarServicoAsync());
+        </code></pre>
+
+        <div class="slide-footer">
+          <div class="footer-bar">03 – Padrões de Resiliência</div>
+          <div class="footer-page">7</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: BULKHEAD PATTERN ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="slide-title-area"><div class="accent-bar"></div><h2>Bulkhead Pattern</h2></div>
+
+        <p>O Bulkhead Pattern isola grupos de recursos para limitar o impacto de falhas. Assim como compartimentos estanques num navio, evita que a falha em uma parte afete o todo.</p>
+        <ul>
+          <li>Divide recursos em limites independentes</li>
+          <li>Previne falhas em cascata</li>
+          <li>Útil para proteger serviços críticos</li>
+        </ul>
+
+        <pre><code class="language-java">
+// Exemplo Resilience4j - bulkhead
+Bulkhead bulkhead = Bulkhead.of("servicoCritico", BulkheadConfig.custom()
+    .maxConcurrentCalls(5)
+    .maxWaitDuration(Duration.ofMillis(500))
+    .build());
+Supplier&lt;String&gt; decoratedSupplier = Bulkhead.decorateSupplier(bulkhead, () -&gt; chamarServico());
+        </code></pre>
+
+        <div class="slide-footer">
+          <div class="footer-bar">03 – Padrões de Resiliência</div>
+          <div class="footer-page">8</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: FALLBACK ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="slide-title-area"><div class="accent-bar"></div><h2>Fallback</h2></div>
+
+        <p>Fallback é uma estratégia para retornar um valor padrão ou comportamento alternativo quando um serviço falha, garantindo continuidade da aplicação.</p>
+        <ul>
+          <li>Evita erros para o usuário final</li>
+          <li>Garante resposta mesmo em falhas</li>
+          <li>Combinado com Circuit Breaker e Retry</li>
+        </ul>
+
+        <pre><code class="language-javascript">
+// Exemplo Opossum (Node.js) com fallback
+const circuitBreaker = require('opossum')(asyncFunction);
+circuitBreaker.fallback(() =&gt; 'Resposta padrão');
+        </code></pre>
+
+        <div class="slide-footer">
+          <div class="footer-bar">03 – Padrões de Resiliência</div>
+          <div class="footer-page">9</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: BIBLIOTECAS ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="slide-title-area"><div class="accent-bar"></div><h2>Bibliotecas para Resiliência</h2></div>
+
+        <table>
+          <thead>
+            <tr><th>Biblioteca</th><th>Plataforma</th><th>Descrição</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Polly</td><td>.NET / C#</td><td>Framework para políticas de resiliência como Retry, Circuit Breaker, Fallback</td></tr>
+            <tr><td>Resilience4j</td><td>Java / Spring Boot</td><td>Biblioteca leve para tolerância a falhas, modular e funcional</td></tr>
+            <tr><td>Opossum</td><td>Node.js</td><td>Implementa Circuit Breaker com fallback e eventos</td></tr>
+          </tbody>
+        </table>
+
+        <div class="slide-footer">
+          <div class="footer-bar">03 – Padrões de Resiliência</div>
+          <div class="footer-page">10</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: CASO REAL AMAZON ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="slide-title-area"><div class="accent-bar"></div><h2>Caso Real: Amazon e Falhas em Cascata</h2></div>
+
+        <p>A Amazon utiliza extensivamente padrões de resiliência para evitar falhas em cascata entre seus microsserviços:</p>
+        <ul>
+          <li>Circuit Breakers isolam serviços instáveis para evitar propagação de erros</li>
+          <li>Retries com backoff são usados para chamadas temporariamente indisponíveis</li>
+          <li>Bulkheads isolam recursos críticos para manter disponibilidade</li>
+          <li>Fallbacks garantem experiência mínima quando serviços falham</li>
+        </ul>
+        <p>Esta arquitetura garante alta disponibilidade e melhor experiência do usuário mesmo em falhas temporárias.</p>
+
+        <div class="slide-footer">
+          <div class="footer-bar">03 – Padrões de Resiliência</div>
+          <div class="footer-page">11</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: QUIZ 1 - ESTADOS CIRCUIT BREAKER ==================== -->
+      <section class="quiz-slide content-slide" data-correct="Closed" data-quiz-feedback="Closed é o estado onde as chamadas são permitidas normalmente.">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="slide-title-area"><div class="accent-bar"></div><h2>Quiz 1: Estados do Circuit Breaker</h2></div>
+
+        <p>Qual estado do Circuit Breaker permite chamadas normalmente?</p>
+        <ul class="quiz-options">
+          <li>Open</li>
+          <li>Half-Open</li>
+          <li>Closed</li>
+        </ul>
+
+        <div class="slide-footer">
+          <div class="footer-bar">03 – Padrões de Resiliência</div>
+          <div class="footer-page">12</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: QUIZ 2 - BULKHEAD VS CIRCUIT BREAKER ==================== -->
+      <section class="quiz-slide content-slide" data-correct="Bulkhead" data-quiz-feedback="Bulkhead isola recursos para limitar impacto, diferente do Circuit Breaker que bloqueia chamadas.">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="slide-title-area"><div class="accent-bar"></div><h2>Quiz 2: Quando usar Bulkhead ou Circuit Breaker?</h2></div>
+
+        <p>Qual padrão isola recursos para limitar o impacto de falhas?</p>
+        <ul class="quiz-options">
+          <li>Circuit Breaker</li>
+          <li>Fallback</li>
+          <li>Bulkhead</li>
+        </ul>
+
+        <div class="slide-footer">
+          <div class="footer-bar">03 – Padrões de Resiliência</div>
+          <div class="footer-page">13</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: INTERVALO ==================== -->
+      <section class="break-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <h2>Intervalo</h2>
+        <p>21h00 – 21h20</p>
+        <p>☕ Aproveite para descansar e se preparar para o próximo bloco</p>
+
+        <div class="slide-footer">
+          <div class="footer-bar">03 – Padrões de Resiliência</div>
+          <div class="footer-page">14</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: SEÇÃO BLOCO 2 ==================== -->
+      <section class="section-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="accent-bar"></div>
+        <h2>Bloco 2<br>Exercício Prático e Quiz</h2>
+        <div class="slide-footer">
+          <div class="footer-bar">03 – Padrões de Resiliência</div>
+          <div class="footer-page">15</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: EXERCICIO POLLY CIRCUIT BREAKER ==================== -->
+      <section class="exercise-slide content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="slide-title-area"><div class="accent-bar"></div><h2>Exercício Hands-On: Implementar Circuit Breaker com Polly (.NET)</h2></div>
+
+        <div class="exercise-container">
+          <h3>Objetivo:</h3>
+          <p>Implementar um Circuit Breaker usando a biblioteca Polly para proteger um serviço instável e simular falhas.</p>
+
+          <h3>Passos:</h3>
+          <ol class="exercise-steps">
+            <li>Crie um projeto Console .NET C#.</li>
+            <li>Instale o pacote <code>Polly</code> via NuGet.</li>
+            <li>Implemente um método que simule chamadas a um serviço instável (ex: falha intermitente).</li>
+            <li>Configure um Circuit Breaker Polly com estados Closed, Open e Half-Open.</li>
+            <li>Adicione lógica para retry com Exponential Backoff.</li>
+            <li>Teste o comportamento e observe as transições de estados no console.</li>
+          </ol>
+
+          <h3>Dica de código:</h3>
+          <pre><code class="language-csharp">
+// Simulação de serviço instável
+static async Task ServicoInstavel()
+{
+    Random rnd = new Random();
+    if (rnd.NextDouble() &lt; 0.5)
+        throw new Exception("Falha simulada");
+    Console.WriteLine("Serviço executado com sucesso");
+}
+
+// Circuit Breaker com Polly
+var circuitBreaker = Policy
+    .Handle&lt;Exception&gt;()
+    .CircuitBreakerAsync(2, TimeSpan.FromSeconds(10),
+        onBreak: (ex, ts) =&gt; Console.WriteLine($"Circuit Open por {ts.TotalSeconds}s: {ex.Message}"),
+        onReset: () =&gt; Console.WriteLine("Circuit Closed"),
+        onHalfOpen: () =&gt; Console.WriteLine("Circuit Half-Open"));
+
+var retry = Policy
+    .Handle&lt;Exception&gt;()
+    .WaitAndRetryAsync(new[] {
+        TimeSpan.FromSeconds(1),
+        TimeSpan.FromSeconds(2),
+        TimeSpan.FromSeconds(4)
+    });
+
+var policyWrap = Policy.WrapAsync(retry, circuitBreaker);
+
+await policyWrap.ExecuteAsync(() =&gt; ServicoInstavel());
+          </code></pre>
+        </div>
+
+        <div class="slide-footer">
+          <div class="footer-bar">03 – Padrões de Resiliência</div>
+          <div class="footer-page">16</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: QUIZ 3 - CIRCUIT BREAKER OPEN ==================== -->
+      <section class="quiz-slide content-slide" data-correct="Quando o número de falhas ultrapassa o limite configurado" data-quiz-feedback="O Circuit Breaker passa para estado Open após exceder o limite de falhas para evitar mais chamadas falhas.">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="slide-title-area"><div class="accent-bar"></div><h2>Quiz 3: Quando o Circuit Breaker entra em estado Open?</h2></div>
+
+        <ul class="quiz-options">
+          <li>Quando todas as chamadas são bem-sucedidas</li>
+          <li>Quando o número de falhas ultrapassa o limite configurado</li>
+          <li>Imediatamente após iniciar o sistema</li>
+        </ul>
+
+        <div class="slide-footer">
+          <div class="footer-bar">03 – Padrões de Resiliência</div>
+          <div class="footer-page">17</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: EXEMPLOS SPRING BOOT CIRCUIT BREAKER ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="slide-title-area"><div class="accent-bar"></div><h2>Exemplo Circuit Breaker com Resilience4j (Spring Boot)</h2></div>
+
+        <pre><code class="language-java">
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+import org.springframework.stereotype.Service;
+
+@Service
+public class Servico {
+
+  @CircuitBreaker(name = "servicoCircuitBreaker", fallbackMethod = "fallback")
+  public String chamarServico() {
+      // lógica que pode falhar
+      if(Math.random() &lt; 0.5) {
+          throw new RuntimeException("Falha simulada");
+      }
+      return "Sucesso";
+  }
+
+  public String fallback(Throwable t) {
+      return "Resposta fallback devido a: " + t.getMessage();
+  }
+}
+        </code></pre>
+
+        <div class="slide-footer">
+          <div class="footer-bar">03 – Padrões de Resiliência</div>
+          <div class="footer-page">18</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: EXEMPLO NODE.JS OPOSSUM ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="slide-title-area"><div class="accent-bar"></div><h2>Exemplo Circuit Breaker com Opossum (Node.js)</h2></div>
+
+        <pre><code class="language-javascript">
+const CircuitBreaker = require('opossum');
+
+function servicoInstavel() {
+  return new Promise((resolve, reject) =&gt; {
+    if (Math.random() &lt; 0.5) {
+      reject('Falha simulada');
+    } else {
+      resolve('Sucesso');
+    }
+  });
+}
+
+const breaker = new CircuitBreaker(servicoInstavel, {
+  timeout: 3000,
+  errorThresholdPercentage: 50,
+  resetTimeout: 10000
+});
+
+breaker.fallback(() =&gt; 'Resposta fallback');
+
+breaker.fire()
+  .then(console.log)
+  .catch(console.error);
+        </code></pre>
+
+        <div class="slide-footer">
+          <div class="footer-bar">03 – Padrões de Resiliência</div>
+          <div class="footer-page">19</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: RECAPITULAÇÃO ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="slide-title-area"><div class="accent-bar"></div><h2>Recapitulação</h2></div>
+
+        <ul>
+          <li>Circuit Breaker protege contra falhas em cascata</li>
+          <li>Retry com Exponential Backoff evita sobrecarga</li>
+          <li>Bulkhead isola recursos para limitar impacto</li>
+          <li>Fallback garante continuidade do serviço</li>
+          <li>Bibliotecas: Polly, Resilience4j, Opossum facilitam implementação</li>
+          <li>Amazon usa esses padrões para alta disponibilidade</li>
+        </ul>
+
+        <div class="slide-footer">
+          <div class="footer-bar">03 – Padrões de Resiliência</div>
+          <div class="footer-page">20</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: DÚVIDAS OU CURIOSIDADES? ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Dúvidas ou curiosidades?</h2>
+        </div>
+
+        <div style="display:flex; align-items:center; justify-content:center; flex:1; font-size:4em; color: var(--fiap-dark); font-weight:800; opacity:0.15; margin-top:40px;">
+          ?
+        </div>
+
+        <div class="slide-footer">
+          <div class="footer-bar">03 – Padrões de Resiliência</div>
+          <div class="footer-page">21</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: ENCERRAMENTO ==================== -->
+      <section class="end-slide">
+        <img src="../assets/img/fiap-logo-graduacao.png" alt="FIAP Graduação" style="max-width:350px;" />
+        <div class="copyright">
+          Copyright &copy; 2026<br />
+          Prof.º José Romualdo da Costa Filho<br /><br />
+          Todos direitos reservados. Reprodução ou divulgação total ou parcial<br />
+          deste documento é expressamente proibido sem o consentimento formal,<br />
+          por escrito, do Professor (autor).
+        </div>
+      </section>
+
+    </div>
+  </div>
+
+  <script src="../node_modules/reveal.js/dist/reveal.js"></script>
+  <script src="../node_modules/reveal.js/plugin/highlight/highlight.js"></script>
+  <script src="../assets/js/fiap-quiz.js"></script>
+  <script>
+    Reveal.initialize({
+      hash: true,
+      slideNumber: false,
+      width: 1280,
+      height: 720,
+      margin: 0,
+      minScale: 0.2,
+      maxScale: 2.0,
+      center: false,
+      transition: 'slide',
+      transitionSpeed: 'default',
+      scrollActivationWidth: null,
+      view: null,
+      plugins: [RevealHighlight]
+    });
+  </script>
+</body>
+</html>

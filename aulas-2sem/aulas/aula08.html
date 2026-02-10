@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Aula 08 – Cache com Redis | FIAP</title>
+  <link rel="stylesheet" href="../node_modules/reveal.js/dist/reveal.css" />
+  <link rel="stylesheet" href="../node_modules/reveal.js/dist/theme/white.css" />
+  <link rel="stylesheet" href="../node_modules/reveal.js/plugin/highlight/monokai.css" />
+  <link rel="stylesheet" href="../assets/css/fiap-theme.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+</head>
+<body>
+  <div class="reveal">
+    <div class="slides">
+
+      <!-- ==================== SLIDE: CAPA FIAP ==================== -->
+      <section class="cover-slide">
+        <img src="../assets/img/fiap-logo-graduacao.png" alt="FIAP Graduação" class="fiap-logo-full" />
+      </section>
+
+      <!-- ==================== SLIDE: TÍTULO DA AULA ==================== -->
+      <section class="title-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="title-card">
+          <div class="accent-bar"></div>
+          <h1>08 - Cache com Redis</h1>
+          <h2>Prof. José Romualdo</h2>
+          <h3>07/04/2026</h3>
+        </div>
+        <div class="lesson-bar">AULA 08 – Cache com Redis</div>
+      </section>
+
+      <!-- ==================== SLIDE: AGENDA ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Agenda</h2>
+        </div>
+
+        <table>
+          <thead>
+            <tr><th>Bloco</th><th>Horário</th><th>Conteúdo</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><strong>Bloco 1</strong></td><td>19h30 – 21h00</td><td>Por que cache? Estratégias, TTL, Políticas de Eviction, Redis como cache distribuído, Redis CLI e caso real</td></tr>
+            <tr><td><strong>Intervalo</strong></td><td>21h00 – 21h20</td><td>☕ Pausa</td></tr>
+            <tr><td><strong>Bloco 2</strong></td><td>21h20 – 22h45</td><td>Exercício prático com Redis e Node.js, Quiz interativo</td></tr>
+          </tbody>
+        </table>
+
+        <div class="slide-footer">
+          <div class="footer-bar">08 - Cache com Redis</div>
+          <div class="footer-page">3</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: SEÇÃO - B1 ==================== -->
+      <section class="section-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="accent-bar"></div>
+        <h2>Bloco 1<br>Por que cache? Estratégias e conceitos</h2>
+        <div class="slide-footer">
+          <div class="footer-bar">08 - Cache com Redis</div>
+          <div class="footer-page">4</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: Por que cache? ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Por que usar cache?</h2>
+        </div>
+
+        <ul>
+          <li>Reduzir latência das respostas</li>
+          <li>Aliviar carga em bancos de dados e serviços</li>
+          <li>Melhorar escalabilidade e performance do sistema</li>
+          <li>Prover respostas rápidas para dados frequentemente acessados</li>
+        </ul>
+
+        <div class="slide-footer">
+          <div class="footer-bar">08 - Cache com Redis</div>
+          <div class="footer-page">5</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: Estratégias de Cache ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Estratégias de Cache</h2>
+        </div>
+
+        <dl>
+          <dt><strong>Cache-Aside (Lazy Loading)</strong></dt>
+          <dd>Aplicação consulta cache; se não existir, busca no banco, atualiza cache e retorna.</dd>
+          <dt><strong>Write-Through</strong></dt>
+          <dd>Dados escritos simultaneamente no cache e no banco, garantindo sincronização.</dd>
+          <dt><strong>Write-Behind (Write-Back)</strong></dt>
+          <dd>Dados escritos no cache e sincronizados no banco depois, em background.</dd>
+          <dt><strong>Read-Through</strong></dt>
+          <dd>Cache é responsável por buscar no banco caso dado não esteja em cache.</dd>
+        </dl>
+
+        <div class="slide-footer">
+          <div class="footer-bar">08 - Cache com Redis</div>
+          <div class="footer-page">6</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: Quiz 1 ==================== -->
+      <section class="quiz-slide content-slide" data-correct="cache-aside" data-quiz-feedback="A estratégia Cache-Aside é eficiente para cargas com leituras frequentes e escrita esporádica.">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Quiz: Qual estratégia de cache é mais adequada para leituras frequentes e poucas escritas?</h2>
+        </div>
+
+        <ul>
+          <li><button class="quiz-option" data-value="write-through">Write-Through</button></li>
+          <li><button class="quiz-option" data-value="cache-aside">Cache-Aside</button></li>
+          <li><button class="quiz-option" data-value="write-behind">Write-Behind</button></li>
+          <li><button class="quiz-option" data-value="read-through">Read-Through</button></li>
+        </ul>
+
+        <div class="quiz-feedback"></div>
+
+        <div class="slide-footer">
+          <div class="footer-bar">08 - Cache com Redis</div>
+          <div class="footer-page">7</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: TTL e Eviction Policies ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>TTL e Políticas de Eviction</h2>
+        </div>
+
+        <p><strong>TTL (Time To Live):</strong> Tempo que uma chave permanece no cache antes de expirar automaticamente.</p>
+
+        <p><strong>Eviction Policies:</strong> Estratégias para remover itens quando o cache está cheio:</p>
+        <ul>
+          <li><strong>LRU (Least Recently Used):</strong> Remove o dado menos acessado recentemente.</li>
+          <li><strong>LFU (Least Frequently Used):</strong> Remove o dado com menor frequência de acesso.</li>
+          <li><strong>FIFO (First In First Out):</strong> Remove o dado mais antigo no cache.</li>
+        </ul>
+
+        <div class="slide-footer">
+          <div class="footer-bar">08 - Cache com Redis</div>
+          <div class="footer-page">8</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: Redis como Cache Distribuído ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Redis como Cache Distribuído</h2>
+        </div>
+
+        <ul>
+          <li>Armazenamento chave-valor em memória super rápido.</li>
+          <li>Suporta múltiplas estruturas: strings, hashes, listas, sets, sorted sets.</li>
+          <li>Alta disponibilidade com replicação e persistência opcional.</li>
+          <li>Suporte a clusters para escalabilidade horizontal.</li>
+          <li>Ideal para cache distribuído em arquiteturas de microsserviços.</li>
+        </ul>
+
+        <div class="slide-footer">
+          <div class="footer-bar">08 - Cache com Redis</div>
+          <div class="footer-page">9</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: Redis CLI ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Comandos básicos Redis CLI</h2>
+        </div>
+
+        <pre><code class="language-bash">
+# Conectar ao Redis
+redis-cli
+
+# Setar valor com TTL 60 segundos
+SET usuario:123 '{"nome":"João"}' EX 60
+
+# Obter valor
+GET usuario:123
+
+# Remover chave
+DEL usuario:123
+
+# Verificar chaves existentes
+KEYS *
+
+# Monitorar comandos em tempo real
+MONITOR
+        </code></pre>
+
+        <div class="slide-footer">
+          <div class="footer-bar">08 - Cache com Redis</div>
+          <div class="footer-page">10</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: Caso real Twitter ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Caso Real: Cache Invalidation no Twitter</h2>
+        </div>
+
+        <p>O Twitter enfrenta o desafio de manter timelines atualizadas em cache para milhões de usuários.</p>
+        <p><strong>Problema:</strong> Como invalidar corretamente o cache da timeline ao publicar, deletar ou retweetar?</p>
+        <p><strong>Solução:</strong> Uso de mecanismos de invalidação seletiva, como remoção ou atualização das chaves relacionadas, para evitar dados obsoletos.</p>
+        <p>Cache Invalidation é conhecido como um dos problemas mais difíceis em sistemas distribuídos.</p>
+
+        <div class="slide-footer">
+          <div class="footer-bar">08 - Cache com Redis</div>
+          <div class="footer-page">11</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: Exemplo Java/Spring Boot Cache-Aside ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Exemplo Cache-Aside com Java/Spring Boot</h2>
+        </div>
+
+        <pre><code class="language-java">
+// Método para obter usuário com cache Redis
+public User getUserById(String id) {
+  String cacheKey = "user:" + id;
+  String cached = redisTemplate.opsForValue().get(cacheKey);
+  if (cached != null) {
+    return objectMapper.readValue(cached, User.class);
+  }
+  User user = userRepository.findById(id);
+  redisTemplate.opsForValue().set(cacheKey, objectMapper.writeValueAsString(user), 10, TimeUnit.MINUTES);
+  return user;
+}
+        </code></pre>
+
+        <div class="slide-footer">
+          <div class="footer-bar">08 - Cache com Redis</div>
+          <div class="footer-page">12</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: Exemplo .NET/C# Write-Through ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Exemplo Write-Through com .NET / C#</h2>
+        </div>
+
+        <pre><code class="language-csharp">
+public async Task SaveProductAsync(Product product) {
+  // Atualiza banco
+  await _dbContext.Products.UpdateAsync(product);
+  await _dbContext.SaveChangesAsync();
+
+  // Atualiza cache Redis
+  var cacheKey = $"product:{product.Id}";
+  var json = JsonSerializer.Serialize(product);
+  await _redisDb.StringSetAsync(cacheKey, json, TimeSpan.FromMinutes(15));
+}
+        </code></pre>
+
+        <div class="slide-footer">
+          <div class="footer-bar">08 - Cache com Redis</div>
+          <div class="footer-page">13</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: Exemplo Node.js Cache-Aside ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Exemplo Cache-Aside com Node.js</h2>
+        </div>
+
+        <pre><code class="language-javascript">
+// Supondo client Redis e db simulados
+async function getUser(id) {
+  const cacheKey = `user:${id}`;
+  let cached = await redisClient.get(cacheKey);
+  if (cached) return JSON.parse(cached);
+
+  const user = await database.findUserById(id);
+  await redisClient.set(cacheKey, JSON.stringify(user), 'EX', 600);
+  return user;
+}
+        </code></pre>
+
+        <div class="slide-footer">
+          <div class="footer-bar">08 - Cache com Redis</div>
+          <div class="footer-page">14</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: Intervalo ==================== -->
+      <section class="break-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="break-text">
+          <h2>Intervalo</h2>
+          <h3>21h00 – 21h20</h3>
+          <p>☕ Aproveite para descansar um pouco</p>
+        </div>
+        <div class="slide-footer">
+          <div class="footer-bar">08 - Cache com Redis</div>
+          <div class="footer-page">15</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: SEÇÃO - B2 ==================== -->
+      <section class="section-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="accent-bar"></div>
+        <h2>Bloco 2<br>Exercício prático e Quiz</h2>
+        <div class="slide-footer">
+          <div class="footer-bar">08 - Cache com Redis</div>
+          <div class="footer-page">16</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: Exercício hands-on ==================== -->
+      <section class="exercise-slide content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Exercício: Implementar Cache-Aside com Redis e Node.js</h2>
+        </div>
+
+        <div class="exercise-container">
+          <p><strong>Objetivo:</strong> Criar uma API Node.js que consulta um banco simulado e utiliza Redis como cache seguindo o padrão Cache-Aside.</p>
+          <p><strong>Passos:</strong></p>
+          <ol class="exercise-steps">
+            <li>Subir uma instância do Redis usando Docker: <code>docker run -d -p 6379:6379 redis</code></li>
+            <li>Configurar cliente Redis na aplicação Node.js</li>
+            <li>Implementar endpoint GET /users/:id que:</li>
+            <ul>
+              <li>Verifica cache Redis</li>
+              <li>Se não existir, consulta banco simulado (array ou JSON)</li>
+              <li>Armazena resultado no Redis com TTL (ex: 10 minutos)</li>
+              <li>Retorna o dado ao cliente</li>
+            </ul>
+            <li>Testar com diversas requisições e monitorar Redis CLI</li>
+          </ol>
+        </div>
+
+        <div class="slide-footer">
+          <div class="footer-bar">08 - Cache com Redis</div>
+          <div class="footer-page">17</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: Código exemplo exercício ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Exemplo de código Node.js para Cache-Aside</h2>
+        </div>
+
+        <pre><code class="language-javascript">
+// Setup básico com express e redis
+const express = require('express');
+const redis = require('redis');
+const app = express();
+const redisClient = redis.createClient();
+
+const users = [
+  { id: '1', name: 'Ana' },
+  { id: '2', name: 'Bruno' },
+  { id: '3', name: 'Carla' }
+];
+
+redisClient.connect();
+
+app.get('/users/:id', async (req, res) => {
+  const id = req.params.id;
+  const cacheKey = `user:${id}`;
+
+  try {
+    const cachedUser = await redisClient.get(cacheKey);
+    if (cachedUser) {
+      return res.json({ source: 'cache', data: JSON.parse(cachedUser) });
+    }
+
+    const user = users.find(u => u.id === id);
+    if (!user) return res.status(404).json({ error: 'User not found' });
+
+    await redisClient.set(cacheKey, JSON.stringify(user), { EX: 600 }); // 10 min TTL
+    res.json({ source: 'database', data: user });
+
+  } catch (err) {
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+app.listen(3000, () => console.log('API rodando na porta 3000'));
+        </code></pre>
+
+        <div class="slide-footer">
+          <div class="footer-bar">08 - Cache com Redis</div>
+          <div class="footer-page">18</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: Quiz 2 - Estratégias e uso ==================== -->
+      <section class="quiz-slide content-slide" data-correct="write-through" data-quiz-feedback="Write-Through é recomendado quando é crucial que cache e banco estejam sempre sincronizados, mesmo que com custo de escrita maior.">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Quiz: Quando usar a estratégia Write-Through ao invés de Cache-Aside?</h2>
+        </div>
+
+        <ul>
+          <li><button class="quiz-option" data-value="write-behind">Quando a escrita pode ser atrasada</button></li>
+          <li><button class="quiz-option" data-value="write-through">Quando é necessário garantir consistência imediata entre cache e banco</button></li>
+          <li><button class="quiz-option" data-value="cache-aside">Quando há poucas escritas e muitas leituras</button></li>
+          <li><button class="quiz-option" data-value="read-through">Quando o cache gerencia a leitura automaticamente</button></li>
+        </ul>
+
+        <div class="quiz-feedback"></div>
+
+        <div class="slide-footer">
+          <div class="footer-bar">08 - Cache com Redis</div>
+          <div class="footer-page">19</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: Quiz 3 - TTL e Eviction ==================== -->
+      <section class="quiz-slide content-slide" data-correct="LRU" data-quiz-feedback="LRU é a política mais utilizada por remover itens menos acessados recentemente, ótimo para caches de alta rotatividade.">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Quiz: Qual política de remoção é mais adequada para um cache com alta rotatividade de dados?</h2>
+        </div>
+
+        <ul>
+          <li><button class="quiz-option" data-value="FIFO">FIFO</button></li>
+          <li><button class="quiz-option" data-value="LFU">LFU</button></li>
+          <li><button class="quiz-option" data-value="LRU">LRU</button></li>
+          <li><button class="quiz-option" data-value="TTL">TTL</button></li>
+        </ul>
+
+        <div class="quiz-feedback"></div>
+
+        <div class="slide-footer">
+          <div class="footer-bar">08 - Cache com Redis</div>
+          <div class="footer-page">20</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: Caso real resumo e aprendizado ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Resumo do Caso Real e Aprendizados</h2>
+        </div>
+
+        <ul>
+          <li>Cache Invalidation é um problema complexo e crítico em sistemas distribuídos.</li>
+          <li>Escolher a estratégia de cache correta depende do perfil de leitura/escrita do sistema.</li>
+          <li>TTL e políticas de eviction evitam dados obsoletos e cache cheio.</li>
+          <li>Redis oferece recursos poderosos para cache distribuído e alta performance.</li>
+        </ul>
+
+        <div class="slide-footer">
+          <div class="footer-bar">08 - Cache com Redis</div>
+          <div class="footer-page">21</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: Dúvidas e exercícios ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Dúvidas ou curiosidades?</h2>
+        </div>
+
+        <div style="display:flex; align-items:center; justify-content:center; flex:1; font-size:4em; color: var(--fiap-dark); font-weight:800; opacity:0.15; margin-top:40px;">
+          ?
+        </div>
+
+        <div class="slide-footer">
+          <div class="footer-bar">08 - Cache com Redis</div>
+          <div class="footer-page">22</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: ENCERRAMENTO ==================== -->
+      <section class="end-slide">
+        <img src="../assets/img/fiap-logo-graduacao.png" alt="FIAP Graduação" style="max-width:350px;" />
+        <div class="copyright">
+          Copyright &copy; 2026<br />
+          Prof.º José Romualdo da Costa Filho<br /><br />
+          Todos direitos reservados. Reprodução ou divulgação total ou parcial<br />
+          deste documento é expressamente proibido sem o consentimento formal,<br />
+          por escrito, do Professor (autor).
+        </div>
+      </section>
+
+    </div>
+  </div>
+
+  <script src="../node_modules/reveal.js/dist/reveal.js"></script>
+  <script src="../node_modules/reveal.js/plugin/highlight/highlight.js"></script>
+  <script src="../assets/js/fiap-quiz.js"></script>
+  <script>
+    Reveal.initialize({
+      hash: true,
+      slideNumber: false,
+      width: 1280,
+      height: 720,
+      margin: 0,
+      minScale: 0.2,
+      maxScale: 2.0,
+      center: false,
+      transition: 'slide',
+      transitionSpeed: 'default',
+      scrollActivationWidth: null,
+      view: null,
+      plugins: [RevealHighlight]
+    });
+  </script>
+</body>
+</html>

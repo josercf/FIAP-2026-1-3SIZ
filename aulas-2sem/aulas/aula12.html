@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Aula 12 - Testes de Interface | FIAP</title>
+  <link rel="stylesheet" href="../node_modules/reveal.js/dist/reveal.css">
+  <link rel="stylesheet" href="../node_modules/reveal.js/dist/theme/white.css">
+  <link rel="stylesheet" href="../node_modules/reveal.js/plugin/highlight/monokai.css">
+  <link rel="stylesheet" href="../assets/css/fiap-theme.css">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="reveal">
+    <div class="slides">
+
+      <!-- ==================== SLIDE: CAPA FIAP ==================== -->
+      <section class="cover-slide">
+        <img src="../assets/img/fiap-logo-graduacao.png" alt="FIAP Graduação" class="fiap-logo-full">
+      </section>
+
+      <!-- ==================== SLIDE: TÍTULO DA AULA ==================== -->
+      <section class="title-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header">
+        <div class="title-card">
+          <div class="accent-bar"></div>
+          <h1>Sistemas de Informação</h1>
+          <h2>Testes de Interface</h2>
+          <h3>Prof. José Romualdo</h3>
+          <h4>12/05/2026 - Aula 12</h4>
+        </div>
+        <div class="lesson-bar">12 - Testes de Interface</div>
+      </section>
+
+      <!-- ==================== SLIDE: AGENDA ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header">
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Agenda</h2>
+        </div>
+
+        <table>
+          <thead>
+            <tr><th>Bloco</th><th>Horário</th><th>Conteúdo</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><strong>Bloco 1</strong></td><td>19h30 – 21h00</td><td>Testes E2E, Selenium, Cypress, Playwright, Padrão Page Object, Visual Regression, Flaky Tests e caso real Mercado Livre</td></tr>
+            <tr><td><strong>Intervalo</strong></td><td>21h00 – 21h20</td><td>☕ Pausa</td></tr>
+            <tr><td><strong>Bloco 2</strong></td><td>21h20 – 22h45</td><td>Exercício prático com Cypress + Quiz sobre Page Object e testes E2E vs unitários</td></tr>
+          </tbody>
+        </table>
+
+        <div class="slide-footer">
+          <div class="footer-bar">12 - Testes de Interface</div>
+          <div class="footer-page">3</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: SEÇÃO BLOCO 1 ==================== -->
+      <section class="section-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header">
+        <div class="accent-bar"></div>
+        <h2>Bloco 1</h2>
+        <h3>Testes E2E e Ferramentas</h3>
+
+        <div class="slide-footer">
+          <div class="footer-bar">12 - Testes de Interface</div>
+          <div class="footer-page">4</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: PIRÂMIDE DE TESTES E2E ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header">
+
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Testes E2E na Pirâmide de Testes</h2>
+        </div>
+
+        <p>A pirâmide de testes indica a proporção ideal entre tipos de testes:</p>
+        <ul>
+          <li><strong>Testes Unitários:</strong> Base da pirâmide, rápidos e confiáveis.</li>
+          <li><strong>Testes de Integração:</strong> Validam interações entre componentes.</li>
+          <li><strong>Testes E2E (End-to-End):</strong> Validam o fluxo completo, simulando o usuário real.</li>
+        </ul>
+        <p>Embora essenciais, testes E2E são mais lentos e frágeis, por isso devem ser usados com moderação.</p>
+
+        <div class="slide-footer">
+          <div class="footer-bar">12 - Testes de Interface</div>
+          <div class="footer-page">5</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: COMPARATIVO SELENIUM / CYPRESS / PLAYWRIGHT ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header">
+
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Comparativo: Selenium vs Cypress vs Playwright</h2>
+        </div>
+
+        <table>
+          <thead>
+            <tr><th>Característica</th><th>Selenium</th><th>Cypress</th><th>Playwright</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Linguagens suportadas</td><td>Java, C#, Python, JS e mais</td><td>JavaScript/TypeScript</td><td>JavaScript/TypeScript, Python, C#, Java</td></tr>
+            <tr><td>Velocidade</td><td>Moderada</td><td>Alta</td><td>Alta</td></tr>
+            <tr><td>Facilidade de uso</td><td>Complexo</td><td>Fácil</td><td>Fácil</td></tr>
+            <tr><td>Suporte a múltiplos navegadores</td><td>Sim</td><td>Chrome, Edge, Firefox (experimental)</td><td>Sim (Chrome, Firefox, Safari)</td></tr>
+            <tr><td>Execução paralela</td><td>Via Grid ou ferramentas externas</td><td>Sim</td><td>Sim</td></tr>
+            <tr><td>Comunidade e maturidade</td><td>Mais madura</td><td>Crescente</td><td>Crescente</td></tr>
+          </tbody>
+        </table>
+
+        <div class="slide-footer">
+          <div class="footer-bar">12 - Testes de Interface</div>
+          <div class="footer-page">6</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: PAGE OBJECT PATTERN ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header">
+
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Page Object Pattern / Model</h2>
+        </div>
+
+        <p>É um padrão de projeto que encapsula a estrutura das páginas da aplicação, isolando a lógica de localização e interação dos elementos.</p>
+        <ul>
+          <li>Facilita a manutenção dos testes.</li>
+          <li>Promove reutilização de código.</li>
+          <li>Melhora a leitura e organização dos testes.</li>
+        </ul>
+
+        <pre><code class="language-java">// Exemplo Java com Selenium
+public class LoginPage {
+  private WebDriver driver;
+  private By usernameField = By.id("username");
+  private By passwordField = By.id("password");
+  private By loginButton = By.id("loginBtn");
+
+  public LoginPage(WebDriver driver) {
+    this.driver = driver;
+  }
+
+  public void enterUsername(String username) {
+    driver.findElement(usernameField).sendKeys(username);
+  }
+
+  public void enterPassword(String password) {
+    driver.findElement(passwordField).sendKeys(password);
+  }
+
+  public void clickLogin() {
+    driver.findElement(loginButton).click();
+  }
+}</code></pre>
+
+        <div class="slide-footer">
+          <div class="footer-bar">12 - Testes de Interface</div>
+          <div class="footer-page">7</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: VISUAL REGRESSION TESTING ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header">
+
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Visual Regression Testing</h2>
+        </div>
+
+        <p>Testes de regressão visual comparam screenshots da UI para detectar mudanças visuais não intencionais.</p>
+        <ul>
+          <li>Importante para detectar bugs visuais após alterações.</li>
+          <li>Ferramentas populares: Applitools, Percy, BackstopJS.</li>
+          <li>Integração com Cypress, Selenium e Playwright.</li>
+        </ul>
+
+        <div class="slide-footer">
+          <div class="footer-bar">12 - Testes de Interface</div>
+          <div class="footer-page">8</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: FLAKY TESTS E COMO EVITAR ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header">
+
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Flaky Tests e Como Evitar</h2>
+        </div>
+
+        <p>Flaky tests são testes que falham intermitentemente sem mudanças no código, causando insegurança e retrabalho.</p>
+        <ul>
+          <li>Causas comuns:
+            <ul>
+              <li>Dependência de tempo / sincronização incorreta</li>
+              <li>Dados de teste inconsistentes</li>
+              <li>Problemas ambientais (rede, banco, etc.)</li>
+            </ul>
+          </li>
+          <li>Como evitar:
+            <ul>
+              <li>Usar waits explícitos e evitar sleeps</li>
+              <li>Isolar dados e manter ambiente estável</li>
+              <li>Revisar e refatorar testes regularmente</li>
+            </ul>
+          </li>
+        </ul>
+
+        <div class="slide-footer">
+          <div class="footer-bar">12 - Testes de Interface</div>
+          <div class="footer-page">9</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: CASO REAL MERCADO LIVRE ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header">
+
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Caso Real: Mercado Livre e Cypress</h2>
+        </div>
+
+        <p>O Mercado Livre adotou Cypress para automatizar testes do fluxo de checkout com resultados expressivos.</p>
+        <ul>
+          <li>Benefícios:
+            <ul>
+              <li>Testes rápidos e confiáveis</li>
+              <li>Integração contínua facilitada</li>
+              <li>Melhor cobertura do fluxo de compra</li>
+            </ul>
+          </li>
+          <li>Abordagem:
+            <ul>
+              <li>Padrão Page Object para organizar testes</li>
+              <li>Testes simulam usuário final, incluindo pagamento</li>
+              <li>Uso de mocks para serviços externos quando necessário</li>
+            </ul>
+          </li>
+        </ul>
+        <p>Esse caso mostra como empresas grandes melhoram qualidade com testes E2E modernos.</p>
+
+        <div class="slide-footer">
+          <div class="footer-bar">12 - Testes de Interface</div>
+          <div class="footer-page">10</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: QUIZ 1 - PAGE OBJECT PATTERN ==================== -->
+      <section class="quiz-slide content-slide" data-correct="b" data-quiz-feedback="A resposta correta é b. O Page Object Pattern melhora manutenção e legibilidade dos testes.">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header">
+
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Quiz: Page Object Pattern</h2>
+        </div>
+
+        <p>Qual a principal vantagem de utilizar o Page Object Pattern nos testes E2E?</p>
+        <form class="quiz-form">
+          <label><input type="radio" name="q1" value="a"> Aumentar o número de testes automatizados.</label><br>
+          <label><input type="radio" name="q1" value="b"> Facilitar a manutenção e reutilização dos testes.</label><br>
+          <label><input type="radio" name="q1" value="c"> Reduzir o tempo de execução dos testes.</label><br>
+          <label><input type="radio" name="q1" value="d"> Garantir a execução paralela dos testes.</label><br>
+        </form>
+
+        <button class="quiz-submit">Enviar</button>
+        <div class="quiz-feedback"></div>
+
+        <div class="slide-footer">
+          <div class="footer-bar">12 - Testes de Interface</div>
+          <div class="footer-page">11</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: QUIZ 2 - E2E VS TESTE UNITÁRIO ==================== -->
+      <section class="quiz-slide content-slide" data-correct="a" data-quiz-feedback="A resposta correta é a. Testes E2E validam fluxos completos, enquanto unitários testam partes isoladas.">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header">
+
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Quiz: Quando usar Testes E2E?</h2>
+        </div>
+
+        <p>Em qual situação é mais indicado utilizar testes E2E ao invés de testes unitários?</p>
+        <form class="quiz-form">
+          <label><input type="radio" name="q2" value="a"> Validar o fluxo completo da aplicação simulando o usuário.</label><br>
+          <label><input type="radio" name="q2" value="b"> Testar métodos isolados de uma classe.</label><br>
+          <label><input type="radio" name="q2" value="c"> Verificar a cobertura de código.</label><br>
+          <label><input type="radio" name="q2" value="d"> Testar performance da aplicação.</label><br>
+        </form>
+
+        <button class="quiz-submit">Enviar</button>
+        <div class="quiz-feedback"></div>
+
+        <div class="slide-footer">
+          <div class="footer-bar">12 - Testes de Interface</div>
+          <div class="footer-page">12</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: INTERVALO ==================== -->
+      <section class="break-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" style="opacity:0.3; margin-bottom: 30px;">
+        <h2>Intervalo</h2>
+        <h3>21h00 – 21h20</h3>
+        <p>☕ Aproveite para descansar e se preparar para o próximo bloco!</p>
+
+        <div class="slide-footer">
+          <div class="footer-bar">12 - Testes de Interface</div>
+          <div class="footer-page">13</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: SEÇÃO BLOCO 2 ==================== -->
+      <section class="section-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header">
+        <div class="accent-bar"></div>
+        <h2>Bloco 2</h2>
+        <h3>Exercício Hands-on e Quiz</h3>
+
+        <div class="slide-footer">
+          <div class="footer-bar">12 - Testes de Interface</div>
+          <div class="footer-page">14</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: EXERCÍCIO - TESTE E2E COM CYPRESS ==================== -->
+      <section class="exercise-slide content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header">
+
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Exercício Hands-on</h2>
+          <h3>Escrevendo teste E2E com Cypress para formulário web</h3>
+        </div>
+
+        <div class="exercise-container">
+          <p>Objetivo: Criar um teste Cypress que preencha um formulário, submeta e valide o resultado.</p>
+
+          <ol class="exercise-steps">
+            <li>Crie um arquivo de teste Cypress (ex: form.spec.js).</li>
+            <li>Use o comando <code>cy.visit()</code> para abrir a página do formulário.</li>
+            <li>Preencha os campos de texto (nome, email) usando <code>cy.get().type()</code>.</li>
+            <li>Selecione opções, se houver, com <code>cy.get().select()</code>.</li>
+            <li>Submeta o formulário com <code>cy.get().click()</code> no botão enviar.</li>
+            <li>Valide a mensagem de sucesso com <code>cy.contains()</code> ou <code>cy.get().should()</code>.</li>
+          </ol>
+
+          <pre><code class="language-javascript">// Exemplo básico Cypress
+describe('Formulário de Contato', () => {
+  it('Deve preencher e submeter o formulário com sucesso', () => {
+    cy.visit('/formulario');
+
+    cy.get('#nome').type('João Silva');
+    cy.get('#email').type('joao.silva@email.com');
+    cy.get('#assunto').select('Feedback');
+    cy.get('#mensagem').type('Ótimo site!');
+
+    cy.get('#btnEnviar').click();
+
+    cy.contains('Obrigado pelo seu contato!').should('be.visible');
+  });
+});</code></pre>
+        </div>
+
+        <div class="slide-footer">
+          <div class="footer-bar">12 - Testes de Interface</div>
+          <div class="footer-page">15</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: DICAS PARA O EXERCÍCIO ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header">
+
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Dicas para o Exercício</h2>
+        </div>
+
+        <ul>
+          <li>Utilize seletores únicos para evitar flakiness.</li>
+          <li>Evite usar <code>cy.wait()</code>, prefira comandos implícitos do Cypress.</li>
+          <li>Organize comandos em funções para reutilização (exemplo do Page Object).</li>
+          <li>Execute testes no modo interativo para depurar facilmente.</li>
+        </ul>
+
+        <div class="slide-footer">
+          <div class="footer-bar">12 - Testes de Interface</div>
+          <div class="footer-page">16</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: QUIZ 3 - PAGE OBJECT PRÁTICO ==================== -->
+      <section class="quiz-slide content-slide" data-correct="c" data-quiz-feedback="Resposta correta: c. O Page Object Pattern ajuda a organizar código dos testes e facilitar manutenção.">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header">
+
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Quiz: Page Object Pattern na prática</h2>
+        </div>
+
+        <p>Qual é a melhor prática ao implementar o Page Object Pattern?</p>
+        <form class="quiz-form">
+          <label><input type="radio" name="q3" value="a"> Colocar comandos de teste diretamente nos testes.</label><br>
+          <label><input type="radio" name="q3" value="b"> Escrever testes complexos misturando UI e lógica.</label><br>
+          <label><input type="radio" name="q3" value="c"> Encapsular seletores e ações em classes ou funções separadas.</label><br>
+          <label><input type="radio" name="q3" value="d"> Evitar reutilização de código para cada teste ser independente.</label><br>
+        </form>
+
+        <button class="quiz-submit">Enviar</button>
+        <div class="quiz-feedback"></div>
+
+        <div class="slide-footer">
+          <div class="footer-bar">12 - Testes de Interface</div>
+          <div class="footer-page">17</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: QUIZ 4 - TESTES E2E VS UNITARIOS ==================== -->
+      <section class="quiz-slide content-slide" data-correct="d" data-quiz-feedback="Resposta correta: d. Testes unitários são rápidos e isolados; testes E2E validam a experiência do usuário.">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header">
+
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Quiz: Testes E2E vs Testes Unitários</h2>
+        </div>
+
+        <p>Qual a diferença principal entre testes unitários e testes E2E?</p>
+        <form class="quiz-form">
+          <label><input type="radio" name="q4" value="a"> Testes unitários testam a aplicação inteira.</label><br>
+          <label><input type="radio" name="q4" value="b"> Testes E2E são mais rápidos que unitários.</label><br>
+          <label><input type="radio" name="q4" value="c"> Testes E2E não simulam interação do usuário.</label><br>
+          <label><input type="radio" name="q4" value="d"> Testes unitários testam partes isoladas; E2E validam o fluxo do usuário.</label><br>
+        </form>
+
+        <button class="quiz-submit">Enviar</button>
+        <div class="quiz-feedback"></div>
+
+        <div class="slide-footer">
+          <div class="footer-bar">12 - Testes de Interface</div>
+          <div class="footer-page">18</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: EXEMPLO SPRING BOOT TESTE E2E ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header">
+
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Exemplo Java / Spring Boot - Teste E2E</h2>
+        </div>
+
+        <pre><code class="language-java">// Teste E2E com Spring Boot e Selenium
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+public class CheckoutE2ETest {
+  @Autowired
+  private WebDriver driver;
+
+  @Test
+  public void testCheckoutFlow() {
+    driver.get("http://localhost:8080/checkout");
+
+    driver.findElement(By.id("address")).sendKeys("Rua Exemplo, 123");
+    driver.findElement(By.id("paymentMethod")).click();
+    driver.findElement(By.id("submitOrder")).click();
+
+    WebElement confirmation = driver.findElement(By.id("confirmationMessage"));
+    Assertions.assertTrue(confirmation.isDisplayed());
+    Assertions.assertEquals("Pedido realizado com sucesso!", confirmation.getText());
+  }
+}</code></pre>
+
+        <div class="slide-footer">
+          <div class="footer-bar">12 - Testes de Interface</div>
+          <div class="footer-page">19</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: EXEMPLO .NET/C# TESTE E2E ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header">
+
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Exemplo .NET / C# - Teste E2E com Selenium</h2>
+        </div>
+
+        <pre><code class="language-csharp">// Teste E2E com Selenium WebDriver em C#
+[TestFixture]
+public class LoginE2ETest {
+  private IWebDriver driver;
+
+  [SetUp]
+  public void Setup() {
+    driver = new ChromeDriver();
+  }
+
+  [Test]
+  public void DeveLogarComSucesso() {
+    driver.Navigate().GoToUrl("http://localhost:5000/login");
+
+    driver.FindElement(By.Id("username")).SendKeys("usuario");
+    driver.FindElement(By.Id("password")).SendKeys("senha123");
+    driver.FindElement(By.Id("btnLogin")).Click();
+
+    var welcome = driver.FindElement(By.Id("welcomeMessage"));
+    Assert.IsTrue(welcome.Displayed);
+    Assert.AreEqual("Bem-vindo, usuario", welcome.Text);
+  }
+
+  [TearDown]
+  public void TearDown() {
+    driver.Quit();
+  }
+}</code></pre>
+
+        <div class="slide-footer">
+          <div class="footer-bar">12 - Testes de Interface</div>
+          <div class="footer-page">20</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: EXEMPLO NODE.JS CYPRESS ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header">
+
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Exemplo Node.js - Teste E2E com Cypress</h2>
+        </div>
+
+        <pre><code class="language-javascript">// Teste Cypress para formulário
+describe('Formulário de Cadastro', () => {
+  it('preenche campos e envia formulário', () => {
+    cy.visit('http://localhost:3000/register');
+
+    cy.get('#name').type('Maria Fernandes');
+    cy.get('#email').type('maria.fernandes@example.com');
+    cy.get('#password').type('senhaSegura123');
+    cy.get('#confirmPassword').type('senhaSegura123');
+
+    cy.get('#submitBtn').click();
+
+    cy.contains('Cadastro realizado com sucesso!').should('be.visible');
+  });
+});</code></pre>
+
+        <div class="slide-footer">
+          <div class="footer-bar">12 - Testes de Interface</div>
+          <div class="footer-page">21</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: FIM ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header">
+
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Dúvidas ou curiosidades?</h2>
+        </div>
+
+        <div style="display:flex; align-items:center; justify-content:center; flex:1; font-size:4em; color: var(--fiap-dark); font-weight:800; opacity:0.15; margin-top:40px;">
+          ?
+        </div>
+
+        <div class="slide-footer">
+          <div class="footer-bar">12 - Testes de Interface</div>
+          <div class="footer-page">22</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: ENCERRAMENTO ==================== -->
+      <section class="end-slide">
+        <img src="../assets/img/fiap-logo-graduacao.png" alt="FIAP Graduação" style="max-width:350px;">
+        <div class="copyright">
+          Copyright &copy; 2026<br>
+          Prof.º José Romualdo da Costa Filho<br><br>
+          Todos direitos reservados. Reprodução ou divulgação total ou parcial<br>
+          deste documento é expressamente proibido sem o consentimento formal,<br>
+          por escrito, do Professor (autor).
+        </div>
+      </section>
+
+    </div>
+  </div>
+
+  <script src="../node_modules/reveal.js/dist/reveal.js"></script>
+  <script src="../node_modules/reveal.js/plugin/highlight/highlight.js"></script>
+  <script src="../assets/js/fiap-quiz.js"></script>
+  <script>
+    Reveal.initialize({
+      hash: true,
+      slideNumber: false,
+      width: 1280,
+      height: 720,
+      margin: 0,
+      minScale: 0.2,
+      maxScale: 2.0,
+      center: false,
+      transition: 'slide',
+      transitionSpeed: 'default',
+      scrollActivationWidth: null,
+      view: null,
+      plugins: [RevealHighlight]
+    });
+  </script>
+</body>
+</html>

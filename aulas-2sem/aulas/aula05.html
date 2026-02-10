@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>AULA 05 - Testes de Unidade | FIAP</title>
+  <link rel="stylesheet" href="../node_modules/reveal.js/dist/reveal.css" />
+  <link rel="stylesheet" href="../node_modules/reveal.js/dist/theme/white.css" />
+  <link rel="stylesheet" href="../node_modules/reveal.js/plugin/highlight/monokai.css" />
+  <link rel="stylesheet" href="../assets/css/fiap-theme.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+</head>
+<body>
+  <div class="reveal">
+    <div class="slides">
+
+      <!-- ==================== SLIDE: CAPA FIAP ==================== -->
+      <section class="cover-slide">
+        <img src="../assets/img/fiap-logo-graduacao.png" alt="FIAP Graduação" class="fiap-logo-full" />
+      </section>
+
+      <!-- ==================== SLIDE: TÍTULO DA AULA ==================== -->
+      <section class="title-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="title-card">
+          <div class="accent-bar"></div>
+          <h1>Testes de Unidade</h1>
+          <h2>AULA 05 - 17/03/2026</h2>
+          <h3>Prof. José Romualdo</h3>
+        </div>
+        <div class="lesson-bar">05 – Testes de Unidade</div>
+      </section>
+
+      <!-- ==================== SLIDE: AGENDA ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Agenda</h2>
+        </div>
+        <table>
+          <thead>
+            <tr><th>Bloco</th><th>Horário</th><th>Conteúdo</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><strong>Bloco 1</strong></td><td>19h30 – 21h00</td><td>Pirâmide de Testes, TDD, Mocks/Stubs/Fakes, DI, Frameworks e Caso Real Spotify</td></tr>
+            <tr><td><strong>Intervalo</strong></td><td>21h00 – 21h20</td><td>☕ Pausa</td></tr>
+            <tr><td><strong>Bloco 2</strong></td><td>21h20 – 22h45</td><td>Exercício prático com TDD, Quiz sobre TDD e Mocks/Stubs</td></tr>
+          </tbody>
+        </table>
+        <div class="slide-footer">
+          <div class="footer-bar">05 – Testes de Unidade</div>
+          <div class="footer-page">3</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: SEÇÃO PIRÂMIDE DE TESTES ==================== -->
+      <section class="section-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="accent-bar"></div>
+        <h2>Pirâmide de Testes</h2>
+        <p>Estratégia para balancear testes em diferentes níveis:</p>
+        <ul>
+          <li><strong>Testes de Unidade:</strong> pequenos, rápidos, isolados.</li>
+          <li><strong>Testes de Integração:</strong> verificam interação entre componentes.</li>
+          <li><strong>Testes End-to-End (E2E):</strong> validam o sistema completo do ponto de vista do usuário.</li>
+        </ul>
+        <div class="slide-footer">
+          <div class="footer-bar">05 – Testes de Unidade</div>
+          <div class="footer-page">4</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: PIRÂMIDE DE TESTES GRÁFICO ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Visualizando a Pirâmide</h2>
+        </div>
+        <img src="../assets/img/testing-pyramid.png" alt="Pirâmide de Testes" style="max-width:600px; margin: 0 auto; display:block;"/>
+        <p style="text-align:center; margin-top:1em;">Fonte: Mike Cohn - <em>Test Pyramid</em></p>
+        <div class="slide-footer">
+          <div class="footer-bar">05 – Testes de Unidade</div>
+          <div class="footer-page">5</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: TDD - RED GREEN REFACTOR ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>TDD (Test Driven Development)</h2>
+        </div>
+        <p>Fluxo em três etapas para desenvolvimento orientado a testes:</p>
+        <ol>
+          <li><strong>Red:</strong> escrever um teste que falha.</li>
+          <li><strong>Green:</strong> implementar código mínimo para passar no teste.</li>
+          <li><strong>Refactor:</strong> melhorar o código mantendo os testes verdes.</li>
+        </ol>
+        <div class="slide-footer">
+          <div class="footer-bar">05 – Testes de Unidade</div>
+          <div class="footer-page">6</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: MOCKS, STUBS E FAKES ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Mocks, Stubs e Fakes</h2>
+        </div>
+        <p>Objetos utilizados para simular comportamentos e dependências em testes:</p>
+        <ul>
+          <li><strong>Stub:</strong> retorna dados pré-definidos para chamadas específicas.</li>
+          <li><strong>Mock:</strong> objeto que verifica se métodos foram chamados corretamente.</li>
+          <li><strong>Fake:</strong> implementação simplificada que funciona para testes.</li>
+        </ul>
+        <div class="slide-footer">
+          <div class="footer-bar">05 – Testes de Unidade</div>
+          <div class="footer-page">7</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: DEPENDENCY INJECTION PARA TESTABILIDADE ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Dependency Injection (DI) para Testabilidade</h2>
+        </div>
+        <p>DI facilita testes ao permitir que dependências sejam substituídas por mocks/stubs:</p>
+        <ul>
+          <li>Promove código desacoplado e modular.</li>
+          <li>Permite injetar implementações fake na classe testada.</li>
+          <li>Frameworks comuns: Spring Boot, .NET Core DI, inversify.js (Node.js).</li>
+        </ul>
+        <div class="slide-footer">
+          <div class="footer-bar">05 – Testes de Unidade</div>
+          <div class="footer-page">8</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: FRAMEWORKS DE TESTES ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Frameworks Populares de Testes Unitários</h2>
+        </div>
+        <table>
+          <thead>
+            <tr><th>Plataforma</th><th>Framework</th><th>Características</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Java</td><td>JUnit 5</td><td>Suporte a extensões, anotações modernas, integração Maven/Gradle</td></tr>
+            <tr><td>.NET</td><td>xUnit</td><td>Moderno, extensível, integração com .NET Core CLI</td></tr>
+            <tr><td>Node.js</td><td>Jest</td><td>Testes unitários e integração, mocks embutidos, snapshots</td></tr>
+          </tbody>
+        </table>
+        <div class="slide-footer">
+          <div class="footer-bar">05 – Testes de Unidade</div>
+          <div class="footer-page">9</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: EXEMPLOS DE CÓDIGO ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Exemplos de Testes Unitários</h2>
+        </div>
+        <h3>Java - JUnit 5</h3>
+        <pre><code class="language-java">
+import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.Test;
+
+class CalculadoraTest {
+  @Test
+  void somaDoisNumeros() {
+    Calculadora calc = new Calculadora();
+    assertEquals(5, calc.soma(2, 3));
+  }
+}
+        </code></pre>
+
+        <h3>C# - xUnit</h3>
+        <pre><code class="language-csharp">
+using Xunit;
+
+public class CalculadoraTests {
+  [Fact]
+  public void SomaDoisNumeros() {
+    var calc = new Calculadora();
+    Assert.Equal(5, calc.Soma(2, 3));
+  }
+}
+        </code></pre>
+
+        <h3>Node.js - Jest</h3>
+        <pre><code class="language-javascript">
+const calculadora = require('./calculadora');
+
+test('soma dois números', () => {
+  expect(calculadora.soma(2, 3)).toBe(5);
+});
+        </code></pre>
+
+        <div class="slide-footer">
+          <div class="footer-bar">05 – Testes de Unidade</div>
+          <div class="footer-page">10</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: CASO REAL SPOTIFY ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Caso Real: Spotify e TDD</h2>
+        </div>
+        <p>O Spotify adota TDD em squads autônomos para:</p>
+        <ul>
+          <li>Garantir alta qualidade e confiabilidade dos serviços.</li>
+          <li>Permitir entregas rápidas com segurança.</li>
+          <li>Fomentar cultura de responsabilidade e feedback contínuo.</li>
+        </ul>
+        <p>Testes são parte integrante do ciclo de desenvolvimento, garantindo que cada novo recurso seja confiável desde o início.</p>
+        <div class="slide-footer">
+          <div class="footer-bar">05 – Testes de Unidade</div>
+          <div class="footer-page">11</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: QUIZ SOBRE TDD ==================== -->
+      <section class="quiz-slide content-slide" data-quiz-id="tdd-quiz-1">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Quiz: TDD - Test Driven Development</h2>
+        </div>
+        <form>
+          <p>Qual é a ordem correta das fases do TDD?</p>
+          <label><input type="radio" name="q1" data-correct="false"> Green - Refactor - Red</label><br />
+          <label><input type="radio" name="q1" data-correct="true"> Red - Green - Refactor</label><br />
+          <label><input type="radio" name="q1" data-correct="false"> Refactor - Red - Green</label><br />
+          <label><input type="radio" name="q1" data-correct="false"> Green - Red - Refactor</label><br />
+        </form>
+        <div class="quiz-feedback" data-feedback="q1">
+          <p><strong>Resposta correta:</strong> Red - Green - Refactor. Primeiro o teste falha, depois implementa para passar, e por fim refatora o código.</p>
+        </div>
+        <div class="slide-footer">
+          <div class="footer-bar">05 – Testes de Unidade</div>
+          <div class="footer-page">12</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: QUIZ MOCK VS STUB ==================== -->
+      <section class="quiz-slide content-slide" data-quiz-id="mock-stub-quiz-2">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Quiz: Mock vs Stub</h2>
+        </div>
+        <form>
+          <p>Qual a principal diferença entre Mock e Stub?</p>
+          <label><input type="radio" name="q2" data-correct="false"> Ambos são objetos reais usados em produção.</label><br />
+          <label><input type="radio" name="q2" data-correct="true"> Stub retorna dados pré-definidos; Mock verifica interações.</label><br />
+          <label><input type="radio" name="q2" data-correct="false"> Mock é uma implementação fake completa.</label><br />
+          <label><input type="radio" name="q2" data-correct="false"> Stub grava logs do teste.</label><br />
+        </form>
+        <div class="quiz-feedback" data-feedback="q2">
+          <p><strong>Resposta correta:</strong> Stub retorna dados pré-definidos para testes, enquanto Mock verifica se métodos foram chamados como esperado.</p>
+        </div>
+        <div class="slide-footer">
+          <div class="footer-bar">05 – Testes de Unidade</div>
+          <div class="footer-page">13</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: INTERVALO ==================== -->
+      <section class="break-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="break-title">
+          <h2>Intervalo</h2>
+          <p>21h00 – 21h20</p>
+          <p>☕ Aproveite para descansar</p>
+        </div>
+        <div class="slide-footer">
+          <div class="footer-bar">05 – Testes de Unidade</div>
+          <div class="footer-page">14</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: SEÇÃO EXERCÍCIO PRÁTICO ==================== -->
+      <section class="section-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="accent-bar"></div>
+        <h2>Exercício Hands-on</h2>
+        <h3>API de Cálculo de Frete usando TDD</h3>
+        <p>Objetivo: Escrever testes unitários para a API de cálculo de frete antes de implementar a lógica.</p>
+        <p>Passos:</p>
+        <ol>
+          <li>Crie um teste unitário que verifique o cálculo do frete para um determinado CEP.</li>
+          <li>Implemente a lógica mínima para passar no teste.</li>
+          <li>Refatore o código mantendo os testes verdes.</li>
+        </ol>
+        <div class="slide-footer">
+          <div class="footer-bar">05 – Testes de Unidade</div>
+          <div class="footer-page">15</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: EXERCÍCIO CONTAINER E PASSOS ==================== -->
+      <section class="exercise-slide content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Exercício: Implementação TDD</h2>
+        </div>
+        <div class="exercise-container">
+          <div class="exercise-steps">
+            <h3>Passo 1: Escreva o teste unitário</h3>
+            <pre><code class="language-java">
+// Exemplo inicial em Java com JUnit 5
+import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.Test;
+
+class FreteServiceTest {
+  @Test
+  void calculaFreteParaCEPValido() {
+    FreteService service = new FreteService();
+    double frete = service.calculaFrete("01310-000");
+    assertEquals(15.0, frete);
+  }
+}
+            </code></pre>
+
+            <h3>Passo 2: Implemente o método para passar no teste</h3>
+            <pre><code class="language-java">
+class FreteService {
+  double calculaFrete(String cep) {
+    if ("01310-000".equals(cep)) {
+      return 15.0;
+    }
+    return 0.0;
+  }
+}
+            </code></pre>
+
+            <h3>Passo 3: Refatore e adicione mais testes</h3>
+            <pre><code class="language-java">
+// Adicione mais testes para outros CEPs e refatore o código para usar tabelas ou regras.</code></pre>
+          </div>
+        </div>
+        <div class="slide-footer">
+          <div class="footer-bar">05 – Testes de Unidade</div>
+          <div class="footer-page">16</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: EXERCÍCIO - EXEMPLOS .NET ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Exemplo .NET - xUnit</h2>
+        </div>
+        <pre><code class="language-csharp">
+using Xunit;
+
+public class FreteServiceTests {
+  [Fact]
+  public void CalculaFreteParaCEPValido() {
+    var service = new FreteService();
+    var frete = service.CalculaFrete("01310-000");
+    Assert.Equal(15.0, frete);
+  }
+}
+
+public class FreteService {
+  public double CalculaFrete(string cep) {
+    if (cep == "01310-000")
+      return 15.0;
+    return 0.0;
+  }
+}
+        </code></pre>
+        <div class="slide-footer">
+          <div class="footer-bar">05 – Testes de Unidade</div>
+          <div class="footer-page">17</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: EXERCÍCIO - EXEMPLOS NODE.JS ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Exemplo Node.js - Jest</h2>
+        </div>
+        <pre><code class="language-javascript">
+// freteService.js
+function calculaFrete(cep) {
+  if (cep === "01310-000") return 15.0;
+  return 0.0;
+}
+module.exports = { calculaFrete };
+
+// freteService.test.js
+const { calculaFrete } = require('./freteService');
+
+test('Calcula frete para CEP válido', () => {
+  expect(calculaFrete("01310-000")).toBe(15.0);
+});
+        </code></pre>
+        <div class="slide-footer">
+          <div class="footer-bar">05 – Testes de Unidade</div>
+          <div class="footer-page">18</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: QUIZ SOBRE TDD E MOCKS/STUBS ==================== -->
+      <section class="quiz-slide content-slide" data-quiz-id="tdd-mocks-quiz-3">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Quiz: TDD e Mocks/Stubs</h2>
+        </div>
+        <form>
+          <p>Por que TDD é considerado uma prática importante?</p>
+          <label><input type="radio" name="q3" data-correct="true"> Ajuda a garantir qualidade e design melhor do código.</label><br />
+          <label><input type="radio" name="q3" data-correct="false"> É usado apenas para testes manuais.</label><br />
+          <label><input type="radio" name="q3" data-correct="false"> Impede o uso de mocks e stubs.</label><br />
+          <label><input type="radio" name="q3" data-correct="false"> Substitui a necessidade de testes de integração.</label><br />
+        </form>
+        <div class="quiz-feedback" data-feedback="q3">
+          <p><strong>Resposta correta:</strong> TDD ajuda a criar código testável, confiável e com design mais limpo.</p>
+        </div>
+        <form>
+          <p>Qual das afirmativas sobre mocks e stubs está correta?</p>
+          <label><input type="radio" name="q4" data-correct="false"> Mocks são usados apenas para gerar dados aleatórios.</label><br />
+          <label><input type="radio" name="q4" data-correct="true"> Stubs fornecem respostas pré-definidas, mocks verificam interações.</label><br />
+          <label><input type="radio" name="q4" data-correct="false"> Fakes não são usados em testes unitários.</label><br />
+          <label><input type="radio" name="q4" data-correct="false"> Mock e stub são termos intercambiáveis e significam a mesma coisa.</label><br />
+        </form>
+        <div class="quiz-feedback" data-feedback="q4">
+          <p><strong>Resposta correta:</strong> Stubs retornam dados fixos, mocks verificam chamadas feitas durante o teste.</p>
+        </div>
+        <div class="slide-footer">
+          <div class="footer-bar">05 – Testes de Unidade</div>
+          <div class="footer-page">19</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: DÚVIDAS OU CURIOSIDADES ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Dúvidas ou curiosidades?</h2>
+        </div>
+        <div style="display:flex; align-items:center; justify-content:center; flex:1; font-size:4em; color: var(--fiap-dark); font-weight:800; opacity:0.15; margin-top:40px;">
+          ?
+        </div>
+        <div class="slide-footer">
+          <div class="footer-bar">05 – Testes de Unidade</div>
+          <div class="footer-page">20</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: ENCERRAMENTO ==================== -->
+      <section class="end-slide">
+        <img src="../assets/img/fiap-logo-graduacao.png" alt="FIAP Graduação" style="max-width:350px;" />
+        <div class="copyright">
+          Copyright &copy; 2026<br/>
+          Prof.º José Romualdo da Costa Filho<br/><br/>
+          Todos direitos reservados. Reprodução ou divulgação total ou parcial<br/>
+          deste documento é expressamente proibido sem o consentimento formal,<br/>
+          por escrito, do Professor (autor).
+        </div>
+      </section>
+
+    </div>
+  </div>
+
+  <script src="../node_modules/reveal.js/dist/reveal.js"></script>
+  <script src="../node_modules/reveal.js/plugin/highlight/highlight.js"></script>
+  <script src="../assets/js/fiap-quiz.js"></script>
+  <script>
+    Reveal.initialize({
+      hash: true,
+      slideNumber: false,
+      width: 1280,
+      height: 720,
+      margin: 0,
+      minScale: 0.2,
+      maxScale: 2.0,
+      center: false,
+      transition: 'slide',
+      transitionSpeed: 'default',
+      scrollActivationWidth: null,
+      view: null,
+      plugins: [RevealHighlight]
+    });
+  </script>
+</body>
+</html>
