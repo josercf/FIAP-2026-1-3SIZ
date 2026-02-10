@@ -8,6 +8,8 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/theme/white.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/plugin/highlight/monokai.css">
   <link rel="stylesheet" href="../assets/css/fiap-theme.css">
+  <link rel="stylesheet" href="../assets/css/fiap-print.css">
+  <script>if(/print-pdf/gi.test(window.location.search)){var link=document.createElement('link');link.rel='stylesheet';link.href='https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/css/print/pdf.css';document.head.appendChild(link);}</script>
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 </head>
 <body>
@@ -217,6 +219,132 @@
         </div>
       </section>
 
+      <!-- ==================== SLIDE: NEM TODO GATEWAY É IGUAL ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header">
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Mas nem todo Gateway é igual!</h2>
+        </div>
+
+        <p>Lembra do modelo OSI? Gateways podem atuar em <strong>camadas diferentes</strong>. Dependendo da camada, ele "enxerga" coisas diferentes da requisição.</p>
+
+        <div style="display:flex; align-items:center; gap:30px; margin-top:15px;">
+          <img src="../assets/img/osi-tcpip.svg" alt="Modelo OSI vs TCP/IP" style="width:55%; height:auto; border-radius:6px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+          <div style="flex:1;">
+            <div class="concept-card" style="margin-bottom:12px; border-left-color: #ED145B;">
+              <h4 style="color:#ED145B;">Camada 7 – Aplicação</h4>
+              <p>Entende <strong>URLs, headers HTTP, body, cookies</strong>. É aqui que o <strong>API Gateway</strong> atua.</p>
+            </div>
+            <div class="concept-card" style="border-left-color: #666;">
+              <h4 style="color:#666;">Camadas 3/4 – Rede e Transporte</h4>
+              <p>Enxerga apenas <strong>endereços IP e portas TCP</strong>. Atua como Load Balancer de rede.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="slide-footer">
+          <div class="footer-bar">01 – Revisão + API Gateway & Proxy Reverso</div>
+          <div class="footer-page">10</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: COMPARAÇÃO LAYER 3/4 vs LAYER 7 ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header">
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Layer 3/4 vs Layer 7 — O que cada um "enxerga"?</h2>
+        </div>
+
+        <div class="side-by-side">
+          <div class="side" style="border-top: 4px solid #888;">
+            <h4 style="color:#666;">Network Gateway (L3/4)</h4>
+            <p>Olha apenas o "envelope" da requisição:</p>
+            <ul>
+              <li>IP de origem e destino</li>
+              <li>Porta TCP (ex.: 80, 443, 8080)</li>
+              <li>Protocolo (TCP/UDP)</li>
+            </ul>
+            <p style="margin-top:10px;"><strong>Analogia:</strong> É o <em>porteiro</em> do prédio — sabe de qual andar você veio e para qual vai, mas não lê suas cartas.</p>
+          </div>
+          <div class="side" style="border-top: 4px solid #ED145B;">
+            <h4>API Gateway (L7)</h4>
+            <p>Abre e entende o <strong>conteúdo</strong> da requisição:</p>
+            <ul>
+              <li>URL / path (<code>/api/pedidos</code>)</li>
+              <li>Método HTTP (GET, POST...)</li>
+              <li>Headers (<code>Authorization</code>, <code>Content-Type</code>)</li>
+              <li>Body (JSON, XML...)</li>
+            </ul>
+            <p style="margin-top:10px;"><strong>Analogia:</strong> É a <em>recepcionista</em> — lê o pedido, verifica seu crachá e direciona para o setor certo.</p>
+          </div>
+        </div>
+
+        <div class="slide-footer">
+          <div class="footer-bar">01 – Revisão + API Gateway & Proxy Reverso</div>
+          <div class="footer-page">11</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: MINI-MUNDO ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header">
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Mini-mundo: Dois problemas, duas camadas</h2>
+        </div>
+
+        <p style="font-size:0.75em; margin-bottom:15px;">A <strong>Loja TechBR</strong> está crescendo. O time de infra precisa resolver dois problemas diferentes. Cada um exige um tipo de gateway:</p>
+
+        <div class="side-by-side">
+          <div class="side" style="border-left: 4px solid #888; border-top:none; background: linear-gradient(135deg, #f8f8f8 0%, #f0f0f0 100%);">
+            <h4 style="color:#666;">Problema 1 — Camada 3/4 (IP/TCP)</h4>
+            <p style="font-size:0.65em; line-height:1.5;">A loja tem <strong>3 servidores idênticos</strong> rodando a mesma aplicação. Quando chega muito tráfego, um servidor sozinho não aguenta.</p>
+            <p style="font-size:0.65em; line-height:1.5; margin-top:8px;"><strong>Solução:</strong> Um <strong>Load Balancer L3/4</strong> distribui as conexões pelos 3 servidores, olhando apenas o IP e a porta TCP. Não precisa saber o que tem dentro da requisição.</p>
+            <div class="flow-diagram" style="margin:10px 0; gap:6px;">
+              <div class="flow-item" style="font-size:0.55em; padding:8px 12px;">Clientes</div>
+              <div class="flow-arrow" style="font-size:0.9em;">→</div>
+              <div class="flow-item" style="font-size:0.55em; padding:8px 12px; background:#888;">LB L3/4<br><small>:80</small></div>
+              <div class="flow-arrow" style="font-size:0.9em;">→</div>
+              <div style="display:flex; flex-direction:column; gap:4px;">
+                <div class="flow-item" style="font-size:0.5em; padding:5px 10px;">Srv 1</div>
+                <div class="flow-item" style="font-size:0.5em; padding:5px 10px;">Srv 2</div>
+                <div class="flow-item" style="font-size:0.5em; padding:5px 10px;">Srv 3</div>
+              </div>
+            </div>
+          </div>
+          <div class="side" style="border-left: 4px solid #ED145B; border-top:none; background: linear-gradient(135deg, #fff5f8 0%, #fff0f3 100%);">
+            <h4>Problema 2 — Camada 7 (HTTP)</h4>
+            <p style="font-size:0.65em; line-height:1.5;">A loja agora tem <strong>microsserviços separados</strong>: Catálogo, Carrinho e Pagamento. O gateway precisa ler a URL para saber para onde enviar.</p>
+            <p style="font-size:0.65em; line-height:1.5; margin-top:8px;"><strong>Solução:</strong> Um <strong>API Gateway L7</strong> lê o path HTTP e roteia: <code>/catalogo</code> → Serviço Catálogo, <code>/carrinho</code> → Serviço Carrinho.</p>
+            <div class="flow-diagram" style="margin:10px 0; gap:6px;">
+              <div class="flow-item" style="font-size:0.55em; padding:8px 12px;">Clientes</div>
+              <div class="flow-arrow" style="font-size:0.9em;">→</div>
+              <div class="flow-item" style="font-size:0.55em; padding:8px 12px; background:var(--fiap-pink);">API GW<br><small>L7</small></div>
+              <div class="flow-arrow" style="font-size:0.9em;">→</div>
+              <div style="display:flex; flex-direction:column; gap:4px;">
+                <div class="flow-item" style="font-size:0.5em; padding:5px 10px;">/catalogo</div>
+                <div class="flow-item" style="font-size:0.5em; padding:5px 10px;">/carrinho</div>
+                <div class="flow-item" style="font-size:0.5em; padding:5px 10px;">/pagamento</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="callout" style="margin-top:10px;">
+          <p><strong>Resumo:</strong> O API Gateway (L7) usa sessões da Camada 5 e se baseia na infraestrutura IP/TCP (L3/4) para fazer o gerenciamento avançado de APIs. São complementares, não concorrentes!</p>
+        </div>
+
+        <div class="slide-footer">
+          <div class="footer-bar">01 – Revisão + API Gateway & Proxy Reverso</div>
+          <div class="footer-page">12</div>
+        </div>
+      </section>
+
       <!-- ==================== SLIDE: RESPONSABILIDADES DO GATEWAY ==================== -->
       <section class="content-slide">
         <div class="top-bar"></div>
@@ -242,7 +370,7 @@
 
         <div class="slide-footer">
           <div class="footer-bar">01 – Revisão + API Gateway & Proxy Reverso</div>
-          <div class="footer-page">10</div>
+          <div class="footer-page">13</div>
         </div>
       </section>
 
@@ -280,7 +408,7 @@
 
         <div class="slide-footer">
           <div class="footer-bar">01 – Revisão + API Gateway & Proxy Reverso</div>
-          <div class="footer-page">11</div>
+          <div class="footer-page">14</div>
         </div>
       </section>
 
@@ -323,7 +451,7 @@ server {
 
         <div class="slide-footer">
           <div class="footer-bar">01 – Revisão + API Gateway & Proxy Reverso</div>
-          <div class="footer-page">12</div>
+          <div class="footer-page">15</div>
         </div>
       </section>
 
@@ -371,7 +499,7 @@ server {
 
         <div class="slide-footer">
           <div class="footer-bar">01 – Revisão + API Gateway & Proxy Reverso</div>
-          <div class="footer-page">13</div>
+          <div class="footer-page">16</div>
         </div>
       </section>
 
@@ -400,7 +528,7 @@ server {
 
         <div class="slide-footer">
           <div class="footer-bar">01 – Revisão + API Gateway & Proxy Reverso</div>
-          <div class="footer-page">14</div>
+          <div class="footer-page">17</div>
         </div>
       </section>
 
@@ -432,7 +560,7 @@ server {
 
         <div class="slide-footer">
           <div class="footer-bar">01 – Revisão + API Gateway & Proxy Reverso</div>
-          <div class="footer-page">15</div>
+          <div class="footer-page">18</div>
         </div>
       </section>
 
@@ -448,7 +576,7 @@ server {
         <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header">
         <div class="accent-bar"></div>
         <h2>Exercício Prático</h2>
-        <div class="slide-footer"><div class="footer-page">17</div></div>
+        <div class="slide-footer"><div class="footer-page">20</div></div>
       </section>
 
       <!-- ==================== SLIDE: EXERCÍCIO ==================== -->
@@ -464,8 +592,17 @@ server {
           <h3>🎯 Objetivo</h3>
           <p>Configurar o Nginx como proxy reverso para rotear requisições para duas APIs diferentes rodando em containers Docker.</p>
 
+          <p style="margin:8px 0 15px 0;">
+            <a href="https://github.com/josercf/2026-1-1002-aula01" target="_blank"
+               style="display:inline-flex; align-items:center; gap:8px; background:#ED145B; color:#fff; padding:8px 16px; border-radius:5px; text-decoration:none; font-size:0.65em; font-weight:600; transition:background 0.2s;">
+              <svg width="18" height="18" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+              Repositório do Exercício
+            </a>
+            <span style="font-size:0.55em; color:#aaa; margin-left:8px;">github.com/josercf/2026-1-1002-aula01</span>
+          </p>
+
           <ol class="exercise-steps">
-            <li>Crie uma pasta <code>exercicio-gateway</code> e dentro dela crie o <code>docker-compose.yml</code></li>
+            <li>Clone o repositório: <code>git clone https://github.com/josercf/2026-1-1002-aula01.git</code></li>
             <li>Configure dois serviços simples usando a imagem <code>hashicorp/http-echo</code>: um retornando "Serviço A" na porta 5001 e outro "Serviço B" na porta 5002</li>
             <li>Crie o arquivo <code>nginx.conf</code> com rotas: <code>/servico-a</code> → container A e <code>/servico-b</code> → container B</li>
             <li>Adicione o Nginx como serviço no docker-compose, mapeando a porta 80 e montando o <code>nginx.conf</code></li>
@@ -476,7 +613,7 @@ server {
 
         <div class="slide-footer">
           <div class="footer-bar">01 – Revisão + API Gateway & Proxy Reverso</div>
-          <div class="footer-page">18</div>
+          <div class="footer-page">21</div>
         </div>
       </section>
 
@@ -521,7 +658,7 @@ networks:
 
         <div class="slide-footer">
           <div class="footer-bar">01 – Revisão + API Gateway & Proxy Reverso</div>
-          <div class="footer-page">19</div>
+          <div class="footer-page">22</div>
         </div>
       </section>
 
@@ -563,13 +700,18 @@ server {
     }
 }</code></pre>
 
-        <div class="callout">
+        <div class="callout" style="display:flex; align-items:center; justify-content:space-between;">
           <p><strong>Teste:</strong> <code>curl -i http://localhost/servico-a</code> — observe o header <code>X-Gateway: fiap-proxy</code> na resposta!</p>
+          <a href="https://github.com/josercf/2026-1-1002-aula01" target="_blank"
+             style="display:inline-flex; align-items:center; gap:5px; color:#ED145B; text-decoration:none; font-size:0.6em; font-weight:600; white-space:nowrap;">
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+            Ver no GitHub
+          </a>
         </div>
 
         <div class="slide-footer">
           <div class="footer-bar">01 – Revisão + API Gateway & Proxy Reverso</div>
-          <div class="footer-page">20</div>
+          <div class="footer-page">23</div>
         </div>
       </section>
 
@@ -610,7 +752,7 @@ server {
 
         <div class="slide-footer">
           <div class="footer-bar">01 – Revisão + API Gateway & Proxy Reverso</div>
-          <div class="footer-page">21</div>
+          <div class="footer-page">24</div>
         </div>
       </section>
 
@@ -651,7 +793,7 @@ server {
 
         <div class="slide-footer">
           <div class="footer-bar">01 – Revisão + API Gateway & Proxy Reverso</div>
-          <div class="footer-page">22</div>
+          <div class="footer-page">25</div>
         </div>
       </section>
 
@@ -681,7 +823,7 @@ server {
 
         <div class="slide-footer">
           <div class="footer-bar">01 – Revisão + API Gateway & Proxy Reverso</div>
-          <div class="footer-page">23</div>
+          <div class="footer-page">26</div>
         </div>
       </section>
 
@@ -700,7 +842,7 @@ server {
 
         <div class="slide-footer">
           <div class="footer-bar">01 – Revisão + API Gateway & Proxy Reverso</div>
-          <div class="footer-page">24</div>
+          <div class="footer-page">27</div>
         </div>
       </section>
 
@@ -732,6 +874,8 @@ server {
       minScale: 0.2,
       maxScale: 2.0,
       center: false,
+        pdfMaxPagesPerSlide: 1,
+        pdfSeparateFragments: false,
       transition: 'slide',
       transitionSpeed: 'default',
       scrollActivationWidth: null,
@@ -739,5 +883,6 @@ server {
       plugins: [RevealHighlight]
     });
   </script>
+  <script src="../assets/js/fiap-print.js"></script>
 </body>
 </html>
