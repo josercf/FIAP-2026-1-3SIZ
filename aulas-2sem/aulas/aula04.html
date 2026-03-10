@@ -47,9 +47,9 @@
             <tr><th>Bloco</th><th>Horário</th><th>Conteúdo</th></tr>
           </thead>
           <tbody>
-            <tr><td><strong>Bloco 1</strong></td><td>19h30 – 21h00</td><td>Database per Service, Shared DB, EDA, Polling vs Eventos, Pub/Sub vs Streaming, Saga Pattern, Event Sourcing, CQRS, Noisy Neighbor</td></tr>
+            <tr><td><strong>Bloco 1</strong></td><td>19h30 – 21h00</td><td>Database per Service, Shared DB, EDA, Polling vs Eventos, Pub/Sub vs Streaming, Saga Pattern, Event Sourcing, CQRS, Noisy Neighbor, SLA</td></tr>
             <tr><td><strong>Intervalo</strong></td><td>21h00 – 21h20</td><td>☕ Pausa</td></tr>
-            <tr><td><strong>Bloco 2</strong></td><td>21h20 – 22h45</td><td>Exercício prático: Fluxo Saga + Quiz</td></tr>
+            <tr><td><strong>Bloco 2</strong></td><td>21h20 – 22h45</td><td>Desafio de Arquitetura (duplas/trios) + Quiz</td></tr>
           </tbody>
         </table>
         <div class="slide-footer">
@@ -1450,6 +1450,294 @@
         </div>
       </section>
 
+      <!-- ==================== SLIDE: SLA - O que é? ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>SLA — Service Level Agreement</h2>
+          <h3>O contrato de disponibilidade do seu sistema</h3>
+        </div>
+
+        <svg viewBox="0 0 1100 380" style="width:100%; max-height:358px; margin-top:2px;">
+          <!-- Central concept -->
+          <rect x="300" y="5" width="460" height="65" rx="12" fill="#1a1a1a"/>
+          <text x="530" y="32" text-anchor="middle" fill="#ED145B" font-size="16" font-weight="800" font-family="Montserrat">SLA = % do tempo que o sistema fica disponível</text>
+          <text x="530" y="55" text-anchor="middle" fill="#aaa" font-size="11" font-family="Montserrat">Quanto mais "noves", menos tempo fora do ar</text>
+
+          <!-- Table of nines -->
+          <rect x="50" y="90" width="1000" height="30" rx="4" fill="#1a1a1a"/>
+          <text x="160" y="110" text-anchor="middle" fill="#fff" font-size="11" font-weight="700" font-family="Montserrat">SLA</text>
+          <text x="370" y="110" text-anchor="middle" fill="#fff" font-size="11" font-weight="700" font-family="Montserrat">Downtime / Ano</text>
+          <text x="580" y="110" text-anchor="middle" fill="#fff" font-size="11" font-weight="700" font-family="Montserrat">Downtime / Mês</text>
+          <text x="790" y="110" text-anchor="middle" fill="#fff" font-size="11" font-weight="700" font-family="Montserrat">Downtime / Semana</text>
+          <text x="960" y="110" text-anchor="middle" fill="#fff" font-size="11" font-weight="700" font-family="Montserrat">Nome</text>
+
+          <!-- Row 99% -->
+          <rect x="50" y="122" width="1000" height="28" fill="#fdedec"/>
+          <text x="160" y="141" text-anchor="middle" fill="#e74c3c" font-size="13" font-weight="800" font-family="Montserrat">99%</text>
+          <text x="370" y="141" text-anchor="middle" fill="#333" font-size="11" font-family="Montserrat">3 dias 15h 36min</text>
+          <text x="580" y="141" text-anchor="middle" fill="#333" font-size="11" font-family="Montserrat">7h 18min</text>
+          <text x="790" y="141" text-anchor="middle" fill="#333" font-size="11" font-family="Montserrat">1h 41min</text>
+          <text x="960" y="141" text-anchor="middle" fill="#e74c3c" font-size="10" font-weight="600" font-family="Montserrat">"Dois noves"</text>
+
+          <!-- Row 99.9% -->
+          <rect x="50" y="152" width="1000" height="28" fill="#fef9e7"/>
+          <text x="160" y="171" text-anchor="middle" fill="#f39c12" font-size="13" font-weight="800" font-family="Montserrat">99.9%</text>
+          <text x="370" y="171" text-anchor="middle" fill="#333" font-size="11" font-family="Montserrat">8h 45min 36s</text>
+          <text x="580" y="171" text-anchor="middle" fill="#333" font-size="11" font-family="Montserrat">43min 50s</text>
+          <text x="790" y="171" text-anchor="middle" fill="#333" font-size="11" font-family="Montserrat">10min 5s</text>
+          <text x="960" y="171" text-anchor="middle" fill="#f39c12" font-size="10" font-weight="600" font-family="Montserrat">"Três noves"</text>
+
+          <!-- Row 99.99% -->
+          <rect x="50" y="182" width="1000" height="28" fill="#eafaf1"/>
+          <text x="160" y="201" text-anchor="middle" fill="#2ecc71" font-size="13" font-weight="800" font-family="Montserrat">99.99%</text>
+          <text x="370" y="201" text-anchor="middle" fill="#333" font-size="11" font-family="Montserrat">52min 34s</text>
+          <text x="580" y="201" text-anchor="middle" fill="#333" font-size="11" font-family="Montserrat">4min 23s</text>
+          <text x="790" y="201" text-anchor="middle" fill="#333" font-size="11" font-family="Montserrat">1min 0s</text>
+          <text x="960" y="201" text-anchor="middle" fill="#2ecc71" font-size="10" font-weight="600" font-family="Montserrat">"Quatro noves"</text>
+
+          <!-- Row 99.999% -->
+          <rect x="50" y="212" width="1000" height="28" fill="#ebf5fb"/>
+          <text x="160" y="231" text-anchor="middle" fill="#3498db" font-size="13" font-weight="800" font-family="Montserrat">99.999%</text>
+          <text x="370" y="231" text-anchor="middle" fill="#333" font-size="11" font-family="Montserrat">5min 15s</text>
+          <text x="580" y="231" text-anchor="middle" fill="#333" font-size="11" font-family="Montserrat">26s</text>
+          <text x="790" y="231" text-anchor="middle" fill="#333" font-size="11" font-family="Montserrat">6s</text>
+          <text x="960" y="231" text-anchor="middle" fill="#3498db" font-size="10" font-weight="600" font-family="Montserrat">"Cinco noves"</text>
+
+          <!-- Visual scale -->
+          <text x="530" y="270" text-anchor="middle" fill="#ED145B" font-size="12" font-weight="700" font-family="Montserrat">Cada "nove" a mais custa exponencialmente mais caro!</text>
+
+          <!-- Cost vs availability graph -->
+          <rect x="50" y="285" width="480" height="85" rx="8" fill="#f5f5f5"/>
+          <text x="70" y="308" fill="#333" font-size="11" font-weight="700" font-family="Montserrat">Fórmula:</text>
+          <text x="70" y="332" fill="#ED145B" font-size="16" font-weight="800" font-family="Montserrat, monospace">Disponibilidade = (Uptime / Tempo Total) x 100</text>
+          <text x="70" y="358" fill="#888" font-size="10" font-family="Montserrat">Ex: 8.700h no ar em 8.760h/ano = 99,31% (dois noves)</text>
+
+          <!-- Key insight -->
+          <rect x="560" y="285" width="490" height="85" rx="8" fill="rgba(237,20,91,0.06)"/>
+          <text x="580" y="308" fill="#ED145B" font-size="11" font-weight="700" font-family="Montserrat">Por que isso importa em microsserviços?</text>
+          <text x="580" y="332" fill="#555" font-size="10" font-family="Montserrat">O SLA do sistema é o PRODUTO dos SLAs de cada componente.</text>
+          <text x="580" y="350" fill="#555" font-size="10" font-family="Montserrat">Mais serviços em série = SLA composto MENOR.</text>
+          <text x="580" y="368" fill="#555" font-size="10" font-family="Montserrat">Redundância e desacoplamento são essenciais.</text>
+        </svg>
+
+        <div class="slide-footer">
+          <div class="footer-bar">04 - Dados em Microsservicos</div>
+          <div class="footer-page">27</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: SLA Composto - Como Calcular ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>SLA Composto — Como Calcular?</h2>
+          <h3>Componentes em série: multiplique os SLAs</h3>
+        </div>
+
+        <svg viewBox="0 0 1100 380" style="width:100%; max-height:358px; margin-top:2px;">
+          <!-- Diagram: components in series -->
+          <text x="530" y="22" text-anchor="middle" fill="#1a1a1a" font-size="13" font-weight="700" font-family="Montserrat">Uma requisição passa por TODOS os componentes em série:</text>
+
+          <!-- User -->
+          <rect x="30" y="55" width="90" height="65" rx="10" fill="#1a1a1a"/>
+          <text x="75" y="82" text-anchor="middle" fill="#fff" font-size="10" font-weight="700" font-family="Montserrat">Usuário</text>
+          <text x="75" y="100" text-anchor="middle" fill="#888" font-size="18" font-family="Montserrat">👤</text>
+
+          <!-- Arrow -->
+          <line x1="125" y1="88" x2="175" y2="88" stroke="#ED145B" stroke-width="2.5" marker-end="url(#sla-arr)"/>
+
+          <!-- Network -->
+          <rect x="180" y="45" width="180" height="85" rx="12" fill="#f5f5f5" stroke="#9b59b6" stroke-width="2.5"/>
+          <rect x="180" y="45" width="180" height="30" rx="12" fill="#9b59b6"/>
+          <text x="270" y="66" text-anchor="middle" fill="#fff" font-size="11" font-weight="700" font-family="Montserrat">Rede / Load Balancer</text>
+          <text x="270" y="92" text-anchor="middle" fill="#9b59b6" font-size="22" font-weight="800" font-family="Montserrat">99.95%</text>
+          <text x="270" y="118" text-anchor="middle" fill="#888" font-size="9" font-family="Montserrat">~26min downtime/mês</text>
+
+          <!-- Arrow -->
+          <line x1="365" y1="88" x2="415" y2="88" stroke="#ED145B" stroke-width="2.5" marker-end="url(#sla-arr)"/>
+          <text x="390" y="78" text-anchor="middle" fill="#ED145B" font-size="14" font-weight="800" font-family="Montserrat">×</text>
+
+          <!-- App Server -->
+          <rect x="420" y="45" width="180" height="85" rx="12" fill="#f5f5f5" stroke="#3498db" stroke-width="2.5"/>
+          <rect x="420" y="45" width="180" height="30" rx="12" fill="#3498db"/>
+          <text x="510" y="66" text-anchor="middle" fill="#fff" font-size="11" font-weight="700" font-family="Montserrat">Servidor de Aplicação</text>
+          <text x="510" y="92" text-anchor="middle" fill="#3498db" font-size="22" font-weight="800" font-family="Montserrat">99.9%</text>
+          <text x="510" y="118" text-anchor="middle" fill="#888" font-size="9" font-family="Montserrat">~44min downtime/mês</text>
+
+          <!-- Arrow -->
+          <line x1="605" y1="88" x2="655" y2="88" stroke="#ED145B" stroke-width="2.5" marker-end="url(#sla-arr)"/>
+          <text x="630" y="78" text-anchor="middle" fill="#ED145B" font-size="14" font-weight="800" font-family="Montserrat">×</text>
+
+          <!-- Database -->
+          <rect x="660" y="45" width="180" height="85" rx="12" fill="#f5f5f5" stroke="#2ecc71" stroke-width="2.5"/>
+          <rect x="660" y="45" width="180" height="30" rx="12" fill="#2ecc71"/>
+          <text x="750" y="66" text-anchor="middle" fill="#fff" font-size="11" font-weight="700" font-family="Montserrat">Banco de Dados</text>
+          <text x="750" y="92" text-anchor="middle" fill="#2ecc71" font-size="22" font-weight="800" font-family="Montserrat">99.99%</text>
+          <text x="750" y="118" text-anchor="middle" fill="#888" font-size="9" font-family="Montserrat">~4min downtime/mês</text>
+
+          <!-- Result arrow -->
+          <line x1="845" y1="88" x2="885" y2="88" stroke="#ED145B" stroke-width="2.5" marker-end="url(#sla-arr)"/>
+          <text x="865" y="78" text-anchor="middle" fill="#ED145B" font-size="14" font-weight="800" font-family="Montserrat">=</text>
+
+          <!-- Result -->
+          <rect x="890" y="40" width="180" height="95" rx="12" fill="#ED145B"/>
+          <text x="980" y="66" text-anchor="middle" fill="#fff" font-size="10" font-weight="600" font-family="Montserrat">SLA Composto</text>
+          <text x="980" y="96" text-anchor="middle" fill="#fff" font-size="26" font-weight="800" font-family="Montserrat">99.84%</text>
+          <text x="980" y="122" text-anchor="middle" fill="rgba(255,255,255,0.7)" font-size="9" font-family="Montserrat">~70min downtime/mês</text>
+
+          <!-- Calculation -->
+          <rect x="120" y="165" width="820" height="55" rx="10" fill="#1a1a1a"/>
+          <text x="530" y="190" text-anchor="middle" fill="#fff" font-size="14" font-family="Montserrat, monospace">
+            <tspan fill="#9b59b6" font-weight="700">0.9995</tspan> × <tspan fill="#3498db" font-weight="700">0.999</tspan> × <tspan fill="#2ecc71" font-weight="700">0.9999</tspan> = <tspan fill="#ED145B" font-weight="800">0.99840</tspan>
+          </text>
+          <text x="530" y="210" text-anchor="middle" fill="#888" font-size="10" font-family="Montserrat">Multiplique as disponibilidades (em decimal) de cada componente em série</text>
+
+          <!-- Alert callout -->
+          <rect x="50" y="240" width="500" height="60" rx="8" fill="#fdedec" stroke="#e74c3c" stroke-width="1.5"/>
+          <text x="70" y="263" fill="#e74c3c" font-size="12" font-weight="700" font-family="Montserrat">Perceba: nenhum componente tem menos de 99.9%</text>
+          <text x="70" y="283" fill="#555" font-size="10" font-family="Montserrat">Mas o sistema composto tem apenas 99.84% — o SLA sempre CAI!</text>
+
+          <!-- Parallel callout -->
+          <rect x="580" y="240" width="470" height="60" rx="8" fill="#eafaf1" stroke="#2ecc71" stroke-width="1.5"/>
+          <text x="600" y="263" fill="#2ecc71" font-size="12" font-weight="700" font-family="Montserrat">Componentes em paralelo (redundância):</text>
+          <text x="600" y="283" fill="#555" font-size="10" font-family="Montserrat">SLA = 1 - (1 - SLA_A) × (1 - SLA_B) → SLA SOBE!</text>
+
+          <!-- Example with redundancy -->
+          <rect x="50" y="320" width="1000" height="50" rx="8" fill="rgba(237,20,91,0.06)"/>
+          <text x="530" y="343" text-anchor="middle" fill="#ED145B" font-size="12" font-weight="700" font-family="Montserrat">Ex: 2 servidores de app em paralelo (cada um 99.9%): 1 - (0.001 × 0.001) = 99.9999% — quase perfeito!</text>
+          <text x="530" y="362" text-anchor="middle" fill="#555" font-size="10" font-family="Montserrat">É por isso que microsserviços usam réplicas, multi-AZ, load balancing — tudo para AUMENTAR o SLA composto.</text>
+
+          <defs>
+            <marker id="sla-arr" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="#ED145B"/></marker>
+          </defs>
+        </svg>
+
+        <div class="slide-footer">
+          <div class="footer-bar">04 - Dados em Microsservicos</div>
+          <div class="footer-page">28</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: SLA - Exemplo Prático com Calculadora ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>SLA na Prática: E-commerce com 5 Componentes</h2>
+        </div>
+
+        <svg viewBox="0 0 1100 390" style="width:100%; max-height:368px; margin-top:0;">
+          <!-- Architecture diagram -->
+          <text x="530" y="20" text-anchor="middle" fill="#1a1a1a" font-size="12" font-weight="700" font-family="Montserrat">Arquitetura típica de um e-commerce em cloud</text>
+
+          <!-- CDN -->
+          <rect x="30" y="40" width="140" height="65" rx="10" fill="#f5f5f5" stroke="#e67e22" stroke-width="2"/>
+          <rect x="30" y="40" width="140" height="25" rx="10" fill="#e67e22"/>
+          <text x="100" y="58" text-anchor="middle" fill="#fff" font-size="9" font-weight="700" font-family="Montserrat">CDN (CloudFront)</text>
+          <text x="100" y="80" text-anchor="middle" fill="#e67e22" font-size="14" font-weight="800" font-family="Montserrat">99.9%</text>
+
+          <text x="188" y="75" fill="#ED145B" font-size="14" font-weight="800" font-family="Montserrat">→</text>
+
+          <!-- Load Balancer -->
+          <rect x="210" y="40" width="140" height="65" rx="10" fill="#f5f5f5" stroke="#9b59b6" stroke-width="2"/>
+          <rect x="210" y="40" width="140" height="25" rx="10" fill="#9b59b6"/>
+          <text x="280" y="58" text-anchor="middle" fill="#fff" font-size="9" font-weight="700" font-family="Montserrat">Load Balancer (ALB)</text>
+          <text x="280" y="80" text-anchor="middle" fill="#9b59b6" font-size="14" font-weight="800" font-family="Montserrat">99.99%</text>
+
+          <text x="368" y="75" fill="#ED145B" font-size="14" font-weight="800" font-family="Montserrat">→</text>
+
+          <!-- App Server -->
+          <rect x="390" y="40" width="140" height="65" rx="10" fill="#f5f5f5" stroke="#3498db" stroke-width="2"/>
+          <rect x="390" y="40" width="140" height="25" rx="10" fill="#3498db"/>
+          <text x="460" y="58" text-anchor="middle" fill="#fff" font-size="9" font-weight="700" font-family="Montserrat">API (ECS/Fargate)</text>
+          <text x="460" y="80" text-anchor="middle" fill="#3498db" font-size="14" font-weight="800" font-family="Montserrat">99.99%</text>
+
+          <text x="548" y="75" fill="#ED145B" font-size="14" font-weight="800" font-family="Montserrat">→</text>
+
+          <!-- Message Broker -->
+          <rect x="570" y="40" width="140" height="65" rx="10" fill="#f5f5f5" stroke="#ED145B" stroke-width="2"/>
+          <rect x="570" y="40" width="140" height="25" rx="10" fill="#ED145B"/>
+          <text x="640" y="58" text-anchor="middle" fill="#fff" font-size="9" font-weight="700" font-family="Montserrat">Kafka (MSK)</text>
+          <text x="640" y="80" text-anchor="middle" fill="#ED145B" font-size="14" font-weight="800" font-family="Montserrat">99.9%</text>
+
+          <text x="728" y="75" fill="#ED145B" font-size="14" font-weight="800" font-family="Montserrat">→</text>
+
+          <!-- Database -->
+          <rect x="750" y="40" width="140" height="65" rx="10" fill="#f5f5f5" stroke="#2ecc71" stroke-width="2"/>
+          <rect x="750" y="40" width="140" height="25" rx="10" fill="#2ecc71"/>
+          <text x="820" y="58" text-anchor="middle" fill="#fff" font-size="9" font-weight="700" font-family="Montserrat">RDS (Multi-AZ)</text>
+          <text x="820" y="80" text-anchor="middle" fill="#2ecc71" font-size="14" font-weight="800" font-family="Montserrat">99.99%</text>
+
+          <!-- Result -->
+          <text x="910" y="75" fill="#ED145B" font-size="14" font-weight="800" font-family="Montserrat">=</text>
+          <rect x="935" y="40" width="140" height="65" rx="10" fill="#1a1a1a"/>
+          <text x="1005" y="62" text-anchor="middle" fill="#ED145B" font-size="9" font-weight="600" font-family="Montserrat">SLA Composto</text>
+          <text x="1005" y="88" text-anchor="middle" fill="#fff" font-size="18" font-weight="800" font-family="Montserrat">99.77%</text>
+
+          <!-- Calculation -->
+          <rect x="30" y="125" width="1040" height="40" rx="8" fill="#1a1a1a"/>
+          <text x="530" y="150" text-anchor="middle" fill="#fff" font-size="12" font-family="Montserrat, monospace">
+            <tspan fill="#e67e22">0.999</tspan> × <tspan fill="#9b59b6">0.9999</tspan> × <tspan fill="#3498db">0.9999</tspan> × <tspan fill="#ED145B">0.999</tspan> × <tspan fill="#2ecc71">0.9999</tspan> = <tspan fill="#fff" font-weight="800">0.99770</tspan> → <tspan fill="#f39c12" font-weight="700">~100 min de downtime/mês</tspan>
+          </text>
+
+          <!-- What this means -->
+          <rect x="30" y="185" width="510" height="95" rx="10" fill="#fdedec" stroke="#e74c3c" stroke-width="1.5"/>
+          <text x="50" y="210" fill="#e74c3c" font-size="12" font-weight="700" font-family="Montserrat">Sem redundância (99.77%):</text>
+          <text x="50" y="232" fill="#555" font-size="11" font-family="Montserrat">~100 min de downtime por mês</text>
+          <text x="50" y="250" fill="#555" font-size="11" font-family="Montserrat">~20h de downtime por ano</text>
+          <text x="50" y="268" fill="#e74c3c" font-size="10" font-weight="600" font-family="Montserrat">Black Friday fora do ar? Prejuízo enorme!</text>
+
+          <rect x="560" y="185" width="510" height="95" rx="10" fill="#eafaf1" stroke="#2ecc71" stroke-width="1.5"/>
+          <text x="580" y="210" fill="#2ecc71" font-size="12" font-weight="700" font-family="Montserrat">Com redundância nos gargalos:</text>
+          <text x="580" y="232" fill="#555" font-size="11" font-family="Montserrat">2x API em paralelo: 99.99% → 99.999999%</text>
+          <text x="580" y="250" fill="#555" font-size="11" font-family="Montserrat">2x Kafka em paralelo: 99.9% → 99.9999%</text>
+          <text x="580" y="268" fill="#2ecc71" font-size="10" font-weight="600" font-family="Montserrat">SLA sobe para ~99.97% → apenas 13min/mês!</text>
+
+          <!-- Takeaway -->
+          <rect x="30" y="300" width="1040" height="80" rx="10" fill="rgba(237,20,91,0.06)"/>
+          <text x="530" y="325" text-anchor="middle" fill="#ED145B" font-size="13" font-weight="700" font-family="Montserrat">Lições para microsserviços:</text>
+          <text x="290" y="350" text-anchor="middle" fill="#555" font-size="10" font-family="Montserrat">1. Identifique o componente com MENOR SLA</text>
+          <text x="290" y="368" text-anchor="middle" fill="#555" font-size="10" font-family="Montserrat">→ Ele é seu gargalo de disponibilidade</text>
+          <text x="630" y="350" text-anchor="middle" fill="#555" font-size="10" font-family="Montserrat">2. Adicione redundância nos gargalos</text>
+          <text x="630" y="368" text-anchor="middle" fill="#555" font-size="10" font-family="Montserrat">→ Multi-AZ, réplicas, load balancing</text>
+          <text x="930" y="350" text-anchor="middle" fill="#555" font-size="10" font-family="Montserrat">3. Desacople com filas</text>
+          <text x="930" y="368" text-anchor="middle" fill="#555" font-size="10" font-family="Montserrat">→ Componentes async não somam</text>
+        </svg>
+
+        <div class="slide-footer">
+          <div class="footer-bar">04 - Dados em Microsservicos</div>
+          <div class="footer-page">29</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: Quiz - SLA ==================== -->
+      <section class="quiz-slide content-slide" data-correct="b" data-quiz-feedback="99.9% × 99.9% = 0.999 × 0.999 = 0.998001 ≈ 99.8%. O SLA composto é SEMPRE menor que o menor SLA individual quando componentes estão em série." >
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Quiz: SLA Composto</h2>
+          <h3>Se o App Server tem SLA 99.9% e o Banco tem SLA 99.9%, qual o SLA do sistema?</h3>
+        </div>
+        <form class="quiz-options">
+          <label><input type="radio" name="qsla" value="a" /> A) 99.9% — mantém o mesmo SLA</label><br/>
+          <label><input type="radio" name="qsla" value="b" /> B) 99.8% — o SLA cai ao multiplicar</label><br/>
+          <label><input type="radio" name="qsla" value="c" /> C) 99.95% — faz a média dos dois</label><br/>
+          <label><input type="radio" name="qsla" value="d" /> D) 99.99% — o SLA sobe quando há mais componentes</label>
+        </form>
+        <div class="quiz-feedback"></div>
+        <div class="slide-footer">
+          <div class="footer-bar">04 - Dados em Microsservicos</div>
+          <div class="footer-page">30</div>
+        </div>
+      </section>
+
       <!-- ==================== SLIDE: Intervalo ==================== -->
       <section class="break-slide">
         <div class="top-bar"></div>
@@ -1458,7 +1746,7 @@
         <p>21h00 – 21h20<br>☕ Aproveite para descansar e se preparar para o próximo bloco.</p>
         <div class="slide-footer">
           <div class="footer-bar">04 - Dados em Microsservicos</div>
-          <div class="footer-page">27</div>
+          <div class="footer-page">31</div>
         </div>
       </section>
 
@@ -1467,153 +1755,132 @@
         <div class="top-bar"></div>
         <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
         <div class="accent-bar"></div>
-        <h2>Bloco 2:<br>Exercício Hands-on</h2>
-        <div class="slide-footer">
-          <div class="footer-bar">04 - Dados em Microsservicos</div>
-          <div class="footer-page">28</div>
-        </div>
-      </section>
-
-      <!-- ==================== SLIDE: Exercício prático - Modelar fluxo Saga ==================== -->
-      <section class="exercise-slide content-slide">
-        <div class="top-bar"></div>
-        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
-        <div class="slide-title-area">
-          <div class="accent-bar"></div>
-          <h2>Exercício: Modelar fluxo Saga</h2>
-        </div>
-
-        <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 20px;">
-          <!-- Cenário -->
-          <div class="exercise-container">
-            <h3>Cenário: E-commerce</h3>
-            <p>Um cliente faz um pedido de R$ 500. Modele a saga completa:</p>
-            <svg viewBox="0 0 400 50" style="width:100%; margin: 8px 0;">
-              <rect x="0" y="10" width="80" height="30" rx="6" fill="#3498db"/>
-              <text x="40" y="30" text-anchor="middle" fill="#fff" font-size="9" font-weight="700" font-family="Montserrat">Pedido</text>
-              <text x="97" y="30" fill="#ED145B" font-size="12" font-weight="700" font-family="Montserrat">→</text>
-              <rect x="110" y="10" width="80" height="30" rx="6" fill="#2ecc71"/>
-              <text x="150" y="30" text-anchor="middle" fill="#fff" font-size="9" font-weight="700" font-family="Montserrat">Pagamento</text>
-              <text x="207" y="30" fill="#ED145B" font-size="12" font-weight="700" font-family="Montserrat">→</text>
-              <rect x="220" y="10" width="80" height="30" rx="6" fill="#f39c12"/>
-              <text x="260" y="30" text-anchor="middle" fill="#fff" font-size="9" font-weight="700" font-family="Montserrat">Estoque</text>
-              <text x="317" y="30" fill="#ED145B" font-size="12" font-weight="700" font-family="Montserrat">→</text>
-              <rect x="330" y="10" width="65" height="30" rx="6" fill="#9b59b6"/>
-              <text x="362" y="30" text-anchor="middle" fill="#fff" font-size="9" font-weight="700" font-family="Montserrat">Envio</text>
-            </svg>
-          </div>
-
-          <!-- Tarefas -->
-          <div class="exercise-container">
-            <h3>O que entregar:</h3>
-            <ol class="exercise-steps">
-              <li>Diagrama da saga com transações <strong>e compensações</strong></li>
-              <li>Escolha: orquestração ou coreografia? Justifique</li>
-              <li>Pseudocódigo do serviço de pagamento</li>
-              <li>Liste os eventos trocados entre serviços</li>
-            </ol>
-          </div>
-        </div>
-
-        <div class="slide-footer">
-          <div class="footer-bar">04 - Dados em Microsservicos</div>
-          <div class="footer-page">29</div>
-        </div>
-      </section>
-
-      <!-- ==================== SLIDE: Exemplo pseudocódigo Saga Orquestração ==================== -->
-      <section class="content-slide">
-        <div class="top-bar"></div>
-        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
-        <div class="slide-title-area">
-          <div class="accent-bar"></div>
-          <h2>Exemplo: Pseudocódigo Saga Orquestração para Pagamento</h2>
-        </div>
-        <pre><code class="language-javascript">
-// Orquestrador controla o fluxo da saga
-async function processOrderSaga(orderId) {
-  try {
-    await pedidoService.createOrder(orderId);
-    await pagamentoService.processPayment(orderId);
-    await estoqueService.reserveStock(orderId);
-    await envioService.scheduleShipment(orderId);
-    await orquestrador.confirmSaga(orderId);
-  } catch (error) {
-    await orquestrador.compensateSaga(orderId);
-  }
-}
-        </code></pre>
-        <div class="slide-footer">
-          <div class="footer-bar">04 - Dados em Microsservicos</div>
-          <div class="footer-page">30</div>
-        </div>
-      </section>
-
-      <!-- ==================== SLIDE: Exemplo pseudocódigo Saga Coreografia ==================== -->
-      <section class="content-slide">
-        <div class="top-bar"></div>
-        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
-        <div class="slide-title-area">
-          <div class="accent-bar"></div>
-          <h2>Exemplo: Pseudocódigo Saga Coreografia para Pagamento</h2>
-        </div>
-        <pre><code class="language-javascript">
-// Serviço Pagamento escuta evento PedidoCriado
-pedidoService.on('PedidoCriado', async (order) =&gt; {
-  try {
-    await pagamentoService.processPayment(order.id);
-    pagamentoService.emit('PagamentoRealizado', { orderId: order.id });
-  } catch (err) {
-    pagamentoService.emit('PagamentoFalhou', { orderId: order.id });
-  }
-});
-        </code></pre>
-        <p>Outros serviços escutam esses eventos e agem conforme necessário.</p>
-        <div class="slide-footer">
-          <div class="footer-bar">04 - Dados em Microsservicos</div>
-          <div class="footer-page">31</div>
-        </div>
-      </section>
-
-      <!-- ==================== SLIDE: Caso real Salesforce e particionamento ==================== -->
-      <section class="content-slide">
-        <div class="top-bar"></div>
-        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
-        <div class="slide-title-area">
-          <div class="accent-bar"></div>
-          <h2>Caso Real: Isolamento de Tenants na Salesforce</h2>
-        </div>
-        <p>Salesforce usa múltiplas estratégias para garantir isolamento e performance: </p>
-        <ul>
-          <li><strong>Particionamento por tenant:</strong> bancos de dados separados ou schemas isolados</li>
-          <li><strong>Rate limiting:</strong> controla uso excessivo de recursos</li>
-          <li><strong>Uso de caches locais e globais:</strong> diminui latência e carga</li>
-          <li><strong>Monitoramento e alertas:</strong> detecta e mitiga noisy neighbors</li>
-        </ul>
+        <h2>Bloco 2:<br>Desafio de Arquitetura</h2>
         <div class="slide-footer">
           <div class="footer-bar">04 - Dados em Microsservicos</div>
           <div class="footer-page">32</div>
         </div>
       </section>
 
-      <!-- ==================== SLIDE: Quiz 3 - Escolha do padrão Saga ==================== -->
-      <section class="quiz-slide content-slide" data-correct="c" data-quiz-feedback="Correto! Orquestração centraliza o controle da saga, coreografia distribui o controle entre serviços." >
+      <!-- ==================== SLIDE: Exercício - Desafio de Arquitetura ==================== -->
+      <section class="exercise-slide content-slide">
         <div class="top-bar"></div>
         <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
         <div class="slide-title-area">
           <div class="accent-bar"></div>
-          <h2>Quiz: Quando usar Orquestração no Saga Pattern?</h2>
+          <h2>Desafio: Projetar a Arquitetura de um Sistema</h2>
+        </div>
+
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 18px;">
+          <div class="exercise-container">
+            <h3>Formem duplas ou trios e escolham UM cenário:</h3>
+            <ol class="exercise-steps">
+              <li><strong>Fintech de Pagamentos:</strong> Processar 10k transações/min com auditoria completa e SLA 99.99%</li>
+              <li><strong>Plataforma de Streaming:</strong> Catálogo de 50k filmes, recomendações personalizadas e 500k usuários simultâneos</li>
+              <li><strong>Sistema Hospitalar:</strong> Prontuário eletrônico multi-unidade, agendamento e notificações, com dados sensíveis (LGPD)</li>
+            </ol>
+          </div>
+
+          <div class="exercise-container">
+            <h3>Entregas (50 min):</h3>
+            <ol class="exercise-steps">
+              <li><strong>Definir a arquitetura:</strong> Quais padrões usar? (Database per Service, Saga, CQRS, Event Sourcing, EDA)</li>
+              <li><strong>Desenhar no Draw.io:</strong> Diagrama com serviços, bancos, filas e fluxo de dados</li>
+              <li><strong>Escolher serviços de nuvem:</strong> AWS, Azure ou GCP — justifiquem cada escolha</li>
+              <li><strong>Calcular o SLA composto:</strong> Com base nos SLAs dos serviços escolhidos</li>
+            </ol>
+          </div>
+        </div>
+
+        <div class="slide-footer">
+          <div class="footer-bar">04 - Dados em Microsservicos</div>
+          <div class="footer-page">33</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: Exercício - Critérios e dicas ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Dicas e Critérios de Avaliação</h2>
+        </div>
+
+        <div class="side-by-side">
+          <div class="side" style="border-top: 3px solid #2ecc71;">
+            <h4 style="color:#2ecc71;">O que será avaliado:</h4>
+            <ul>
+              <li>Justificativa técnica das decisões</li>
+              <li>Clareza do diagrama (Draw.io)</li>
+              <li>Coerência entre padrões escolhidos</li>
+              <li>Cálculo correto do SLA composto</li>
+              <li>Escolha adequada dos serviços cloud</li>
+            </ul>
+          </div>
+          <div class="side" style="border-top: 3px solid #3498db;">
+            <h4 style="color:#3498db;">SLAs de referência (AWS):</h4>
+            <ul>
+              <li>EC2 / ECS / Fargate: 99.99%</li>
+              <li>RDS Multi-AZ: 99.99%</li>
+              <li>DynamoDB: 99.999%</li>
+              <li>SQS / SNS: 99.9%</li>
+              <li>MSK (Kafka): 99.9%</li>
+              <li>CloudFront (CDN): 99.9%</li>
+              <li>ALB (Load Balancer): 99.99%</li>
+            </ul>
+          </div>
+        </div>
+        <div class="callout" style="margin-top:12px;">
+          <p><strong>Apresentação:</strong> cada grupo terá 5 minutos para apresentar seu diagrama e justificar suas decisões para a turma.</p>
+        </div>
+        <div class="slide-footer">
+          <div class="footer-bar">04 - Dados em Microsservicos</div>
+          <div class="footer-page">34</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: Quiz - Saga Pattern ==================== -->
+      <section class="quiz-slide content-slide" data-correct="b" data-quiz-feedback="Na orquestração, um serviço central (orquestrador) controla o fluxo da saga. Na coreografia, os serviços reagem a eventos de forma autônoma." >
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Quiz: Saga Pattern</h2>
+          <h3>Qual a principal diferença entre orquestração e coreografia?</h3>
         </div>
         <form class="quiz-options">
-          <label><input type="radio" name="q3" value="a" /> A) Quando quer mais desacoplamento e flexibilidade</label><br/>
-          <label><input type="radio" name="q3" value="b" /> B) Quando o sistema é baseado só em eventos</label><br/>
-          <label><input type="radio" name="q3" value="c" /> C) Quando deseja controle centralizado e monitoramento facilitado</label><br/>
-          <label><input type="radio" name="q3" value="d" /> D) Quando não precisa de compensações</label>
+          <label><input type="radio" name="q1" value="a" /> A) Coreografia usa um serviço central para coordenar a saga.</label><br/>
+          <label><input type="radio" name="q1" value="b" /> B) Orquestração usa um serviço central para coordenar a saga.</label><br/>
+          <label><input type="radio" name="q1" value="c" /> C) Orquestração e Coreografia são sinônimos.</label><br/>
+          <label><input type="radio" name="q1" value="d" /> D) Coreografia exige banco de dados compartilhado.</label>
         </form>
         <div class="quiz-feedback"></div>
         <div class="slide-footer">
           <div class="footer-bar">04 - Dados em Microsservicos</div>
-          <div class="footer-page">33</div>
+          <div class="footer-page">35</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: Quiz - Noisy Neighbor ==================== -->
+      <section class="quiz-slide content-slide" data-correct="a" data-quiz-feedback="Noisy Neighbor ocorre quando um tenant usa recursos excessivamente, degradando a performance dos demais tenants que compartilham a mesma infraestrutura." >
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Quiz: Noisy Neighbor</h2>
+          <h3>O que é o problema Noisy Neighbor em ambientes multi-tenant?</h3>
+        </div>
+        <form class="quiz-options">
+          <label><input type="radio" name="q2" value="a" /> A) Um tenant consome recursos excessivamente impactando os demais.</label><br/>
+          <label><input type="radio" name="q2" value="b" /> B) Um tenant fica isolado completamente sem acesso aos recursos.</label><br/>
+          <label><input type="radio" name="q2" value="c" /> C) Um tenant compartilha dados indevidamente com outros tenants.</label><br/>
+          <label><input type="radio" name="q2" value="d" /> D) Um tenant provoca falha total do sistema.</label>
+        </form>
+        <div class="quiz-feedback"></div>
+        <div class="slide-footer">
+          <div class="footer-bar">04 - Dados em Microsservicos</div>
+          <div class="footer-page">36</div>
         </div>
       </section>
 
@@ -1630,7 +1897,7 @@ pedidoService.on('PedidoCriado', async (order) =&gt; {
         </div>
         <div class="slide-footer">
           <div class="footer-bar">04 - Dados em Microsservicos</div>
-          <div class="footer-page">34</div>
+          <div class="footer-page">37</div>
         </div>
       </section>
 
