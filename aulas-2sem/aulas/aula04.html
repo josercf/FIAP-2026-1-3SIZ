@@ -47,7 +47,7 @@
             <tr><th>Bloco</th><th>Horário</th><th>Conteúdo</th></tr>
           </thead>
           <tbody>
-            <tr><td><strong>Bloco 1</strong></td><td>19h30 – 21h00</td><td>Database per Service, Shared DB, Saga, Event Sourcing, CQRS, Noisy Neighbor + Simulação interativa</td></tr>
+            <tr><td><strong>Bloco 1</strong></td><td>19h30 – 21h00</td><td>Database per Service, Shared DB, EDA, Polling vs Eventos, Pub/Sub vs Streaming, Saga Pattern, Event Sourcing, CQRS, Noisy Neighbor</td></tr>
             <tr><td><strong>Intervalo</strong></td><td>21h00 – 21h20</td><td>☕ Pausa</td></tr>
             <tr><td><strong>Bloco 2</strong></td><td>21h20 – 22h45</td><td>Exercício prático: Fluxo Saga + Quiz</td></tr>
           </tbody>
@@ -113,6 +113,359 @@
         </div>
       </section>
 
+      <!-- ==================== SLIDE: SEÇÃO EDA ==================== -->
+      <section class="section-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="accent-bar"></div>
+        <h2>Arquitetura Orientada<br>a Eventos (EDA)</h2>
+        <div class="slide-footer">
+          <div class="footer-bar">04 - Dados em Microsservicos</div>
+          <div class="footer-page">7</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: EDA - O que é? ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>O que é Arquitetura Orientada a Eventos?</h2>
+        </div>
+        <p>Um padrão arquitetural onde serviços se comunicam por meio de <strong>eventos</strong> — mudanças de estado que ocorrem no sistema.</p>
+
+        <svg viewBox="0 0 1100 320" style="width:100%; max-height:290px; margin-top:8px;">
+          <!-- Producer -->
+          <rect x="30" y="50" width="220" height="120" rx="12" fill="#f5f5f5" stroke="#3498db" stroke-width="2.5"/>
+          <rect x="30" y="50" width="220" height="35" rx="12" fill="#3498db"/>
+          <text x="140" y="74" text-anchor="middle" fill="#fff" font-size="14" font-weight="700" font-family="Montserrat">Produtor de Eventos</text>
+          <text x="140" y="105" text-anchor="middle" fill="#333" font-size="11" font-family="Montserrat">Detecta mudança de estado</text>
+          <text x="140" y="125" text-anchor="middle" fill="#333" font-size="11" font-family="Montserrat">e publica um evento</text>
+          <text x="140" y="155" text-anchor="middle" fill="#888" font-size="10" font-style="italic" font-family="Montserrat">"PedidoCriado", "PagamentoRecebido"</text>
+
+          <!-- Arrow to Router -->
+          <line x1="255" y1="110" x2="370" y2="110" stroke="#ED145B" stroke-width="3" marker-end="url(#eda-arrow)"/>
+          <text x="312" y="100" text-anchor="middle" fill="#ED145B" font-size="10" font-weight="600" font-family="Montserrat">evento</text>
+
+          <!-- Router/Broker -->
+          <rect x="375" y="30" width="260" height="160" rx="14" fill="linear-gradient(135deg, #1e1e2e, #2d2d3f)" stroke="#ED145B" stroke-width="2"/>
+          <rect x="375" y="30" width="260" height="160" rx="14" fill="#1e1e2e"/>
+          <text x="505" y="65" text-anchor="middle" fill="#ED145B" font-size="15" font-weight="800" font-family="Montserrat">Event Router</text>
+          <text x="505" y="88" text-anchor="middle" fill="#aaa" font-size="10" font-family="Montserrat">(Broker / Message Bus)</text>
+          <line x1="405" y1="100" x2="605" y2="100" stroke="#444" stroke-width="1"/>
+          <text x="505" y="122" text-anchor="middle" fill="#ccc" font-size="11" font-family="Montserrat">Filtra, roteia e entrega</text>
+          <text x="505" y="140" text-anchor="middle" fill="#ccc" font-size="11" font-family="Montserrat">eventos aos consumidores</text>
+          <text x="505" y="170" text-anchor="middle" fill="#666" font-size="9" font-family="Montserrat">Kafka, RabbitMQ, Amazon SNS/SQS, Azure Service Bus</text>
+
+          <!-- Arrows to Consumers -->
+          <line x1="640" y1="80" x2="755" y2="50" stroke="#2ecc71" stroke-width="2.5" marker-end="url(#eda-arrow-g)"/>
+          <line x1="640" y1="110" x2="755" y2="110" stroke="#f39c12" stroke-width="2.5" marker-end="url(#eda-arrow-o)"/>
+          <line x1="640" y1="140" x2="755" y2="170" stroke="#9b59b6" stroke-width="2.5" marker-end="url(#eda-arrow-p)"/>
+
+          <!-- Consumer 1 -->
+          <rect x="760" y="15" width="200" height="65" rx="10" fill="#f5f5f5" stroke="#2ecc71" stroke-width="2"/>
+          <rect x="760" y="15" width="200" height="25" rx="10" fill="#2ecc71"/>
+          <text x="860" y="34" text-anchor="middle" fill="#fff" font-size="11" font-weight="700" font-family="Montserrat">Serviço Pagamento</text>
+          <text x="860" y="58" text-anchor="middle" fill="#333" font-size="10" font-family="Montserrat">Processa cobrança</text>
+
+          <!-- Consumer 2 -->
+          <rect x="760" y="90" width="200" height="65" rx="10" fill="#f5f5f5" stroke="#f39c12" stroke-width="2"/>
+          <rect x="760" y="90" width="200" height="25" rx="10" fill="#f39c12"/>
+          <text x="860" y="109" text-anchor="middle" fill="#fff" font-size="11" font-weight="700" font-family="Montserrat">Serviço Estoque</text>
+          <text x="860" y="133" text-anchor="middle" fill="#333" font-size="10" font-family="Montserrat">Reserva itens</text>
+
+          <!-- Consumer 3 -->
+          <rect x="760" y="165" width="200" height="65" rx="10" fill="#f5f5f5" stroke="#9b59b6" stroke-width="2"/>
+          <rect x="760" y="165" width="200" height="25" rx="10" fill="#9b59b6"/>
+          <text x="860" y="184" text-anchor="middle" fill="#fff" font-size="11" font-weight="700" font-family="Montserrat">Serviço Notificação</text>
+          <text x="860" y="208" text-anchor="middle" fill="#333" font-size="10" font-family="Montserrat">Envia e-mail ao cliente</text>
+
+          <!-- Key properties -->
+          <rect x="30" y="240" width="320" height="65" rx="8" fill="rgba(52,152,219,0.08)"/>
+          <text x="45" y="262" fill="#3498db" font-size="12" font-weight="700" font-family="Montserrat">Desacoplamento</text>
+          <text x="45" y="280" fill="#555" font-size="10" font-family="Montserrat">Produtor não sabe quem consome</text>
+          <text x="45" y="295" fill="#555" font-size="10" font-family="Montserrat">Consumidores não se conhecem</text>
+
+          <rect x="390" y="240" width="320" height="65" rx="8" fill="rgba(46,204,113,0.08)"/>
+          <text x="405" y="262" fill="#2ecc71" font-size="12" font-weight="700" font-family="Montserrat">Assíncrono</text>
+          <text x="405" y="280" fill="#555" font-size="10" font-family="Montserrat">Produtor publica e segue adiante</text>
+          <text x="405" y="295" fill="#555" font-size="10" font-family="Montserrat">Sem espera por resposta</text>
+
+          <rect x="750" y="240" width="320" height="65" rx="8" fill="rgba(155,89,182,0.08)"/>
+          <text x="765" y="262" fill="#9b59b6" font-size="12" font-weight="700" font-family="Montserrat">Escalável</text>
+          <text x="765" y="280" fill="#555" font-size="10" font-family="Montserrat">Novos consumidores sem mudar produtores</text>
+          <text x="765" y="295" fill="#555" font-size="10" font-family="Montserrat">Cada serviço escala independente</text>
+
+          <defs>
+            <marker id="eda-arrow" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="#ED145B"/></marker>
+            <marker id="eda-arrow-g" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="#2ecc71"/></marker>
+            <marker id="eda-arrow-o" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="#f39c12"/></marker>
+            <marker id="eda-arrow-p" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="#9b59b6"/></marker>
+          </defs>
+        </svg>
+
+        <div class="slide-footer">
+          <div class="footer-bar">04 - Dados em Microsservicos</div>
+          <div class="footer-page">8</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: Polling vs Event-Driven ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Polling vs Eventos: por que mudar?</h2>
+        </div>
+
+        <svg viewBox="0 0 1100 400" style="width:100%; max-height:380px; margin-top:2px;">
+          <!-- POLLING SIDE -->
+          <text x="260" y="25" text-anchor="middle" fill="#e74c3c" font-size="16" font-weight="800" font-family="Montserrat">Polling (Request-Response)</text>
+
+          <!-- Client box -->
+          <rect x="30" y="45" width="140" height="50" rx="8" fill="#f5f5f5" stroke="#e74c3c" stroke-width="2"/>
+          <text x="100" y="75" text-anchor="middle" fill="#333" font-size="12" font-weight="600" font-family="Montserrat">Cliente</text>
+
+          <!-- Server box -->
+          <rect x="350" y="45" width="140" height="50" rx="8" fill="#f5f5f5" stroke="#e74c3c" stroke-width="2"/>
+          <text x="420" y="75" text-anchor="middle" fill="#333" font-size="12" font-weight="600" font-family="Montserrat">Servidor</text>
+
+          <!-- Polling arrows (repeated requests) -->
+          <line x1="175" y1="55" x2="345" y2="55" stroke="#e74c3c" stroke-width="1.5" marker-end="url(#poll-arr)"/>
+          <text x="260" y="50" text-anchor="middle" fill="#e74c3c" font-size="8" font-family="Montserrat">Tem novidade?</text>
+          <line x1="345" y1="63" x2="175" y2="63" stroke="#999" stroke-width="1" stroke-dasharray="4" marker-end="url(#poll-resp)"/>
+          <text x="260" y="72" text-anchor="middle" fill="#999" font-size="8" font-family="Montserrat">Não...</text>
+
+          <line x1="175" y1="78" x2="345" y2="78" stroke="#e74c3c" stroke-width="1.5" marker-end="url(#poll-arr)"/>
+          <text x="260" y="76" text-anchor="middle" fill="#e74c3c" font-size="8" font-family="Montserrat">E agora?</text>
+          <line x1="345" y1="86" x2="175" y2="86" stroke="#999" stroke-width="1" stroke-dasharray="4" marker-end="url(#poll-resp)"/>
+          <text x="260" y="95" text-anchor="middle" fill="#999" font-size="8" font-family="Montserrat">Não...</text>
+
+          <!-- Polling problems -->
+          <rect x="30" y="115" width="460" height="80" rx="8" fill="#fdedec" stroke="#e74c3c" stroke-width="1"/>
+          <text x="50" y="138" fill="#e74c3c" font-size="11" font-weight="700" font-family="Montserrat">Problemas:</text>
+          <text x="50" y="157" fill="#555" font-size="10" font-family="Montserrat">Desperdício de CPU e rede (maioria das chamadas retorna vazio)</text>
+          <text x="50" y="173" fill="#555" font-size="10" font-family="Montserrat">Latência: novidade só detectada no próximo ciclo de polling</text>
+          <text x="50" y="189" fill="#555" font-size="10" font-family="Montserrat">Escala: N clientes × M vezes/minuto = carga desnecessária no servidor</text>
+
+          <!-- EVENT-DRIVEN SIDE -->
+          <text x="810" y="25" text-anchor="middle" fill="#2ecc71" font-size="16" font-weight="800" font-family="Montserrat">Event-Driven (Push)</text>
+
+          <!-- Producer box -->
+          <rect x="590" y="45" width="140" height="50" rx="8" fill="#f5f5f5" stroke="#2ecc71" stroke-width="2"/>
+          <text x="660" y="75" text-anchor="middle" fill="#333" font-size="12" font-weight="600" font-family="Montserrat">Produtor</text>
+
+          <!-- Broker -->
+          <rect x="780" y="38" width="80" height="64" rx="8" fill="#1e1e2e"/>
+          <text x="820" y="66" text-anchor="middle" fill="#ED145B" font-size="9" font-weight="700" font-family="Montserrat">Broker</text>
+          <text x="820" y="80" text-anchor="middle" fill="#888" font-size="7" font-family="Montserrat">Kafka / SQS</text>
+
+          <!-- Consumers -->
+          <rect x="910" y="35" width="110" height="30" rx="6" fill="#f5f5f5" stroke="#2ecc71" stroke-width="1.5"/>
+          <text x="965" y="55" text-anchor="middle" fill="#333" font-size="9" font-weight="600" font-family="Montserrat">Consumer A</text>
+          <rect x="910" y="72" width="110" height="30" rx="6" fill="#f5f5f5" stroke="#2ecc71" stroke-width="1.5"/>
+          <text x="965" y="92" text-anchor="middle" fill="#333" font-size="9" font-weight="600" font-family="Montserrat">Consumer B</text>
+
+          <!-- Event arrow -->
+          <line x1="735" y1="62" x2="775" y2="62" stroke="#2ecc71" stroke-width="2" marker-end="url(#ev-arr)"/>
+          <line x1="865" y1="50" x2="905" y2="50" stroke="#2ecc71" stroke-width="1.5" marker-end="url(#ev-arr)"/>
+          <line x1="865" y1="80" x2="905" y2="80" stroke="#2ecc71" stroke-width="1.5" marker-end="url(#ev-arr)"/>
+          <text x="750" y="52" text-anchor="middle" fill="#2ecc71" font-size="8" font-weight="600" font-family="Montserrat">evento</text>
+
+          <!-- Event benefits -->
+          <rect x="590" y="115" width="470" height="80" rx="8" fill="#eafaf1" stroke="#2ecc71" stroke-width="1"/>
+          <text x="610" y="138" fill="#2ecc71" font-size="11" font-weight="700" font-family="Montserrat">Vantagens:</text>
+          <text x="610" y="157" fill="#555" font-size="10" font-family="Montserrat">Zero desperdício: dados enviados apenas quando há novidade (push)</text>
+          <text x="610" y="173" fill="#555" font-size="10" font-family="Montserrat">Tempo real: consumidor recebe o evento assim que ele acontece</text>
+          <text x="610" y="189" fill="#555" font-size="10" font-family="Montserrat">Escala: adicionar consumidores sem impactar o produtor</text>
+
+          <!-- COMPARISON TABLE -->
+          <!-- Header -->
+          <rect x="30" y="220" width="1040" height="30" rx="4" fill="#1a1a1a"/>
+          <text x="215" y="240" text-anchor="middle" fill="#fff" font-size="11" font-weight="700" font-family="Montserrat">Aspecto</text>
+          <text x="505" y="240" text-anchor="middle" fill="#e74c3c" font-size="11" font-weight="700" font-family="Montserrat">Polling</text>
+          <text x="845" y="240" text-anchor="middle" fill="#2ecc71" font-size="11" font-weight="700" font-family="Montserrat">Event-Driven</text>
+          <line x1="370" y1="220" x2="370" y2="395" stroke="#ddd" stroke-width="1"/>
+          <line x1="680" y1="220" x2="680" y2="395" stroke="#ddd" stroke-width="1"/>
+
+          <!-- Row 1 -->
+          <rect x="30" y="252" width="1040" height="28" rx="0" fill="#f9f9f9"/>
+          <text x="215" y="271" text-anchor="middle" fill="#333" font-size="10" font-weight="600" font-family="Montserrat">Uso de rede</text>
+          <text x="505" y="271" text-anchor="middle" fill="#555" font-size="10" font-family="Montserrat">Alto — chamadas constantes mesmo sem dados</text>
+          <text x="845" y="271" text-anchor="middle" fill="#555" font-size="10" font-family="Montserrat">Baixo — tráfego apenas quando há evento</text>
+
+          <!-- Row 2 -->
+          <rect x="30" y="282" width="1040" height="28" rx="0" fill="#fff"/>
+          <text x="215" y="301" text-anchor="middle" fill="#333" font-size="10" font-weight="600" font-family="Montserrat">Latência</text>
+          <text x="505" y="301" text-anchor="middle" fill="#555" font-size="10" font-family="Montserrat">Depende do intervalo (5s, 30s, 1min...)</text>
+          <text x="845" y="301" text-anchor="middle" fill="#555" font-size="10" font-family="Montserrat">Quase instantâneo (milissegundos)</text>
+
+          <!-- Row 3 -->
+          <rect x="30" y="312" width="1040" height="28" rx="0" fill="#f9f9f9"/>
+          <text x="215" y="331" text-anchor="middle" fill="#333" font-size="10" font-weight="600" font-family="Montserrat">Acoplamento</text>
+          <text x="505" y="331" text-anchor="middle" fill="#555" font-size="10" font-family="Montserrat">Cliente precisa conhecer o servidor</text>
+          <text x="845" y="331" text-anchor="middle" fill="#555" font-size="10" font-family="Montserrat">Produtor e consumidor desacoplados</text>
+
+          <!-- Row 4 -->
+          <rect x="30" y="342" width="1040" height="28" rx="0" fill="#fff"/>
+          <text x="215" y="361" text-anchor="middle" fill="#333" font-size="10" font-weight="600" font-family="Montserrat">Escalabilidade</text>
+          <text x="505" y="361" text-anchor="middle" fill="#555" font-size="10" font-family="Montserrat">Limitada — cada cliente gera carga</text>
+          <text x="845" y="361" text-anchor="middle" fill="#555" font-size="10" font-family="Montserrat">Alta — consumidores escalam independente</text>
+
+          <!-- Row 5 -->
+          <rect x="30" y="372" width="1040" height="28" rx="0" fill="#f9f9f9"/>
+          <text x="215" y="391" text-anchor="middle" fill="#333" font-size="10" font-weight="600" font-family="Montserrat">Complexidade</text>
+          <text x="505" y="391" text-anchor="middle" fill="#555" font-size="10" font-family="Montserrat">Simples de implementar</text>
+          <text x="845" y="391" text-anchor="middle" fill="#555" font-size="10" font-family="Montserrat">Requer broker e tratamento de falhas</text>
+
+          <defs>
+            <marker id="poll-arr" markerWidth="7" markerHeight="5" refX="7" refY="2.5" orient="auto"><path d="M0,0 L7,2.5 L0,5" fill="#e74c3c"/></marker>
+            <marker id="poll-resp" markerWidth="7" markerHeight="5" refX="7" refY="2.5" orient="auto"><path d="M0,0 L7,2.5 L0,5" fill="#999"/></marker>
+            <marker id="ev-arr" markerWidth="7" markerHeight="5" refX="7" refY="2.5" orient="auto"><path d="M0,0 L7,2.5 L0,5" fill="#2ecc71"/></marker>
+          </defs>
+        </svg>
+
+        <div class="slide-footer">
+          <div class="footer-bar">04 - Dados em Microsservicos</div>
+          <div class="footer-page">9</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: Caso de Uso EDA - E-commerce ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Caso de Uso: Pedido em E-commerce</h2>
+          <h3>Como um evento dispara múltiplas ações em paralelo</h3>
+        </div>
+
+        <svg viewBox="0 0 1100 350" style="width:100%; max-height:320px; margin-top:5px;">
+          <!-- User action -->
+          <rect x="20" y="120" width="150" height="80" rx="12" fill="#1a1a1a"/>
+          <text x="95" y="148" text-anchor="middle" fill="#fff" font-size="11" font-weight="700" font-family="Montserrat">Cliente</text>
+          <text x="95" y="168" text-anchor="middle" fill="#ED145B" font-size="10" font-family="Montserrat">Finaliza compra</text>
+          <text x="95" y="185" text-anchor="middle" fill="#888" font-size="9" font-family="Montserrat">R$ 299,90</text>
+
+          <!-- Order Service -->
+          <rect x="220" y="105" width="170" height="110" rx="10" fill="#f5f5f5" stroke="#3498db" stroke-width="2.5"/>
+          <rect x="220" y="105" width="170" height="32" rx="10" fill="#3498db"/>
+          <text x="305" y="126" text-anchor="middle" fill="#fff" font-size="12" font-weight="700" font-family="Montserrat">Order Service</text>
+          <text x="305" y="155" text-anchor="middle" fill="#333" font-size="10" font-family="Montserrat">Salva pedido no DB</text>
+          <text x="305" y="175" text-anchor="middle" fill="#333" font-size="10" font-family="Montserrat">Publica evento:</text>
+          <rect x="240" y="182" width="130" height="22" rx="4" fill="#3498db" opacity="0.15"/>
+          <text x="305" y="197" text-anchor="middle" fill="#3498db" font-size="10" font-weight="700" font-family="Montserrat">PedidoCriado</text>
+
+          <!-- Arrow user to order -->
+          <line x1="175" y1="160" x2="215" y2="160" stroke="#ED145B" stroke-width="2.5" marker-end="url(#case-arr)"/>
+
+          <!-- Event Bus -->
+          <rect x="435" y="130" width="60" height="60" rx="30" fill="#ED145B"/>
+          <text x="465" y="158" text-anchor="middle" fill="#fff" font-size="9" font-weight="800" font-family="Montserrat">Event</text>
+          <text x="465" y="172" text-anchor="middle" fill="#fff" font-size="9" font-weight="800" font-family="Montserrat">Bus</text>
+
+          <!-- Arrow order to bus -->
+          <line x1="395" y1="160" x2="430" y2="160" stroke="#3498db" stroke-width="2" marker-end="url(#case-arr-b)"/>
+
+          <!-- Fan-out arrows -->
+          <line x1="500" y1="140" x2="580" y2="55" stroke="#2ecc71" stroke-width="2" marker-end="url(#case-arr-g)"/>
+          <line x1="500" y1="155" x2="580" y2="140" stroke="#f39c12" stroke-width="2" marker-end="url(#case-arr-o)"/>
+          <line x1="500" y1="170" x2="580" y2="225" stroke="#9b59b6" stroke-width="2" marker-end="url(#case-arr-p)"/>
+          <line x1="500" y1="180" x2="580" y2="310" stroke="#e67e22" stroke-width="2" marker-end="url(#case-arr-e)"/>
+
+          <!-- Consumer: Payment -->
+          <rect x="585" y="20" width="210" height="70" rx="10" fill="#f5f5f5" stroke="#2ecc71" stroke-width="2"/>
+          <rect x="585" y="20" width="210" height="28" rx="10" fill="#2ecc71"/>
+          <text x="690" y="40" text-anchor="middle" fill="#fff" font-size="11" font-weight="700" font-family="Montserrat">Pagamento</text>
+          <text x="690" y="62" text-anchor="middle" fill="#333" font-size="10" font-family="Montserrat">Cobra R$ 299,90 no cartão</text>
+          <text x="690" y="78" text-anchor="middle" fill="#2ecc71" font-size="9" font-weight="600" font-family="Montserrat">Publica: PagamentoAprovado</text>
+
+          <!-- Consumer: Stock -->
+          <rect x="585" y="105" width="210" height="70" rx="10" fill="#f5f5f5" stroke="#f39c12" stroke-width="2"/>
+          <rect x="585" y="105" width="210" height="28" rx="10" fill="#f39c12"/>
+          <text x="690" y="125" text-anchor="middle" fill="#fff" font-size="11" font-weight="700" font-family="Montserrat">Estoque</text>
+          <text x="690" y="148" text-anchor="middle" fill="#333" font-size="10" font-family="Montserrat">Reserva itens do pedido</text>
+          <text x="690" y="164" text-anchor="middle" fill="#f39c12" font-size="9" font-weight="600" font-family="Montserrat">Publica: EstoqueReservado</text>
+
+          <!-- Consumer: Notification -->
+          <rect x="585" y="190" width="210" height="70" rx="10" fill="#f5f5f5" stroke="#9b59b6" stroke-width="2"/>
+          <rect x="585" y="190" width="210" height="28" rx="10" fill="#9b59b6"/>
+          <text x="690" y="210" text-anchor="middle" fill="#fff" font-size="11" font-weight="700" font-family="Montserrat">Notificação</text>
+          <text x="690" y="233" text-anchor="middle" fill="#333" font-size="10" font-family="Montserrat">Envia e-mail de confirmação</text>
+          <text x="690" y="249" text-anchor="middle" fill="#9b59b6" font-size="9" font-weight="600" font-family="Montserrat">(fire-and-forget)</text>
+
+          <!-- Consumer: Analytics -->
+          <rect x="585" y="275" width="210" height="70" rx="10" fill="#f5f5f5" stroke="#e67e22" stroke-width="2"/>
+          <rect x="585" y="275" width="210" height="28" rx="10" fill="#e67e22"/>
+          <text x="690" y="295" text-anchor="middle" fill="#fff" font-size="11" font-weight="700" font-family="Montserrat">Analytics</text>
+          <text x="690" y="318" text-anchor="middle" fill="#333" font-size="10" font-family="Montserrat">Registra métricas de venda</text>
+          <text x="690" y="334" text-anchor="middle" fill="#e67e22" font-size="9" font-weight="600" font-family="Montserrat">(fire-and-forget)</text>
+
+          <!-- Highlight box -->
+          <rect x="840" y="100" width="240" height="120" rx="10" fill="rgba(237,20,91,0.06)" stroke="#ED145B" stroke-width="1" stroke-dasharray="5"/>
+          <text x="960" y="125" text-anchor="middle" fill="#ED145B" font-size="11" font-weight="700" font-family="Montserrat">Tudo em paralelo!</text>
+          <text x="960" y="148" text-anchor="middle" fill="#555" font-size="10" font-family="Montserrat">O Order Service não espera</text>
+          <text x="960" y="165" text-anchor="middle" fill="#555" font-size="10" font-family="Montserrat">nenhum deles terminar.</text>
+          <text x="960" y="188" text-anchor="middle" fill="#555" font-size="10" font-family="Montserrat">Amanhã podemos adicionar</text>
+          <text x="960" y="205" text-anchor="middle" fill="#555" font-size="10" font-family="Montserrat">um 5º consumidor sem mudar</text>
+          <text x="960" y="222" text-anchor="middle" fill="#ED145B" font-size="10" font-weight="600" font-family="Montserrat">nenhuma linha do Order Service.</text>
+
+          <defs>
+            <marker id="case-arr" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="#ED145B"/></marker>
+            <marker id="case-arr-b" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="#3498db"/></marker>
+            <marker id="case-arr-g" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="#2ecc71"/></marker>
+            <marker id="case-arr-o" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="#f39c12"/></marker>
+            <marker id="case-arr-p" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="#9b59b6"/></marker>
+            <marker id="case-arr-e" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="#e67e22"/></marker>
+          </defs>
+        </svg>
+
+        <div class="slide-footer">
+          <div class="footer-bar">04 - Dados em Microsservicos</div>
+          <div class="footer-page">10</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: Pub/Sub vs Event Streaming ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Dois Modelos: Pub/Sub vs Event Streaming</h2>
+        </div>
+        <div class="side-by-side">
+          <div class="side" style="border-top: 3px solid #3498db;">
+            <h4 style="color:#3498db;">Pub/Sub (Publish-Subscribe)</h4>
+            <ul>
+              <li>Mensagem entregue e <strong>removida</strong> da fila</li>
+              <li>Cada mensagem consumida por <strong>um</strong> consumidor do grupo</li>
+              <li>Ideal para <strong>tarefas</strong> (processar pagamento, enviar e-mail)</li>
+              <li>Ex: RabbitMQ, Amazon SQS, Azure Service Bus</li>
+            </ul>
+          </div>
+          <div class="side" style="border-top: 3px solid #ED145B;">
+            <h4 style="color:#ED145B;">Event Streaming</h4>
+            <ul>
+              <li>Eventos <strong>persistidos</strong> em um log ordenado</li>
+              <li>Múltiplos consumidores leem o <strong>mesmo</strong> stream</li>
+              <li>Permite <strong>replay</strong>: reprocessar eventos do passado</li>
+              <li>Ex: Apache Kafka, Amazon Kinesis, Azure Event Hubs</li>
+            </ul>
+          </div>
+        </div>
+        <div class="callout" style="margin-top:15px;">
+          <p><strong>Na prática:</strong> muitas arquiteturas combinam ambos. Kafka para o stream principal de eventos, RabbitMQ/SQS para filas de trabalho específicas. O importante é escolher pelo requisito: precisa de replay e auditoria? Streaming. Precisa só de entrega confiável? Pub/Sub.</p>
+        </div>
+        <div class="slide-footer">
+          <div class="footer-bar">04 - Dados em Microsservicos</div>
+          <div class="footer-page">11</div>
+        </div>
+      </section>
+
       <!-- ==================== SLIDE: Saga Pattern - Introdução ==================== -->
       <section class="content-slide">
         <div class="top-bar"></div>
@@ -166,7 +519,7 @@
         </svg>
         <div class="slide-footer">
           <div class="footer-bar">04 - Dados em Microsservicos</div>
-          <div class="footer-page">7</div>
+          <div class="footer-page">12</div>
         </div>
       </section>
 
@@ -196,7 +549,7 @@
         </div>
         <div class="slide-footer">
           <div class="footer-bar">04 - Dados em Microsservicos</div>
-          <div class="footer-page">8</div>
+          <div class="footer-page">13</div>
         </div>
       </section>
 
@@ -278,7 +631,7 @@
 
         <div class="slide-footer">
           <div class="footer-bar">04 - Dados em Microsservicos</div>
-          <div class="footer-page">9</div>
+          <div class="footer-page">14</div>
         </div>
       </section>
 
@@ -362,7 +715,7 @@
 
         <div class="slide-footer">
           <div class="footer-bar">04 - Dados em Microsservicos</div>
-          <div class="footer-page">10</div>
+          <div class="footer-page">15</div>
         </div>
       </section>
 
@@ -391,7 +744,7 @@
         </table>
         <div class="slide-footer">
           <div class="footer-bar">04 - Dados em Microsservicos</div>
-          <div class="footer-page">11</div>
+          <div class="footer-page">16</div>
         </div>
       </section>
 
@@ -430,7 +783,7 @@
         </div>
         <div class="slide-footer">
           <div class="footer-bar">04 - Dados em Microsservicos</div>
-          <div class="footer-page">12</div>
+          <div class="footer-page">17</div>
         </div>
       </section>
 
@@ -451,7 +804,7 @@
         </ul>
         <div class="slide-footer">
           <div class="footer-bar">04 - Dados em Microsservicos</div>
-          <div class="footer-page">13</div>
+          <div class="footer-page">18</div>
         </div>
       </section>
 
@@ -472,7 +825,7 @@
         </ul>
         <div class="slide-footer">
           <div class="footer-bar">04 - Dados em Microsservicos</div>
-          <div class="footer-page">14</div>
+          <div class="footer-page">19</div>
         </div>
       </section>
 
@@ -494,7 +847,7 @@
         </ul>
         <div class="slide-footer">
           <div class="footer-bar">04 - Dados em Microsservicos</div>
-          <div class="footer-page">15</div>
+          <div class="footer-page">20</div>
         </div>
       </section>
 
@@ -673,7 +1026,7 @@
 
         <div class="slide-footer">
           <div class="footer-bar">04 - Dados em Microsservicos</div>
-          <div class="footer-page">16</div>
+          <div class="footer-page">21</div>
         </div>
       </section>
 
@@ -714,7 +1067,7 @@ const estoqueDB = new Sequelize('estoquedb', 'user', 'pass', {
         </code></pre>
         <div class="slide-footer">
           <div class="footer-bar">04 - Dados em Microsservicos</div>
-          <div class="footer-page">17</div>
+          <div class="footer-page">22</div>
         </div>
       </section>
 
@@ -736,7 +1089,7 @@ const estoqueDB = new Sequelize('estoquedb', 'user', 'pass', {
         <div class="quiz-feedback"></div>
         <div class="slide-footer">
           <div class="footer-bar">04 - Dados em Microsservicos</div>
-          <div class="footer-page">18</div>
+          <div class="footer-page">23</div>
         </div>
       </section>
 
@@ -758,7 +1111,7 @@ const estoqueDB = new Sequelize('estoquedb', 'user', 'pass', {
         <div class="quiz-feedback"></div>
         <div class="slide-footer">
           <div class="footer-bar">04 - Dados em Microsservicos</div>
-          <div class="footer-page">19</div>
+          <div class="footer-page">24</div>
         </div>
       </section>
 
@@ -770,7 +1123,7 @@ const estoqueDB = new Sequelize('estoquedb', 'user', 'pass', {
         <p>21h00 – 21h20<br>☕ Aproveite para descansar e se preparar para o próximo bloco.</p>
         <div class="slide-footer">
           <div class="footer-bar">04 - Dados em Microsservicos</div>
-          <div class="footer-page">20</div>
+          <div class="footer-page">25</div>
         </div>
       </section>
 
@@ -782,7 +1135,7 @@ const estoqueDB = new Sequelize('estoquedb', 'user', 'pass', {
         <h2>Bloco 2:<br>Exercício Hands-on</h2>
         <div class="slide-footer">
           <div class="footer-bar">04 - Dados em Microsservicos</div>
-          <div class="footer-page">21</div>
+          <div class="footer-page">26</div>
         </div>
       </section>
 
@@ -809,7 +1162,7 @@ const estoqueDB = new Sequelize('estoquedb', 'user', 'pass', {
 
         <div class="slide-footer">
           <div class="footer-bar">04 - Dados em Microsservicos</div>
-          <div class="footer-page">22</div>
+          <div class="footer-page">27</div>
         </div>
       </section>
 
@@ -837,7 +1190,7 @@ async function processOrderSaga(orderId) {
         </code></pre>
         <div class="slide-footer">
           <div class="footer-bar">04 - Dados em Microsservicos</div>
-          <div class="footer-page">23</div>
+          <div class="footer-page">28</div>
         </div>
       </section>
 
@@ -863,7 +1216,7 @@ pedidoService.on('PedidoCriado', async (order) =&gt; {
         <p>Outros serviços escutam esses eventos e agem conforme necessário.</p>
         <div class="slide-footer">
           <div class="footer-bar">04 - Dados em Microsservicos</div>
-          <div class="footer-page">24</div>
+          <div class="footer-page">29</div>
         </div>
       </section>
 
@@ -884,7 +1237,7 @@ pedidoService.on('PedidoCriado', async (order) =&gt; {
         </ul>
         <div class="slide-footer">
           <div class="footer-bar">04 - Dados em Microsservicos</div>
-          <div class="footer-page">25</div>
+          <div class="footer-page">30</div>
         </div>
       </section>
 
@@ -905,7 +1258,7 @@ pedidoService.on('PedidoCriado', async (order) =&gt; {
         <div class="quiz-feedback"></div>
         <div class="slide-footer">
           <div class="footer-bar">04 - Dados em Microsservicos</div>
-          <div class="footer-page">26</div>
+          <div class="footer-page">31</div>
         </div>
       </section>
 
@@ -922,7 +1275,7 @@ pedidoService.on('PedidoCriado', async (order) =&gt; {
         </div>
         <div class="slide-footer">
           <div class="footer-bar">04 - Dados em Microsservicos</div>
-          <div class="footer-page">27</div>
+          <div class="footer-page">32</div>
         </div>
       </section>
 
