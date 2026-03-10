@@ -47,7 +47,7 @@
             <tr><th>Bloco</th><th>Horário</th><th>Conteúdo</th></tr>
           </thead>
           <tbody>
-            <tr><td><strong>Bloco 1</strong></td><td>19h30 – 21h00</td><td>Database per Service, Shared DB, Saga, Event Sourcing, CQRS, Caso real Noisy Neighbor</td></tr>
+            <tr><td><strong>Bloco 1</strong></td><td>19h30 – 21h00</td><td>Database per Service, Shared DB, Saga, Event Sourcing, CQRS, Noisy Neighbor + Simulação interativa</td></tr>
             <tr><td><strong>Intervalo</strong></td><td>21h00 – 21h20</td><td>☕ Pausa</td></tr>
             <tr><td><strong>Bloco 2</strong></td><td>21h20 – 22h45</td><td>Exercício prático: Fluxo Saga + Quiz</td></tr>
           </tbody>
@@ -212,6 +212,185 @@
         </div>
       </section>
 
+      <!-- ==================== SLIDE: Noisy Neighbor - Simulação Interativa ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Simulação: Noisy Neighbor ao Vivo</h2>
+        </div>
+
+        <style>
+          .nn-sim { display: grid; grid-template-columns: 1fr 280px; gap: 18px; margin-top: 5px; }
+          .nn-tenants { display: flex; flex-direction: column; gap: 10px; }
+          .nn-tenant { background: var(--fiap-light-gray); border-radius: 8px; padding: 14px 18px; display: grid; grid-template-columns: 110px 1fr 90px; align-items: center; gap: 12px; border-left: 4px solid #ccc; }
+          .nn-tenant[data-t="a"] { border-left-color: #3498db; }
+          .nn-tenant[data-t="b"] { border-left-color: #2ecc71; }
+          .nn-tenant[data-t="c"] { border-left-color: #9b59b6; }
+          .nn-tenant-name { font-size: 0.65em; font-weight: 700; color: var(--fiap-dark); }
+          .nn-tenant-name small { font-weight: 400; color: #888; display: block; font-size: 0.85em; }
+          .nn-slider-area { display: flex; align-items: center; gap: 8px; }
+          .nn-slider-area input[type="range"] { flex: 1; accent-color: var(--fiap-pink); height: 6px; cursor: pointer; }
+          .nn-slider-area .nn-req-val { font-size: 0.6em; font-weight: 700; color: var(--fiap-dark); min-width: 55px; text-align: right; }
+          .nn-latency { text-align: center; }
+          .nn-latency-val { font-size: 1.4em; font-weight: 800; }
+          .nn-latency-label { font-size: 0.5em; color: #888; }
+          .nn-panel { background: linear-gradient(135deg, #1e1e2e, #2d2d3f); border-radius: 8px; padding: 16px; color: #fff; display: flex; flex-direction: column; gap: 12px; }
+          .nn-panel h4 { font-size: 0.7em; color: var(--fiap-pink); margin: 0; font-weight: 700; }
+          .nn-meter { background: #333; border-radius: 4px; height: 18px; overflow: hidden; position: relative; }
+          .nn-meter-fill { height: 100%; border-radius: 4px; transition: width 0.3s, background 0.3s; }
+          .nn-meter-text { position: absolute; right: 6px; top: 1px; font-size: 0.55em; font-weight: 700; color: #fff; }
+          .nn-status { font-size: 0.55em; color: #aaa; line-height: 1.5; min-height: 50px; }
+          .nn-status.alert { color: #e74c3c; font-weight: 600; }
+          .nn-toggle { display: flex; align-items: center; gap: 8px; margin-top: 4px; }
+          .nn-toggle label { font-size: 0.6em; color: #ccc; cursor: pointer; }
+          .nn-switch { position: relative; width: 40px; height: 22px; }
+          .nn-switch input { opacity: 0; width: 0; height: 0; }
+          .nn-switch .nn-slider { position: absolute; inset: 0; background: #555; border-radius: 22px; cursor: pointer; transition: 0.3s; }
+          .nn-switch .nn-slider::before { content: ''; position: absolute; width: 16px; height: 16px; left: 3px; bottom: 3px; background: #fff; border-radius: 50%; transition: 0.3s; }
+          .nn-switch input:checked + .nn-slider { background: var(--fiap-pink); }
+          .nn-switch input:checked + .nn-slider::before { transform: translateX(18px); }
+          .nn-insight { background: rgba(237,20,91,0.15); border-radius: 6px; padding: 10px; font-size: 0.55em; color: #f5a; line-height: 1.4; min-height: 40px; }
+        </style>
+
+        <div class="nn-sim">
+          <div class="nn-tenants">
+            <div class="nn-tenant" data-t="a">
+              <div class="nn-tenant-name">Empresa A<small>E-commerce</small></div>
+              <div class="nn-slider-area">
+                <input type="range" min="0" max="90" value="15" id="nn-load-a" oninput="nnUpdate()" />
+                <span class="nn-req-val" id="nn-val-a">15 req/s</span>
+              </div>
+              <div class="nn-latency">
+                <div class="nn-latency-val" id="nn-lat-a" style="color:#3498db">12ms</div>
+                <div class="nn-latency-label">latência</div>
+              </div>
+            </div>
+            <div class="nn-tenant" data-t="b">
+              <div class="nn-tenant-name">Empresa B<small>CRM interno</small></div>
+              <div class="nn-slider-area">
+                <input type="range" min="0" max="90" value="10" id="nn-load-b" oninput="nnUpdate()" />
+                <span class="nn-req-val" id="nn-val-b">10 req/s</span>
+              </div>
+              <div class="nn-latency">
+                <div class="nn-latency-val" id="nn-lat-b" style="color:#2ecc71">10ms</div>
+                <div class="nn-latency-label">latência</div>
+              </div>
+            </div>
+            <div class="nn-tenant" data-t="c">
+              <div class="nn-tenant-name">Empresa C<small>Analytics</small></div>
+              <div class="nn-slider-area">
+                <input type="range" min="0" max="90" value="10" id="nn-load-c" oninput="nnUpdate()" />
+                <span class="nn-req-val" id="nn-val-c">10 req/s</span>
+              </div>
+              <div class="nn-latency">
+                <div class="nn-latency-val" id="nn-lat-c" style="color:#9b59b6">10ms</div>
+                <div class="nn-latency-label">latência</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="nn-panel">
+            <h4>Servidor Compartilhado</h4>
+            <div>
+              <div style="font-size:0.55em; color:#aaa; margin-bottom:4px;">Capacidade: 100 req/s</div>
+              <div class="nn-meter">
+                <div class="nn-meter-fill" id="nn-meter-fill" style="width:35%; background:#2ecc71;"></div>
+                <span class="nn-meter-text" id="nn-meter-text">35%</span>
+              </div>
+            </div>
+            <div class="nn-toggle">
+              <label class="nn-switch">
+                <input type="checkbox" id="nn-rate-limit" onchange="nnUpdate()" />
+                <span class="nn-slider"></span>
+              </label>
+              <label for="nn-rate-limit">Rate Limiting (max 40 req/s por tenant)</label>
+            </div>
+            <div class="nn-status" id="nn-status">Arraste os sliders para simular carga dos tenants.</div>
+            <div class="nn-insight" id="nn-insight">Experimente: suba a Empresa A para 80+ req/s e observe o que acontece com B e C.</div>
+          </div>
+        </div>
+
+        <script>
+        function nnUpdate() {
+          var rl = document.getElementById('nn-rate-limit').checked;
+          var cap = 100;
+          var maxPerTenant = rl ? 40 : 90;
+          var tenants = ['a','b','c'];
+          var colors = {a:'#3498db', b:'#2ecc71', c:'#9b59b6'};
+          var loads = {};
+          var total = 0;
+
+          tenants.forEach(function(t) {
+            var raw = parseInt(document.getElementById('nn-load-'+t).value);
+            loads[t] = Math.min(raw, maxPerTenant);
+            if (rl && raw > maxPerTenant) {
+              document.getElementById('nn-load-'+t).value = maxPerTenant;
+            }
+            document.getElementById('nn-val-'+t).textContent = loads[t] + ' req/s';
+            total += loads[t];
+          });
+
+          var pct = Math.min(Math.round(total / cap * 100), 100);
+          var meterFill = document.getElementById('nn-meter-fill');
+          meterFill.style.width = pct + '%';
+          meterFill.style.background = pct < 70 ? '#2ecc71' : (pct < 90 ? '#f39c12' : '#e74c3c');
+          document.getElementById('nn-meter-text').textContent = pct + '%';
+
+          var overload = total > cap ? total - cap : 0;
+          var maxLoad = Math.max(loads.a, loads.b, loads.c);
+          var noisyTenant = null;
+          tenants.forEach(function(t) { if (loads[t] === maxLoad && loads[t] > 50) noisyTenant = t; });
+
+          tenants.forEach(function(t) {
+            var base = 8 + loads[t] * 0.3;
+            var penalty = 0;
+            if (overload > 0) {
+              if (noisyTenant && t !== noisyTenant) {
+                penalty = overload * 4;
+              } else {
+                penalty = overload * 1.5;
+              }
+            }
+            if (total > 70 && total <= cap) {
+              penalty += (total - 70) * 0.8;
+            }
+            var lat = Math.round(base + penalty);
+            var el = document.getElementById('nn-lat-'+t);
+            el.textContent = lat + 'ms';
+            el.style.color = lat < 30 ? colors[t] : (lat < 80 ? '#f39c12' : '#e74c3c');
+          });
+
+          var status = document.getElementById('nn-status');
+          var insight = document.getElementById('nn-insight');
+
+          if (rl) {
+            status.className = 'nn-status';
+            status.textContent = 'Rate limiting ativo: cada tenant limitado a 40 req/s. Isolamento garantido.';
+            insight.textContent = 'Com rate limiting, nenhum tenant consegue monopolizar o servidor. A latência fica estável para todos.';
+          } else if (overload > 0 && noisyTenant) {
+            status.className = 'nn-status alert';
+            status.textContent = 'ALERTA: Servidor sobrecarregado! Empresa ' + noisyTenant.toUpperCase() + ' é o Noisy Neighbor — as outras empresas estão sofrendo!';
+            insight.textContent = 'Perceba: quem mais sofre NÃO é o noisy neighbor, mas os vizinhos. Ative o Rate Limiting para ver a solução.';
+          } else if (total > 70) {
+            status.className = 'nn-status';
+            status.textContent = 'Servidor sob pressão (' + total + '/100 req/s). Latência começando a subir.';
+            insight.textContent = 'A degradação começa antes do limite! Mesmo a 70-80% de uso, a contenção por recursos já impacta todos.';
+          } else {
+            status.className = 'nn-status';
+            status.textContent = 'Servidor saudável. Todos os tenants operando normalmente.';
+            insight.textContent = 'Experimente: suba a Empresa A para 80+ req/s e observe o que acontece com B e C.';
+          }
+        }
+        </script>
+
+        <div class="slide-footer">
+          <div class="footer-bar">04 - Dados em Microsservicos</div>
+          <div class="footer-page">11</div>
+        </div>
+      </section>
+
       <!-- ==================== SLIDE: Exemplos práticos Database per Service ==================== -->
       <section class="content-slide">
         <div class="top-bar"></div>
@@ -249,7 +428,7 @@ const estoqueDB = new Sequelize('estoquedb', 'user', 'pass', {
         </code></pre>
         <div class="slide-footer">
           <div class="footer-bar">04 - Dados em Microsservicos</div>
-          <div class="footer-page">11</div>
+          <div class="footer-page">12</div>
         </div>
       </section>
 
@@ -271,7 +450,7 @@ const estoqueDB = new Sequelize('estoquedb', 'user', 'pass', {
         <div class="quiz-feedback"></div>
         <div class="slide-footer">
           <div class="footer-bar">04 - Dados em Microsservicos</div>
-          <div class="footer-page">12</div>
+          <div class="footer-page">13</div>
         </div>
       </section>
 
@@ -293,7 +472,7 @@ const estoqueDB = new Sequelize('estoquedb', 'user', 'pass', {
         <div class="quiz-feedback"></div>
         <div class="slide-footer">
           <div class="footer-bar">04 - Dados em Microsservicos</div>
-          <div class="footer-page">13</div>
+          <div class="footer-page">14</div>
         </div>
       </section>
 
@@ -305,7 +484,7 @@ const estoqueDB = new Sequelize('estoquedb', 'user', 'pass', {
         <p>21h00 – 21h20<br>☕ Aproveite para descansar e se preparar para o próximo bloco.</p>
         <div class="slide-footer">
           <div class="footer-bar">04 - Dados em Microsservicos</div>
-          <div class="footer-page">14</div>
+          <div class="footer-page">15</div>
         </div>
       </section>
 
@@ -317,7 +496,7 @@ const estoqueDB = new Sequelize('estoquedb', 'user', 'pass', {
         <h2>Bloco 2:<br>Exercício Hands-on</h2>
         <div class="slide-footer">
           <div class="footer-bar">04 - Dados em Microsservicos</div>
-          <div class="footer-page">15</div>
+          <div class="footer-page">16</div>
         </div>
       </section>
 
@@ -344,7 +523,7 @@ const estoqueDB = new Sequelize('estoquedb', 'user', 'pass', {
 
         <div class="slide-footer">
           <div class="footer-bar">04 - Dados em Microsservicos</div>
-          <div class="footer-page">16</div>
+          <div class="footer-page">17</div>
         </div>
       </section>
 
@@ -372,7 +551,7 @@ async function processOrderSaga(orderId) {
         </code></pre>
         <div class="slide-footer">
           <div class="footer-bar">04 - Dados em Microsservicos</div>
-          <div class="footer-page">17</div>
+          <div class="footer-page">18</div>
         </div>
       </section>
 
@@ -398,7 +577,7 @@ pedidoService.on('PedidoCriado', async (order) =&gt; {
         <p>Outros serviços escutam esses eventos e agem conforme necessário.</p>
         <div class="slide-footer">
           <div class="footer-bar">04 - Dados em Microsservicos</div>
-          <div class="footer-page">18</div>
+          <div class="footer-page">19</div>
         </div>
       </section>
 
@@ -419,7 +598,7 @@ pedidoService.on('PedidoCriado', async (order) =&gt; {
         </ul>
         <div class="slide-footer">
           <div class="footer-bar">04 - Dados em Microsservicos</div>
-          <div class="footer-page">19</div>
+          <div class="footer-page">20</div>
         </div>
       </section>
 
@@ -440,7 +619,7 @@ pedidoService.on('PedidoCriado', async (order) =&gt; {
         <div class="quiz-feedback"></div>
         <div class="slide-footer">
           <div class="footer-bar">04 - Dados em Microsservicos</div>
-          <div class="footer-page">20</div>
+          <div class="footer-page">21</div>
         </div>
       </section>
 
@@ -457,7 +636,7 @@ pedidoService.on('PedidoCriado', async (order) =&gt; {
         </div>
         <div class="slide-footer">
           <div class="footer-bar">04 - Dados em Microsservicos</div>
-          <div class="footer-page">21</div>
+          <div class="footer-page">22</div>
         </div>
       </section>
 
@@ -485,9 +664,9 @@ pedidoService.on('PedidoCriado', async (order) =&gt; {
       slideNumber: false,
       width: 1280,
       height: 720,
-      margin: 0,
+      margin: 0.04,
       minScale: 0.2,
-      maxScale: 2.0,
+      maxScale: 3.0,
       center: false,
         pdfMaxPagesPerSlide: 1,
         pdfSeparateFragments: false,
