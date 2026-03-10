@@ -113,38 +113,324 @@
         </div>
       </section>
 
-      <!-- ==================== SLIDE: Saga Pattern (Orquestração vs Coreografia) ==================== -->
+      <!-- ==================== SLIDE: Saga Pattern - Introdução ==================== -->
       <section class="content-slide">
         <div class="top-bar"></div>
         <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
         <div class="slide-title-area">
           <div class="accent-bar"></div>
           <h2>Saga Pattern</h2>
-          <h3>Orquestração vs Coreografia</h3>
+          <h3>Consistência em Transações Distribuídas</h3>
         </div>
-        <p>Sagas são sequências de transações locais que mantêm a consistência eventual em microsserviços.</p>
+        <p>Em microsserviços, cada serviço tem seu próprio banco — não há transação ACID global. Como manter consistência?</p>
+        <div class="callout">
+          <p><strong>Saga</strong> é uma sequência de transações locais. Cada serviço executa sua operação e dispara a próxima etapa via evento ou mensagem. Se uma etapa falha, transações <strong>compensatórias</strong> desfazem o que já foi feito.</p>
+        </div>
+        <svg viewBox="0 0 1100 200" style="width:100%; max-height:180px; margin-top:10px;">
+          <!-- T1 -->
+          <rect x="10" y="60" width="140" height="70" rx="8" fill="#1a1a1a"/>
+          <text x="80" y="90" text-anchor="middle" fill="#fff" font-size="14" font-weight="700" font-family="Montserrat">T1: Pedido</text>
+          <text x="80" y="112" text-anchor="middle" fill="#ED145B" font-size="11" font-family="Montserrat">Criar pedido</text>
+          <!-- Arrow -->
+          <line x1="155" y1="95" x2="210" y2="95" stroke="#ED145B" stroke-width="2.5" marker-end="url(#saga-arrow)"/>
+          <!-- T2 -->
+          <rect x="215" y="60" width="140" height="70" rx="8" fill="#1a1a1a"/>
+          <text x="285" y="90" text-anchor="middle" fill="#fff" font-size="14" font-weight="700" font-family="Montserrat">T2: Pagamento</text>
+          <text x="285" y="112" text-anchor="middle" fill="#ED145B" font-size="11" font-family="Montserrat">Cobrar valor</text>
+          <!-- Arrow -->
+          <line x1="360" y1="95" x2="415" y2="95" stroke="#ED145B" stroke-width="2.5" marker-end="url(#saga-arrow)"/>
+          <!-- T3 -->
+          <rect x="420" y="60" width="140" height="70" rx="8" fill="#1a1a1a"/>
+          <text x="490" y="90" text-anchor="middle" fill="#fff" font-size="14" font-weight="700" font-family="Montserrat">T3: Estoque</text>
+          <text x="490" y="112" text-anchor="middle" fill="#ED145B" font-size="11" font-family="Montserrat">Reservar itens</text>
+          <!-- Arrow -->
+          <line x1="565" y1="95" x2="620" y2="95" stroke="#ED145B" stroke-width="2.5" marker-end="url(#saga-arrow)"/>
+          <!-- T4 -->
+          <rect x="625" y="60" width="140" height="70" rx="8" fill="#1a1a1a"/>
+          <text x="695" y="90" text-anchor="middle" fill="#fff" font-size="14" font-weight="700" font-family="Montserrat">T4: Envio</text>
+          <text x="695" y="112" text-anchor="middle" fill="#ED145B" font-size="11" font-family="Montserrat">Agendar entrega</text>
+          <!-- Success -->
+          <line x1="770" y1="95" x2="825" y2="95" stroke="#2ecc71" stroke-width="2.5" marker-end="url(#saga-ok)"/>
+          <text x="870" y="100" text-anchor="middle" fill="#2ecc71" font-size="16" font-weight="800" font-family="Montserrat">OK</text>
+          <!-- Compensation arrows (below) -->
+          <line x1="490" y1="140" x2="490" y2="168" stroke="#e74c3c" stroke-width="1.5" stroke-dasharray="4"/>
+          <text x="490" y="185" text-anchor="middle" fill="#e74c3c" font-size="10" font-family="Montserrat">Falhou? Compensar!</text>
+          <line x1="490" y1="168" x2="285" y2="168" stroke="#e74c3c" stroke-width="1.5" stroke-dasharray="4" marker-end="url(#saga-comp)"/>
+          <line x1="490" y1="168" x2="80" y2="168" stroke="#e74c3c" stroke-width="1.5" stroke-dasharray="4" marker-end="url(#saga-comp)"/>
+          <!-- Defs -->
+          <defs>
+            <marker id="saga-arrow" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="#ED145B"/></marker>
+            <marker id="saga-ok" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="#2ecc71"/></marker>
+            <marker id="saga-comp" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="#e74c3c"/></marker>
+          </defs>
+        </svg>
+        <div class="slide-footer">
+          <div class="footer-bar">04 - Dados em Microsservicos</div>
+          <div class="footer-page">7</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: Saga - Transações Compensatórias ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Saga: Transações Compensatórias</h2>
+          <h3>O "Ctrl+Z" dos Microsserviços</h3>
+        </div>
+        <p>Cada etapa da saga precisa ter uma <strong>ação compensatória</strong> caso precise ser revertida.</p>
         <table>
           <thead>
-            <tr><th>Orquestração</th><th>Coreografia</th></tr>
+            <tr><th>Etapa</th><th>Transação</th><th>Compensação</th></tr>
           </thead>
           <tbody>
-            <tr>
-              <td>Um serviço central controla o fluxo</td>
-              <td>Serviços reagem a eventos e decidem ações</td>
-            </tr>
-            <tr>
-              <td>Mais fácil de entender e monitorar</td>
-              <td>Mais flexível e desacoplado</td>
-            </tr>
-            <tr>
-              <td>Pode ser ponto único de falha</td>
-              <td>Difícil de rastrear e depurar</td>
-            </tr>
+            <tr><td><strong>1. Pedido</strong></td><td>Criar pedido</td><td>Cancelar pedido</td></tr>
+            <tr><td><strong>2. Pagamento</strong></td><td>Cobrar cartão</td><td>Estornar pagamento</td></tr>
+            <tr><td><strong>3. Estoque</strong></td><td>Reservar itens</td><td>Liberar reserva</td></tr>
+            <tr><td><strong>4. Envio</strong></td><td>Agendar entrega</td><td>Cancelar agendamento</td></tr>
+          </tbody>
+        </table>
+        <div class="callout">
+          <p><strong>Transação Pivot (ponto sem retorno):</strong> a partir dela, as próximas etapas devem ser <em>retriable</em> (idempotentes e com retry). Exemplo: após o pagamento confirmado, o envio deve ser garantido com retentativas.</p>
+        </div>
+        <div class="slide-footer">
+          <div class="footer-bar">04 - Dados em Microsservicos</div>
+          <div class="footer-page">8</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: Saga Coreografia - Diagrama ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Coreografia</h2>
+          <h3>Cada serviço reage a eventos — sem coordenador central</h3>
+        </div>
+
+        <svg viewBox="0 0 1100 380" style="width:100%; max-height:340px; margin-top:5px;">
+          <!-- Event Bus -->
+          <rect x="80" y="10" width="900" height="36" rx="18" fill="#2d2d3f"/>
+          <text x="530" y="33" text-anchor="middle" fill="#ED145B" font-size="14" font-weight="700" font-family="Montserrat">Event Bus / Message Broker</text>
+
+          <!-- Service boxes -->
+          <rect x="40" y="100" width="200" height="100" rx="10" fill="#f5f5f5" stroke="#3498db" stroke-width="2.5"/>
+          <rect x="40" y="100" width="200" height="32" rx="10" fill="#3498db"/>
+          <text x="140" y="122" text-anchor="middle" fill="#fff" font-size="13" font-weight="700" font-family="Montserrat">Pedido Service</text>
+          <text x="140" y="150" text-anchor="middle" fill="#333" font-size="11" font-family="Montserrat">1. Cria pedido</text>
+          <text x="140" y="170" text-anchor="middle" fill="#333" font-size="11" font-family="Montserrat">2. Publica PedidoCriado</text>
+          <rect x="95" y="180" width="90" height="14" rx="4" fill="#3498db" opacity="0.15"/>
+          <text x="140" y="191" text-anchor="middle" fill="#3498db" font-size="9" font-weight="600" font-family="Montserrat">OrderDB</text>
+
+          <rect x="300" y="100" width="200" height="100" rx="10" fill="#f5f5f5" stroke="#2ecc71" stroke-width="2.5"/>
+          <rect x="300" y="100" width="200" height="32" rx="10" fill="#2ecc71"/>
+          <text x="400" y="122" text-anchor="middle" fill="#fff" font-size="13" font-weight="700" font-family="Montserrat">Pagamento Service</text>
+          <text x="400" y="150" text-anchor="middle" fill="#333" font-size="11" font-family="Montserrat">3. Escuta PedidoCriado</text>
+          <text x="400" y="170" text-anchor="middle" fill="#333" font-size="11" font-family="Montserrat">4. Publica PagamentoOK</text>
+          <rect x="355" y="180" width="90" height="14" rx="4" fill="#2ecc71" opacity="0.15"/>
+          <text x="400" y="191" text-anchor="middle" fill="#2ecc71" font-size="9" font-weight="600" font-family="Montserrat">PaymentDB</text>
+
+          <rect x="560" y="100" width="200" height="100" rx="10" fill="#f5f5f5" stroke="#f39c12" stroke-width="2.5"/>
+          <rect x="560" y="100" width="200" height="32" rx="10" fill="#f39c12"/>
+          <text x="660" y="122" text-anchor="middle" fill="#fff" font-size="13" font-weight="700" font-family="Montserrat">Estoque Service</text>
+          <text x="660" y="150" text-anchor="middle" fill="#333" font-size="11" font-family="Montserrat">5. Escuta PagamentoOK</text>
+          <text x="660" y="170" text-anchor="middle" fill="#333" font-size="11" font-family="Montserrat">6. Publica EstoqueReservado</text>
+          <rect x="615" y="180" width="90" height="14" rx="4" fill="#f39c12" opacity="0.15"/>
+          <text x="660" y="191" text-anchor="middle" fill="#f39c12" font-size="9" font-weight="600" font-family="Montserrat">StockDB</text>
+
+          <rect x="820" y="100" width="200" height="100" rx="10" fill="#f5f5f5" stroke="#9b59b6" stroke-width="2.5"/>
+          <rect x="820" y="100" width="200" height="32" rx="10" fill="#9b59b6"/>
+          <text x="920" y="122" text-anchor="middle" fill="#fff" font-size="13" font-weight="700" font-family="Montserrat">Envio Service</text>
+          <text x="920" y="150" text-anchor="middle" fill="#333" font-size="11" font-family="Montserrat">7. Escuta EstoqueReservado</text>
+          <text x="920" y="170" text-anchor="middle" fill="#333" font-size="11" font-family="Montserrat">8. Agenda entrega</text>
+          <rect x="875" y="180" width="90" height="14" rx="4" fill="#9b59b6" opacity="0.15"/>
+          <text x="920" y="191" text-anchor="middle" fill="#9b59b6" font-size="9" font-weight="600" font-family="Montserrat">ShipDB</text>
+
+          <!-- Arrows up to bus -->
+          <line x1="140" y1="100" x2="140" y2="50" stroke="#3498db" stroke-width="2" marker-end="url(#choreo-up)"/>
+          <line x1="400" y1="100" x2="400" y2="50" stroke="#2ecc71" stroke-width="2" marker-end="url(#choreo-up-g)"/>
+          <line x1="660" y1="100" x2="660" y2="50" stroke="#f39c12" stroke-width="2" marker-end="url(#choreo-up-o)"/>
+          <line x1="920" y1="100" x2="920" y2="50" stroke="#9b59b6" stroke-width="2" marker-end="url(#choreo-up-p)"/>
+
+          <!-- Event labels on bus -->
+          <text x="270" y="65" text-anchor="middle" fill="#3498db" font-size="10" font-weight="600" font-family="Montserrat">PedidoCriado</text>
+          <text x="530" y="65" text-anchor="middle" fill="#2ecc71" font-size="10" font-weight="600" font-family="Montserrat">PagamentoOK</text>
+          <text x="790" y="65" text-anchor="middle" fill="#f39c12" font-size="10" font-weight="600" font-family="Montserrat">EstoqueReservado</text>
+
+          <!-- Failure path -->
+          <rect x="300" y="250" width="460" height="50" rx="8" fill="#fdedec" stroke="#e74c3c" stroke-width="1.5" stroke-dasharray="5"/>
+          <text x="530" y="272" text-anchor="middle" fill="#e74c3c" font-size="12" font-weight="700" font-family="Montserrat">Se PagamentoFalhou → cada serviço escuta e compensa individualmente</text>
+          <text x="530" y="290" text-anchor="middle" fill="#c0392b" font-size="10" font-family="Montserrat">Pedido Service cancela pedido autonomamente ao receber o evento</text>
+
+          <!-- Key insight -->
+          <rect x="40" y="320" width="980" height="40" rx="6" fill="rgba(237,20,91,0.08)"/>
+          <text x="530" y="346" text-anchor="middle" fill="#ED145B" font-size="12" font-weight="600" font-family="Montserrat">Nenhum serviço "sabe" o fluxo completo — cada um reage apenas aos eventos que lhe interessam</text>
+
+          <defs>
+            <marker id="choreo-up" markerWidth="7" markerHeight="5" refX="3.5" refY="5" orient="auto"><path d="M0,5 L3.5,0 L7,5" fill="#3498db"/></marker>
+            <marker id="choreo-up-g" markerWidth="7" markerHeight="5" refX="3.5" refY="5" orient="auto"><path d="M0,5 L3.5,0 L7,5" fill="#2ecc71"/></marker>
+            <marker id="choreo-up-o" markerWidth="7" markerHeight="5" refX="3.5" refY="5" orient="auto"><path d="M0,5 L3.5,0 L7,5" fill="#f39c12"/></marker>
+            <marker id="choreo-up-p" markerWidth="7" markerHeight="5" refX="3.5" refY="5" orient="auto"><path d="M0,5 L3.5,0 L7,5" fill="#9b59b6"/></marker>
+          </defs>
+        </svg>
+
+        <div class="slide-footer">
+          <div class="footer-bar">04 - Dados em Microsservicos</div>
+          <div class="footer-page">9</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: Saga Orquestração - Diagrama ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Orquestração</h2>
+          <h3>Um coordenador central comanda todo o fluxo</h3>
+        </div>
+
+        <svg viewBox="0 0 1100 380" style="width:100%; max-height:340px; margin-top:5px;">
+          <!-- Orchestrator -->
+          <rect x="350" y="10" width="360" height="60" rx="12" fill="#ED145B"/>
+          <text x="530" y="38" text-anchor="middle" fill="#fff" font-size="16" font-weight="800" font-family="Montserrat">Orquestrador (Saga Controller)</text>
+          <text x="530" y="56" text-anchor="middle" fill="rgba(255,255,255,0.7)" font-size="10" font-family="Montserrat">Controla fluxo, trata falhas, dispara compensações</text>
+
+          <!-- Services -->
+          <rect x="40" y="150" width="190" height="90" rx="10" fill="#f5f5f5" stroke="#3498db" stroke-width="2.5"/>
+          <rect x="40" y="150" width="190" height="30" rx="10" fill="#3498db"/>
+          <text x="135" y="171" text-anchor="middle" fill="#fff" font-size="12" font-weight="700" font-family="Montserrat">Pedido Service</text>
+          <text x="135" y="200" text-anchor="middle" fill="#333" font-size="11" font-family="Montserrat">Criar / Cancelar pedido</text>
+          <text x="135" y="218" text-anchor="middle" fill="#888" font-size="9" font-family="Montserrat">OrderDB</text>
+
+          <rect x="290" y="150" width="190" height="90" rx="10" fill="#f5f5f5" stroke="#2ecc71" stroke-width="2.5"/>
+          <rect x="290" y="150" width="190" height="30" rx="10" fill="#2ecc71"/>
+          <text x="385" y="171" text-anchor="middle" fill="#fff" font-size="12" font-weight="700" font-family="Montserrat">Pagamento Service</text>
+          <text x="385" y="200" text-anchor="middle" fill="#333" font-size="11" font-family="Montserrat">Cobrar / Estornar</text>
+          <text x="385" y="218" text-anchor="middle" fill="#888" font-size="9" font-family="Montserrat">PaymentDB</text>
+
+          <rect x="540" y="150" width="190" height="90" rx="10" fill="#f5f5f5" stroke="#f39c12" stroke-width="2.5"/>
+          <rect x="540" y="150" width="190" height="30" rx="10" fill="#f39c12"/>
+          <text x="635" y="171" text-anchor="middle" fill="#fff" font-size="12" font-weight="700" font-family="Montserrat">Estoque Service</text>
+          <text x="635" y="200" text-anchor="middle" fill="#333" font-size="11" font-family="Montserrat">Reservar / Liberar</text>
+          <text x="635" y="218" text-anchor="middle" fill="#888" font-size="9" font-family="Montserrat">StockDB</text>
+
+          <rect x="790" y="150" width="190" height="90" rx="10" fill="#f5f5f5" stroke="#9b59b6" stroke-width="2.5"/>
+          <rect x="790" y="150" width="190" height="30" rx="10" fill="#9b59b6"/>
+          <text x="885" y="171" text-anchor="middle" fill="#fff" font-size="12" font-weight="700" font-family="Montserrat">Envio Service</text>
+          <text x="885" y="200" text-anchor="middle" fill="#333" font-size="11" font-family="Montserrat">Agendar / Cancelar</text>
+          <text x="885" y="218" text-anchor="middle" fill="#888" font-size="9" font-family="Montserrat">ShipDB</text>
+
+          <!-- Command arrows down -->
+          <line x1="430" y1="72" x2="135" y2="148" stroke="#ED145B" stroke-width="2" marker-end="url(#orch-cmd)"/>
+          <text x="260" y="100" text-anchor="middle" fill="#ED145B" font-size="9" font-weight="600" font-family="Montserrat">1. criarPedido()</text>
+
+          <line x1="480" y1="72" x2="385" y2="148" stroke="#ED145B" stroke-width="2" marker-end="url(#orch-cmd)"/>
+          <text x="415" y="108" text-anchor="middle" fill="#ED145B" font-size="9" font-weight="600" font-family="Montserrat">2. cobrar()</text>
+
+          <line x1="580" y1="72" x2="635" y2="148" stroke="#ED145B" stroke-width="2" marker-end="url(#orch-cmd)"/>
+          <text x="625" y="108" text-anchor="middle" fill="#ED145B" font-size="9" font-weight="600" font-family="Montserrat">3. reservar()</text>
+
+          <line x1="630" y1="72" x2="885" y2="148" stroke="#ED145B" stroke-width="2" marker-end="url(#orch-cmd)"/>
+          <text x="790" y="100" text-anchor="middle" fill="#ED145B" font-size="9" font-weight="600" font-family="Montserrat">4. agendar()</text>
+
+          <!-- Response arrows up (dashed) -->
+          <line x1="135" y1="148" x2="430" y2="72" stroke="#3498db" stroke-width="1.5" stroke-dasharray="5" marker-end="url(#orch-resp)"/>
+          <line x1="385" y1="148" x2="480" y2="72" stroke="#2ecc71" stroke-width="1.5" stroke-dasharray="5" marker-end="url(#orch-resp-g)"/>
+          <line x1="635" y1="148" x2="580" y2="72" stroke="#f39c12" stroke-width="1.5" stroke-dasharray="5" marker-end="url(#orch-resp-o)"/>
+          <line x1="885" y1="148" x2="630" y2="72" stroke="#9b59b6" stroke-width="1.5" stroke-dasharray="5" marker-end="url(#orch-resp-p)"/>
+
+          <!-- Compensation path -->
+          <rect x="200" y="280" width="660" height="45" rx="8" fill="#fdedec" stroke="#e74c3c" stroke-width="1.5" stroke-dasharray="5"/>
+          <text x="530" y="300" text-anchor="middle" fill="#e74c3c" font-size="12" font-weight="700" font-family="Montserrat">Se etapa 3 falha → Orquestrador dispara compensações na ordem inversa</text>
+          <text x="530" y="316" text-anchor="middle" fill="#c0392b" font-size="10" font-family="Montserrat">estornar() → cancelarPedido() — tudo controlado centralmente</text>
+
+          <!-- Key insight -->
+          <rect x="40" y="340" width="980" height="30" rx="6" fill="rgba(237,20,91,0.08)"/>
+          <text x="530" y="360" text-anchor="middle" fill="#ED145B" font-size="12" font-weight="600" font-family="Montserrat">O orquestrador conhece o fluxo completo e decide o que fazer em cada estado (inclusive falhas)</text>
+
+          <defs>
+            <marker id="orch-cmd" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="#ED145B"/></marker>
+            <marker id="orch-resp" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="#3498db"/></marker>
+            <marker id="orch-resp-g" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="#2ecc71"/></marker>
+            <marker id="orch-resp-o" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="#f39c12"/></marker>
+            <marker id="orch-resp-p" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="#9b59b6"/></marker>
+          </defs>
+        </svg>
+
+        <div class="slide-footer">
+          <div class="footer-bar">04 - Dados em Microsservicos</div>
+          <div class="footer-page">10</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: Comparação Coreografia vs Orquestração ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Coreografia vs Orquestração</h2>
+          <h3>Comparação Detalhada</h3>
+        </div>
+        <table>
+          <thead>
+            <tr><th>Aspecto</th><th>Coreografia</th><th>Orquestração</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><strong>Coordenação</strong></td><td>Descentralizada (eventos)</td><td>Centralizada (controlador)</td></tr>
+            <tr><td><strong>Acoplamento</strong></td><td>Baixo — serviços independentes</td><td>Maior — dependem do orquestrador</td></tr>
+            <tr><td><strong>Observabilidade</strong></td><td>Difícil rastrear fluxo completo</td><td>Fácil — tudo passa pelo orquestrador</td></tr>
+            <tr><td><strong>Ponto de falha</strong></td><td>Distribuído — falha isolada</td><td>Centralizado — orquestrador é crítico</td></tr>
+            <tr><td><strong>Escalabilidade</strong></td><td>Alta — async e desacoplado</td><td>Moderada — depende do orquestrador</td></tr>
+            <tr><td><strong>Complexidade</strong></td><td>Cresce com nº de serviços</td><td>Contida no orquestrador</td></tr>
+            <tr><td><strong>Compensação</strong></td><td>Cada serviço decide sozinho</td><td>Orquestrador coordena rollback</td></tr>
           </tbody>
         </table>
         <div class="slide-footer">
           <div class="footer-bar">04 - Dados em Microsservicos</div>
-          <div class="footer-page">7</div>
+          <div class="footer-page">11</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: Quando usar cada abordagem ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Quando usar cada abordagem?</h2>
+        </div>
+        <div class="side-by-side">
+          <div class="side" style="border-top: 3px solid #2ecc71;">
+            <h4 style="color:#2ecc71;">Use Coreografia quando...</h4>
+            <ul>
+              <li>Fluxo simples com poucos serviços (2-4)</li>
+              <li>Times diferentes mantêm cada serviço</li>
+              <li>Consistência eventual é aceitável</li>
+              <li>Precisa de alta resiliência e desacoplamento</li>
+              <li>Serviços já usam arquitetura orientada a eventos</li>
+            </ul>
+          </div>
+          <div class="side" style="border-top: 3px solid #ED145B;">
+            <h4 style="color:#ED145B;">Use Orquestração quando...</h4>
+            <ul>
+              <li>Fluxo complexo com muitos serviços (5+)</li>
+              <li>Precisa de controle centralizado e monitoramento</li>
+              <li>Lógica de compensação é complexa</li>
+              <li>Consistência e rastreabilidade são prioridade</li>
+              <li>Mesmo time mantém os serviços envolvidos</li>
+            </ul>
+          </div>
+        </div>
+        <div class="callout" style="margin-top:15px;">
+          <p><strong>Abordagem híbrida:</strong> na prática, muitas empresas combinam as duas. Exemplo: orquestração para o fluxo principal de compra e coreografia para notificações e analytics.</p>
+        </div>
+        <div class="slide-footer">
+          <div class="footer-bar">04 - Dados em Microsservicos</div>
+          <div class="footer-page">12</div>
         </div>
       </section>
 
@@ -165,7 +451,7 @@
         </ul>
         <div class="slide-footer">
           <div class="footer-bar">04 - Dados em Microsservicos</div>
-          <div class="footer-page">8</div>
+          <div class="footer-page">13</div>
         </div>
       </section>
 
@@ -186,7 +472,7 @@
         </ul>
         <div class="slide-footer">
           <div class="footer-bar">04 - Dados em Microsservicos</div>
-          <div class="footer-page">9</div>
+          <div class="footer-page">14</div>
         </div>
       </section>
 
@@ -208,7 +494,7 @@
         </ul>
         <div class="slide-footer">
           <div class="footer-bar">04 - Dados em Microsservicos</div>
-          <div class="footer-page">10</div>
+          <div class="footer-page">15</div>
         </div>
       </section>
 
@@ -387,7 +673,7 @@
 
         <div class="slide-footer">
           <div class="footer-bar">04 - Dados em Microsservicos</div>
-          <div class="footer-page">11</div>
+          <div class="footer-page">16</div>
         </div>
       </section>
 
@@ -428,7 +714,7 @@ const estoqueDB = new Sequelize('estoquedb', 'user', 'pass', {
         </code></pre>
         <div class="slide-footer">
           <div class="footer-bar">04 - Dados em Microsservicos</div>
-          <div class="footer-page">12</div>
+          <div class="footer-page">17</div>
         </div>
       </section>
 
@@ -450,7 +736,7 @@ const estoqueDB = new Sequelize('estoquedb', 'user', 'pass', {
         <div class="quiz-feedback"></div>
         <div class="slide-footer">
           <div class="footer-bar">04 - Dados em Microsservicos</div>
-          <div class="footer-page">13</div>
+          <div class="footer-page">18</div>
         </div>
       </section>
 
@@ -472,7 +758,7 @@ const estoqueDB = new Sequelize('estoquedb', 'user', 'pass', {
         <div class="quiz-feedback"></div>
         <div class="slide-footer">
           <div class="footer-bar">04 - Dados em Microsservicos</div>
-          <div class="footer-page">14</div>
+          <div class="footer-page">19</div>
         </div>
       </section>
 
@@ -484,7 +770,7 @@ const estoqueDB = new Sequelize('estoquedb', 'user', 'pass', {
         <p>21h00 – 21h20<br>☕ Aproveite para descansar e se preparar para o próximo bloco.</p>
         <div class="slide-footer">
           <div class="footer-bar">04 - Dados em Microsservicos</div>
-          <div class="footer-page">15</div>
+          <div class="footer-page">20</div>
         </div>
       </section>
 
@@ -496,7 +782,7 @@ const estoqueDB = new Sequelize('estoquedb', 'user', 'pass', {
         <h2>Bloco 2:<br>Exercício Hands-on</h2>
         <div class="slide-footer">
           <div class="footer-bar">04 - Dados em Microsservicos</div>
-          <div class="footer-page">16</div>
+          <div class="footer-page">21</div>
         </div>
       </section>
 
@@ -523,7 +809,7 @@ const estoqueDB = new Sequelize('estoquedb', 'user', 'pass', {
 
         <div class="slide-footer">
           <div class="footer-bar">04 - Dados em Microsservicos</div>
-          <div class="footer-page">17</div>
+          <div class="footer-page">22</div>
         </div>
       </section>
 
@@ -551,7 +837,7 @@ async function processOrderSaga(orderId) {
         </code></pre>
         <div class="slide-footer">
           <div class="footer-bar">04 - Dados em Microsservicos</div>
-          <div class="footer-page">18</div>
+          <div class="footer-page">23</div>
         </div>
       </section>
 
@@ -577,7 +863,7 @@ pedidoService.on('PedidoCriado', async (order) =&gt; {
         <p>Outros serviços escutam esses eventos e agem conforme necessário.</p>
         <div class="slide-footer">
           <div class="footer-bar">04 - Dados em Microsservicos</div>
-          <div class="footer-page">19</div>
+          <div class="footer-page">24</div>
         </div>
       </section>
 
@@ -598,7 +884,7 @@ pedidoService.on('PedidoCriado', async (order) =&gt; {
         </ul>
         <div class="slide-footer">
           <div class="footer-bar">04 - Dados em Microsservicos</div>
-          <div class="footer-page">20</div>
+          <div class="footer-page">25</div>
         </div>
       </section>
 
@@ -619,7 +905,7 @@ pedidoService.on('PedidoCriado', async (order) =&gt; {
         <div class="quiz-feedback"></div>
         <div class="slide-footer">
           <div class="footer-bar">04 - Dados em Microsservicos</div>
-          <div class="footer-page">21</div>
+          <div class="footer-page">26</div>
         </div>
       </section>
 
@@ -636,7 +922,7 @@ pedidoService.on('PedidoCriado', async (order) =&gt; {
         </div>
         <div class="slide-footer">
           <div class="footer-bar">04 - Dados em Microsservicos</div>
-          <div class="footer-page">22</div>
+          <div class="footer-page">27</div>
         </div>
       </section>
 
