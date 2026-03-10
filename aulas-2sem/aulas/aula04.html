@@ -787,45 +787,326 @@
         </div>
       </section>
 
-      <!-- ==================== SLIDE: Event Sourcing ==================== -->
+      <!-- ==================== SLIDE: Event Sourcing - Conceito ==================== -->
       <section class="content-slide">
         <div class="top-bar"></div>
         <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
         <div class="slide-title-area">
           <div class="accent-bar"></div>
           <h2>Event Sourcing</h2>
+          <h3>O estado é a soma dos seus eventos</h3>
         </div>
-        <p>Técnica que armazena o estado do sistema como uma sequência de eventos imutáveis.</p>
-        <ul>
-          <li>Reconstroi o estado atual a partir do histórico de eventos</li>
-          <li>Facilita auditoria e debugging</li>
-          <li>Integração natural com sistemas baseados em eventos</li>
-          <li>Desafios: complexidade e volume de dados</li>
-        </ul>
+        <p>Em vez de gravar apenas o estado atual, armazenamos <strong>todos os eventos</strong> que mudaram o estado — como um extrato bancário.</p>
+
+        <svg viewBox="0 0 1100 340" style="width:100%; max-height:310px; margin-top:5px;">
+          <!-- Traditional side -->
+          <text x="250" y="22" text-anchor="middle" fill="#e74c3c" font-size="14" font-weight="800" font-family="Montserrat">CRUD Tradicional</text>
+          <rect x="50" y="35" width="400" height="60" rx="8" fill="#f5f5f5" stroke="#e74c3c" stroke-width="2"/>
+          <text x="70" y="58" fill="#333" font-size="11" font-weight="600" font-family="Montserrat">Conta: José</text>
+          <text x="70" y="78" fill="#333" font-size="11" font-family="Montserrat">Saldo: R$ 850,00</text>
+          <text x="280" y="68" fill="#999" font-size="10" font-style="italic" font-family="Montserrat">Só o estado final. Como chegou aqui?</text>
+
+          <!-- Event Sourcing side -->
+          <text x="250" y="125" text-anchor="middle" fill="#2ecc71" font-size="14" font-weight="800" font-family="Montserrat">Event Sourcing</text>
+
+          <!-- Event log -->
+          <rect x="50" y="140" width="195" height="45" rx="6" fill="#1e1e2e"/>
+          <text x="60" y="158" fill="#3498db" font-size="9" font-weight="700" font-family="Montserrat">Evento 1</text>
+          <text x="60" y="175" fill="#ccc" font-size="10" font-family="Montserrat">ContaCriada { titular: "José" }</text>
+
+          <rect x="255" y="140" width="205" height="45" rx="6" fill="#1e1e2e"/>
+          <text x="265" y="158" fill="#2ecc71" font-size="9" font-weight="700" font-family="Montserrat">Evento 2</text>
+          <text x="265" y="175" fill="#ccc" font-size="10" font-family="Montserrat">DepositoRealizado { valor: 1000 }</text>
+
+          <rect x="470" y="140" width="205" height="45" rx="6" fill="#1e1e2e"/>
+          <text x="480" y="158" fill="#f39c12" font-size="9" font-weight="700" font-family="Montserrat">Evento 3</text>
+          <text x="480" y="175" fill="#ccc" font-size="10" font-family="Montserrat">SaqueRealizado { valor: 150 }</text>
+
+          <rect x="685" y="140" width="195" height="45" rx="6" fill="#1e1e2e"/>
+          <text x="695" y="158" fill="#ED145B" font-size="9" font-weight="700" font-family="Montserrat">Evento 4</text>
+          <text x="695" y="175" fill="#ccc" font-size="10" font-family="Montserrat">TarifaCobrada { valor: 0 }</text>
+
+          <!-- Replay arrow -->
+          <line x1="440" y1="200" x2="440" y2="230" stroke="#ED145B" stroke-width="2" marker-end="url(#es-down)"/>
+          <text x="440" y="248" text-anchor="middle" fill="#ED145B" font-size="11" font-weight="700" font-family="Montserrat">Replay dos eventos = Estado atual</text>
+
+          <!-- Rebuilt state -->
+          <rect x="250" y="260" width="380" height="55" rx="8" fill="#eafaf1" stroke="#2ecc71" stroke-width="2"/>
+          <text x="270" y="283" fill="#333" font-size="11" font-weight="600" font-family="Montserrat">Conta: José | Saldo: R$ 850,00</text>
+          <text x="270" y="302" fill="#2ecc71" font-size="10" font-family="Montserrat">0 + 1000 - 150 - 0 = 850 (reconstruído dos eventos!)</text>
+
+          <!-- Benefits on the right -->
+          <rect x="750" y="210" width="310" height="120" rx="8" fill="rgba(237,20,91,0.06)"/>
+          <text x="770" y="235" fill="#ED145B" font-size="11" font-weight="700" font-family="Montserrat">Por que usar?</text>
+          <text x="770" y="258" fill="#555" font-size="10" font-family="Montserrat">Auditoria completa (quem fez o quê, quando)</text>
+          <text x="770" y="276" fill="#555" font-size="10" font-family="Montserrat">Debug: reproduzir exatamente o que aconteceu</text>
+          <text x="770" y="294" fill="#555" font-size="10" font-family="Montserrat">Viagem no tempo: estado em qualquer data</text>
+          <text x="770" y="312" fill="#555" font-size="10" font-family="Montserrat">Eventos imutáveis: append-only, sem UPDATE</text>
+
+          <defs>
+            <marker id="es-down" markerWidth="8" markerHeight="6" refX="4" refY="0" orient="auto"><path d="M0,0 L4,6 L8,0" fill="#ED145B"/></marker>
+          </defs>
+        </svg>
+
         <div class="slide-footer">
           <div class="footer-bar">04 - Dados em Microsservicos</div>
           <div class="footer-page">18</div>
         </div>
       </section>
 
-      <!-- ==================== SLIDE: CQRS Distribuído ==================== -->
+      <!-- ==================== SLIDE: Event Sourcing - Caso de Uso Carrinho ==================== -->
       <section class="content-slide">
         <div class="top-bar"></div>
         <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
         <div class="slide-title-area">
           <div class="accent-bar"></div>
-          <h2>CQRS Distribuído</h2>
-          <h3>Command Query Responsibility Segregation</h3>
+          <h2>Caso de Uso: Carrinho de Compras com Event Sourcing</h2>
         </div>
-        <p>Separação dos modelos de leitura e escrita para otimizar performance e escalabilidade.</p>
-        <ul>
-          <li>Escrita: foco em consistência e regras de negócio</li>
-          <li>Leitura: otimizada para consultas rápidas e específicas</li>
-          <li>Em microsserviços: replicação e sincronização de dados podem ser desafiadoras</li>
-        </ul>
+
+        <svg viewBox="0 0 1100 360" style="width:100%; max-height:330px; margin-top:2px;">
+          <!-- Timeline -->
+          <line x1="50" y1="50" x2="1050" y2="50" stroke="#ddd" stroke-width="2"/>
+
+          <!-- Event 1 -->
+          <circle cx="120" cy="50" r="8" fill="#3498db"/>
+          <rect x="70" y="65" width="180" height="55" rx="6" fill="#f5f5f5" stroke="#3498db" stroke-width="1.5"/>
+          <text x="80" y="82" fill="#3498db" font-size="9" font-weight="700" font-family="Montserrat">10:01 - ItemAdicionado</text>
+          <text x="80" y="98" fill="#333" font-size="9" font-family="Montserrat">{ produto: "Camiseta", qtd: 1,</text>
+          <text x="80" y="112" fill="#333" font-size="9" font-family="Montserrat">  preco: 79.90 }</text>
+
+          <!-- Event 2 -->
+          <circle cx="320" cy="50" r="8" fill="#2ecc71"/>
+          <rect x="265" y="65" width="180" height="55" rx="6" fill="#f5f5f5" stroke="#2ecc71" stroke-width="1.5"/>
+          <text x="275" y="82" fill="#2ecc71" font-size="9" font-weight="700" font-family="Montserrat">10:03 - ItemAdicionado</text>
+          <text x="275" y="98" fill="#333" font-size="9" font-family="Montserrat">{ produto: "Tênis", qtd: 1,</text>
+          <text x="275" y="112" fill="#333" font-size="9" font-family="Montserrat">  preco: 299.90 }</text>
+
+          <!-- Event 3 -->
+          <circle cx="520" cy="50" r="8" fill="#f39c12"/>
+          <rect x="460" y="65" width="190" height="55" rx="6" fill="#f5f5f5" stroke="#f39c12" stroke-width="1.5"/>
+          <text x="470" y="82" fill="#f39c12" font-size="9" font-weight="700" font-family="Montserrat">10:05 - QuantidadeAlterada</text>
+          <text x="470" y="98" fill="#333" font-size="9" font-family="Montserrat">{ produto: "Camiseta",</text>
+          <text x="470" y="112" fill="#333" font-size="9" font-family="Montserrat">  qtdAnterior: 1, qtdNova: 3 }</text>
+
+          <!-- Event 4 -->
+          <circle cx="720" cy="50" r="8" fill="#e74c3c"/>
+          <rect x="665" y="65" width="170" height="55" rx="6" fill="#f5f5f5" stroke="#e74c3c" stroke-width="1.5"/>
+          <text x="675" y="82" fill="#e74c3c" font-size="9" font-weight="700" font-family="Montserrat">10:08 - ItemRemovido</text>
+          <text x="675" y="98" fill="#333" font-size="9" font-family="Montserrat">{ produto: "Tênis" }</text>
+
+          <!-- Event 5 -->
+          <circle cx="910" cy="50" r="8" fill="#9b59b6"/>
+          <rect x="850" y="65" width="180" height="55" rx="6" fill="#f5f5f5" stroke="#9b59b6" stroke-width="1.5"/>
+          <text x="860" y="82" fill="#9b59b6" font-size="9" font-weight="700" font-family="Montserrat">10:10 - CupomAplicado</text>
+          <text x="860" y="98" fill="#333" font-size="9" font-family="Montserrat">{ cupom: "FIAP10",</text>
+          <text x="860" y="112" fill="#333" font-size="9" font-family="Montserrat">  desconto: 10% }</text>
+
+          <!-- Current state rebuilt -->
+          <rect x="50" y="145" width="500" height="80" rx="10" fill="#eafaf1" stroke="#2ecc71" stroke-width="2"/>
+          <text x="70" y="168" fill="#2ecc71" font-size="12" font-weight="700" font-family="Montserrat">Estado Atual (reconstruído dos 5 eventos):</text>
+          <text x="70" y="190" fill="#333" font-size="11" font-family="Montserrat">Carrinho: 3x Camiseta = R$ 239,70</text>
+          <text x="70" y="208" fill="#333" font-size="11" font-family="Montserrat">Cupom FIAP10 (-10%) → Total: R$ 215,73</text>
+
+          <!-- Temporal query -->
+          <rect x="590" y="145" width="460" height="80" rx="10" fill="rgba(52,152,219,0.08)" stroke="#3498db" stroke-width="1.5"/>
+          <text x="610" y="168" fill="#3498db" font-size="12" font-weight="700" font-family="Montserrat">Viagem no tempo (replay até 10:05):</text>
+          <text x="610" y="190" fill="#333" font-size="11" font-family="Montserrat">Carrinho: 3x Camiseta + 1x Tênis</text>
+          <text x="610" y="208" fill="#333" font-size="11" font-family="Montserrat">Total: R$ 539,60 (sem cupom ainda)</text>
+
+          <!-- Key insights -->
+          <rect x="50" y="250" width="330" height="95" rx="8" fill="#f5f5f5"/>
+          <text x="70" y="275" fill="#ED145B" font-size="11" font-weight="700" font-family="Montserrat">Event Store (append-only)</text>
+          <text x="70" y="295" fill="#555" font-size="10" font-family="Montserrat">Eventos nunca são alterados ou deletados.</text>
+          <text x="70" y="312" fill="#555" font-size="10" font-family="Montserrat">Para "cancelar", cria-se um novo evento</text>
+          <text x="70" y="329" fill="#555" font-size="10" font-family="Montserrat">compensatório (igual Saga!).</text>
+
+          <rect x="400" y="250" width="310" height="95" rx="8" fill="#f5f5f5"/>
+          <text x="420" y="275" fill="#ED145B" font-size="11" font-weight="700" font-family="Montserrat">Snapshots</text>
+          <text x="420" y="295" fill="#555" font-size="10" font-family="Montserrat">Com milhões de eventos, replay fica lento.</text>
+          <text x="420" y="312" fill="#555" font-size="10" font-family="Montserrat">Snapshot = "foto" do estado em um ponto.</text>
+          <text x="420" y="329" fill="#555" font-size="10" font-family="Montserrat">Replay só dos eventos após o snapshot.</text>
+
+          <rect x="730" y="250" width="320" height="95" rx="8" fill="#f5f5f5"/>
+          <text x="750" y="275" fill="#ED145B" font-size="11" font-weight="700" font-family="Montserrat">Desafios</text>
+          <text x="750" y="295" fill="#555" font-size="10" font-family="Montserrat">Consultas complexas? Precisa de CQRS.</text>
+          <text x="750" y="312" fill="#555" font-size="10" font-family="Montserrat">Volume de dados cresce rapidamente.</text>
+          <text x="750" y="329" fill="#555" font-size="10" font-family="Montserrat">Curva de aprendizado para o time.</text>
+        </svg>
+
         <div class="slide-footer">
           <div class="footer-bar">04 - Dados em Microsservicos</div>
           <div class="footer-page">19</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: CQRS - Conceito ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>CQRS — Command Query Responsibility Segregation</h2>
+          <h3>Por que separar leitura e escrita?</h3>
+        </div>
+        <p>Em muitos sistemas, leitura e escrita têm requisitos <strong>opostos</strong>:</p>
+
+        <svg viewBox="0 0 1100 320" style="width:100%; max-height:300px; margin-top:5px;">
+          <!-- Write side -->
+          <rect x="30" y="10" width="480" height="155" rx="12" fill="#f5f5f5" stroke="#e74c3c" stroke-width="2"/>
+          <rect x="30" y="10" width="480" height="35" rx="12" fill="#e74c3c"/>
+          <text x="270" y="33" text-anchor="middle" fill="#fff" font-size="13" font-weight="700" font-family="Montserrat">Escrita (Command)</text>
+
+          <text x="55" y="65" fill="#333" font-size="11" font-weight="600" font-family="Montserrat">Foco:</text>
+          <text x="110" y="65" fill="#555" font-size="11" font-family="Montserrat">Validação, regras de negócio, consistência</text>
+          <text x="55" y="85" fill="#333" font-size="11" font-weight="600" font-family="Montserrat">Modelo:</text>
+          <text x="120" y="85" fill="#555" font-size="11" font-family="Montserrat">Normalizado, com constraints e transações</text>
+          <text x="55" y="105" fill="#333" font-size="11" font-weight="600" font-family="Montserrat">Volume:</text>
+          <text x="125" y="105" fill="#555" font-size="11" font-family="Montserrat">Geralmente menor (centenas/s)</text>
+          <text x="55" y="125" fill="#333" font-size="11" font-weight="600" font-family="Montserrat">Banco:</text>
+          <text x="115" y="125" fill="#555" font-size="11" font-family="Montserrat">PostgreSQL, MySQL (relacional, ACID)</text>
+          <text x="55" y="148" fill="#e74c3c" font-size="10" font-style="italic" font-family="Montserrat">INSERT INTO scouts VALUES (...)</text>
+
+          <!-- Read side -->
+          <rect x="560" y="10" width="480" height="155" rx="12" fill="#f5f5f5" stroke="#2ecc71" stroke-width="2"/>
+          <rect x="560" y="10" width="480" height="35" rx="12" fill="#2ecc71"/>
+          <text x="800" y="33" text-anchor="middle" fill="#fff" font-size="13" font-weight="700" font-family="Montserrat">Leitura (Query)</text>
+
+          <text x="585" y="65" fill="#333" font-size="11" font-weight="600" font-family="Montserrat">Foco:</text>
+          <text x="635" y="65" fill="#555" font-size="11" font-family="Montserrat">Performance, agregações, dashboards</text>
+          <text x="585" y="85" fill="#333" font-size="11" font-weight="600" font-family="Montserrat">Modelo:</text>
+          <text x="645" y="85" fill="#555" font-size="11" font-family="Montserrat">Desnormalizado, pré-calculado (views)</text>
+          <text x="585" y="105" fill="#333" font-size="11" font-weight="600" font-family="Montserrat">Volume:</text>
+          <text x="650" y="105" fill="#555" font-size="11" font-family="Montserrat">Muito maior (milhares/s, muitos usuários)</text>
+          <text x="585" y="125" fill="#333" font-size="11" font-weight="600" font-family="Montserrat">Banco:</text>
+          <text x="640" y="125" fill="#555" font-size="11" font-family="Montserrat">Redis, Elasticsearch, MongoDB (otimizado)</text>
+          <text x="585" y="148" fill="#2ecc71" font-size="10" font-style="italic" font-family="Montserrat">SELECT * FROM vw_scout_resumo WHERE jogador = ...</text>
+
+          <!-- Sync arrow -->
+          <rect x="350" y="185" width="370" height="40" rx="20" fill="#ED145B"/>
+          <text x="535" y="210" text-anchor="middle" fill="#fff" font-size="11" font-weight="700" font-family="Montserrat">Sincronização via Eventos (async)</text>
+
+          <!-- CQRS diagram -->
+          <rect x="30" y="245" width="200" height="55" rx="8" fill="#1e1e2e"/>
+          <text x="130" y="270" text-anchor="middle" fill="#e74c3c" font-size="11" font-weight="700" font-family="Montserrat">Write DB</text>
+          <text x="130" y="288" text-anchor="middle" fill="#888" font-size="9" font-family="Montserrat">PostgreSQL</text>
+
+          <line x1="235" y1="272" x2="420" y2="272" stroke="#ED145B" stroke-width="2" marker-end="url(#cqrs-arr)"/>
+          <text x="328" y="265" text-anchor="middle" fill="#ED145B" font-size="9" font-weight="600" font-family="Montserrat">Evento: ScoutRegistrado</text>
+
+          <rect x="425" y="245" width="200" height="55" rx="8" fill="#ED145B" opacity="0.9"/>
+          <text x="525" y="270" text-anchor="middle" fill="#fff" font-size="11" font-weight="700" font-family="Montserrat">Event Bus</text>
+          <text x="525" y="288" text-anchor="middle" fill="rgba(255,255,255,0.7)" font-size="9" font-family="Montserrat">Kafka / RabbitMQ</text>
+
+          <line x1="630" y1="272" x2="815" y2="272" stroke="#2ecc71" stroke-width="2" marker-end="url(#cqrs-arr-g)"/>
+          <text x="722" y="265" text-anchor="middle" fill="#2ecc71" font-size="9" font-weight="600" font-family="Montserrat">Atualiza view materializada</text>
+
+          <rect x="820" y="245" width="220" height="55" rx="8" fill="#1e1e2e"/>
+          <text x="930" y="270" text-anchor="middle" fill="#2ecc71" font-size="11" font-weight="700" font-family="Montserrat">Read DB (replica)</text>
+          <text x="930" y="288" text-anchor="middle" fill="#888" font-size="9" font-family="Montserrat">Redis / Elasticsearch</text>
+
+          <defs>
+            <marker id="cqrs-arr" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="#ED145B"/></marker>
+            <marker id="cqrs-arr-g" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="#2ecc71"/></marker>
+          </defs>
+        </svg>
+
+        <div class="slide-footer">
+          <div class="footer-bar">04 - Dados em Microsservicos</div>
+          <div class="footer-page">20</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: CQRS - Caso Footstats ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Caso de Uso: Footstats — Scouts de Futebol com CQRS</h2>
+        </div>
+
+        <svg viewBox="0 0 1100 380" style="width:100%; max-height:355px; margin-top:2px;">
+          <!-- Collectors (Write side) -->
+          <text x="130" y="22" text-anchor="middle" fill="#e74c3c" font-size="13" font-weight="800" font-family="Montserrat">ESCRITA (Coleta em tempo real)</text>
+
+          <rect x="20" y="35" width="115" height="75" rx="8" fill="#f5f5f5" stroke="#e74c3c" stroke-width="2"/>
+          <text x="77" y="55" text-anchor="middle" fill="#e74c3c" font-size="9" font-weight="700" font-family="Montserrat">Coletor A</text>
+          <text x="77" y="72" text-anchor="middle" fill="#333" font-size="8" font-family="Montserrat">Jogo: FLA x FLU</text>
+          <text x="77" y="86" text-anchor="middle" fill="#888" font-size="8" font-family="Montserrat">Passes, finalizações</text>
+          <text x="77" y="100" text-anchor="middle" fill="#888" font-size="8" font-family="Montserrat">desarmes, gols...</text>
+
+          <rect x="145" y="35" width="115" height="75" rx="8" fill="#f5f5f5" stroke="#e74c3c" stroke-width="2"/>
+          <text x="202" y="55" text-anchor="middle" fill="#e74c3c" font-size="9" font-weight="700" font-family="Montserrat">Coletor B</text>
+          <text x="202" y="72" text-anchor="middle" fill="#333" font-size="8" font-family="Montserrat">Jogo: PAL x COR</text>
+          <text x="202" y="86" text-anchor="middle" fill="#888" font-size="8" font-family="Montserrat">Faltas, cartões,</text>
+          <text x="202" y="100" text-anchor="middle" fill="#888" font-size="8" font-family="Montserrat">impedimentos...</text>
+
+          <!-- Write arrows -->
+          <line x1="77" y1="115" x2="180" y2="155" stroke="#e74c3c" stroke-width="2" marker-end="url(#foot-arr-r)"/>
+          <line x1="202" y1="115" x2="200" y2="155" stroke="#e74c3c" stroke-width="2" marker-end="url(#foot-arr-r)"/>
+          <text x="120" y="138" text-anchor="middle" fill="#e74c3c" font-size="8" font-weight="600" font-family="Montserrat">~500 escritas/min</text>
+
+          <!-- Write DB -->
+          <rect x="130" y="160" width="180" height="55" rx="8" fill="#1e1e2e"/>
+          <text x="220" y="185" text-anchor="middle" fill="#e74c3c" font-size="11" font-weight="700" font-family="Montserrat">Write DB</text>
+          <text x="220" y="202" text-anchor="middle" fill="#888" font-size="9" font-family="Montserrat">PostgreSQL (normalizado)</text>
+
+          <!-- Event flow -->
+          <line x1="315" y1="188" x2="430" y2="188" stroke="#ED145B" stroke-width="2.5" marker-end="url(#foot-arr-p)"/>
+          <text x="373" y="178" text-anchor="middle" fill="#ED145B" font-size="8" font-weight="600" font-family="Montserrat">ScoutRegistrado</text>
+
+          <!-- Event Bus -->
+          <rect x="435" y="165" width="120" height="48" rx="24" fill="#ED145B"/>
+          <text x="495" y="193" text-anchor="middle" fill="#fff" font-size="10" font-weight="700" font-family="Montserrat">Kafka</text>
+
+          <!-- Fan out to read models -->
+          <line x1="560" y1="175" x2="670" y2="65" stroke="#2ecc71" stroke-width="2" marker-end="url(#foot-arr-g)"/>
+          <line x1="560" y1="188" x2="670" y2="188" stroke="#3498db" stroke-width="2" marker-end="url(#foot-arr-b)"/>
+          <line x1="560" y1="200" x2="670" y2="310" stroke="#9b59b6" stroke-width="2" marker-end="url(#foot-arr-v)"/>
+
+          <!-- Read side title -->
+          <text x="860" y="22" text-anchor="middle" fill="#2ecc71" font-size="13" font-weight="800" font-family="Montserrat">LEITURA (Consultas otimizadas)</text>
+
+          <!-- Read model 1: Dashboard ao vivo -->
+          <rect x="675" y="35" width="380" height="65" rx="10" fill="#f5f5f5" stroke="#2ecc71" stroke-width="2"/>
+          <rect x="675" y="35" width="380" height="28" rx="10" fill="#2ecc71"/>
+          <text x="865" y="54" text-anchor="middle" fill="#fff" font-size="11" font-weight="700" font-family="Montserrat">Dashboard ao Vivo — Redis</text>
+          <text x="695" y="76" fill="#333" font-size="10" font-family="Montserrat">Placar, posse de bola, finalizações, cartões em tempo real</text>
+          <text x="695" y="92" fill="#888" font-size="9" font-family="Montserrat">Latência &lt; 100ms | Milhares de leituras/s dos torcedores</text>
+
+          <!-- Read model 2: Relatórios -->
+          <rect x="675" y="155" width="380" height="65" rx="10" fill="#f5f5f5" stroke="#3498db" stroke-width="2"/>
+          <rect x="675" y="155" width="380" height="28" rx="10" fill="#3498db"/>
+          <text x="865" y="174" text-anchor="middle" fill="#fff" font-size="11" font-weight="700" font-family="Montserrat">Relatórios de Scout — Elasticsearch</text>
+          <text x="695" y="196" fill="#333" font-size="10" font-family="Montserrat">Busca: "jogadores com +80% passes certos no Brasileirão"</text>
+          <text x="695" y="212" fill="#888" font-size="9" font-family="Montserrat">Dados pré-agregados | Full-text search para treinadores</text>
+
+          <!-- Read model 3: Analytics -->
+          <rect x="675" y="275" width="380" height="65" rx="10" fill="#f5f5f5" stroke="#9b59b6" stroke-width="2"/>
+          <rect x="675" y="275" width="380" height="28" rx="10" fill="#9b59b6"/>
+          <text x="865" y="294" text-anchor="middle" fill="#fff" font-size="11" font-weight="700" font-family="Montserrat">Analytics / BI — ClickHouse</text>
+          <text x="695" y="316" fill="#333" font-size="10" font-family="Montserrat">Evolução de desempenho do jogador ao longo da temporada</text>
+          <text x="695" y="332" fill="#888" font-size="9" font-family="Montserrat">Dados históricos | Queries analíticas pesadas</text>
+
+          <!-- Key insight -->
+          <rect x="20" y="240" width="430" height="90" rx="8" fill="rgba(237,20,91,0.06)" stroke="#ED145B" stroke-width="1" stroke-dasharray="5"/>
+          <text x="40" y="265" fill="#ED145B" font-size="11" font-weight="700" font-family="Montserrat">Por que CQRS funciona aqui?</text>
+          <text x="40" y="285" fill="#555" font-size="10" font-family="Montserrat">Coletores escrevem rápido sem se preocupar com queries.</text>
+          <text x="40" y="302" fill="#555" font-size="10" font-family="Montserrat">Cada read model usa o banco ideal para seu caso de uso.</text>
+          <text x="40" y="319" fill="#555" font-size="10" font-family="Montserrat">Escala independente: mais torcedores? Escala só o Redis.</text>
+
+          <defs>
+            <marker id="foot-arr-r" markerWidth="7" markerHeight="5" refX="7" refY="2.5" orient="auto"><path d="M0,0 L7,2.5 L0,5" fill="#e74c3c"/></marker>
+            <marker id="foot-arr-p" markerWidth="7" markerHeight="5" refX="7" refY="2.5" orient="auto"><path d="M0,0 L7,2.5 L0,5" fill="#ED145B"/></marker>
+            <marker id="foot-arr-g" markerWidth="7" markerHeight="5" refX="7" refY="2.5" orient="auto"><path d="M0,0 L7,2.5 L0,5" fill="#2ecc71"/></marker>
+            <marker id="foot-arr-b" markerWidth="7" markerHeight="5" refX="7" refY="2.5" orient="auto"><path d="M0,0 L7,2.5 L0,5" fill="#3498db"/></marker>
+            <marker id="foot-arr-v" markerWidth="7" markerHeight="5" refX="7" refY="2.5" orient="auto"><path d="M0,0 L7,2.5 L0,5" fill="#9b59b6"/></marker>
+          </defs>
+        </svg>
+
+        <div class="slide-footer">
+          <div class="footer-bar">04 - Dados em Microsservicos</div>
+          <div class="footer-page">21</div>
         </div>
       </section>
 
@@ -847,7 +1128,7 @@
         </ul>
         <div class="slide-footer">
           <div class="footer-bar">04 - Dados em Microsservicos</div>
-          <div class="footer-page">20</div>
+          <div class="footer-page">22</div>
         </div>
       </section>
 
@@ -1026,48 +1307,102 @@
 
         <div class="slide-footer">
           <div class="footer-bar">04 - Dados em Microsservicos</div>
-          <div class="footer-page">21</div>
+          <div class="footer-page">23</div>
         </div>
       </section>
 
-      <!-- ==================== SLIDE: Exemplos práticos Database per Service ==================== -->
+      <!-- ==================== SLIDE: Database per Service - Diagrama Visual ==================== -->
       <section class="content-slide">
         <div class="top-bar"></div>
         <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
         <div class="slide-title-area">
           <div class="accent-bar"></div>
-          <h2>Exemplos práticos: Database per Service</h2>
+          <h2>Database per Service na Prática</h2>
+          <h3>Cada microsserviço com seu banco — como fica a arquitetura?</h3>
         </div>
-        <p>Exemplo Java / Spring Boot: configuração de datasource para serviço de pedidos</p>
-        <pre><code class="language-java">
-// Exemplo datasource em application.yml
-spring:
-  datasource:
-    url: jdbc:mysql://localhost:3306/orderdb
-    username: user
-    password: pass
-        </code></pre>
-        <p>.NET/C# usando EF Core para contexto específico</p>
-        <pre><code class="language-csharp">
-public class OrderContext : DbContext
-{
-    public OrderContext(DbContextOptions&lt;OrderContext&gt; options) 
-        : base(options) { }
 
-    public DbSet&lt;Order&gt; Orders { get; set; }
-}
-        </code></pre>
-        <p>Node.js com Sequelize configurando conexão para estoque</p>
-        <pre><code class="language-javascript">
-const Sequelize = require('sequelize');
-const estoqueDB = new Sequelize('estoquedb', 'user', 'pass', {
-  host: 'localhost',
-  dialect: 'mysql'
-});
-        </code></pre>
+        <svg viewBox="0 0 1100 370" style="width:100%; max-height:345px; margin-top:2px;">
+          <!-- API Gateway -->
+          <rect x="420" y="5" width="220" height="45" rx="8" fill="#1a1a1a"/>
+          <text x="530" y="33" text-anchor="middle" fill="#fff" font-size="12" font-weight="700" font-family="Montserrat">API Gateway</text>
+
+          <!-- Arrows from gateway to services -->
+          <line x1="470" y1="55" x2="150" y2="95" stroke="#ED145B" stroke-width="2" marker-end="url(#dbps-arr)"/>
+          <line x1="510" y1="55" x2="410" y2="95" stroke="#ED145B" stroke-width="2" marker-end="url(#dbps-arr)"/>
+          <line x1="550" y1="55" x2="670" y2="95" stroke="#ED145B" stroke-width="2" marker-end="url(#dbps-arr)"/>
+          <line x1="590" y1="55" x2="930" y2="95" stroke="#ED145B" stroke-width="2" marker-end="url(#dbps-arr)"/>
+
+          <!-- Service 1: Pedido -->
+          <rect x="40" y="100" width="220" height="70" rx="10" fill="#f5f5f5" stroke="#3498db" stroke-width="2.5"/>
+          <rect x="40" y="100" width="220" height="30" rx="10" fill="#3498db"/>
+          <text x="150" y="120" text-anchor="middle" fill="#fff" font-size="12" font-weight="700" font-family="Montserrat">Order Service</text>
+          <text x="150" y="150" text-anchor="middle" fill="#333" font-size="10" font-family="Montserrat">CRUD de pedidos</text>
+          <!-- DB 1 -->
+          <rect x="65" y="195" width="170" height="45" rx="22" fill="#1e1e2e" stroke="#3498db" stroke-width="1.5"/>
+          <text x="150" y="215" text-anchor="middle" fill="#3498db" font-size="10" font-weight="600" font-family="Montserrat">PostgreSQL</text>
+          <text x="150" y="230" text-anchor="middle" fill="#888" font-size="8" font-family="Montserrat">orders, order_items</text>
+          <line x1="150" y1="175" x2="150" y2="190" stroke="#3498db" stroke-width="1.5" stroke-dasharray="4"/>
+
+          <!-- Service 2: Pagamento -->
+          <rect x="300" y="100" width="220" height="70" rx="10" fill="#f5f5f5" stroke="#2ecc71" stroke-width="2.5"/>
+          <rect x="300" y="100" width="220" height="30" rx="10" fill="#2ecc71"/>
+          <text x="410" y="120" text-anchor="middle" fill="#fff" font-size="12" font-weight="700" font-family="Montserrat">Payment Service</text>
+          <text x="410" y="150" text-anchor="middle" fill="#333" font-size="10" font-family="Montserrat">Transações financeiras</text>
+          <!-- DB 2 -->
+          <rect x="325" y="195" width="170" height="45" rx="22" fill="#1e1e2e" stroke="#2ecc71" stroke-width="1.5"/>
+          <text x="410" y="215" text-anchor="middle" fill="#2ecc71" font-size="10" font-weight="600" font-family="Montserrat">MySQL</text>
+          <text x="410" y="230" text-anchor="middle" fill="#888" font-size="8" font-family="Montserrat">payments, refunds</text>
+          <line x1="410" y1="175" x2="410" y2="190" stroke="#2ecc71" stroke-width="1.5" stroke-dasharray="4"/>
+
+          <!-- Service 3: Estoque -->
+          <rect x="560" y="100" width="220" height="70" rx="10" fill="#f5f5f5" stroke="#f39c12" stroke-width="2.5"/>
+          <rect x="560" y="100" width="220" height="30" rx="10" fill="#f39c12"/>
+          <text x="670" y="120" text-anchor="middle" fill="#fff" font-size="12" font-weight="700" font-family="Montserrat">Stock Service</text>
+          <text x="670" y="150" text-anchor="middle" fill="#333" font-size="10" font-family="Montserrat">Controle de inventário</text>
+          <!-- DB 3 -->
+          <rect x="585" y="195" width="170" height="45" rx="22" fill="#1e1e2e" stroke="#f39c12" stroke-width="1.5"/>
+          <text x="670" y="215" text-anchor="middle" fill="#f39c12" font-size="10" font-weight="600" font-family="Montserrat">MongoDB</text>
+          <text x="670" y="230" text-anchor="middle" fill="#888" font-size="8" font-family="Montserrat">products, inventory</text>
+          <line x1="670" y1="175" x2="670" y2="190" stroke="#f39c12" stroke-width="1.5" stroke-dasharray="4"/>
+
+          <!-- Service 4: Notificação -->
+          <rect x="820" y="100" width="220" height="70" rx="10" fill="#f5f5f5" stroke="#9b59b6" stroke-width="2.5"/>
+          <rect x="820" y="100" width="220" height="30" rx="10" fill="#9b59b6"/>
+          <text x="930" y="120" text-anchor="middle" fill="#fff" font-size="12" font-weight="700" font-family="Montserrat">Notification Service</text>
+          <text x="930" y="150" text-anchor="middle" fill="#333" font-size="10" font-family="Montserrat">E-mails e push</text>
+          <!-- DB 4 -->
+          <rect x="845" y="195" width="170" height="45" rx="22" fill="#1e1e2e" stroke="#9b59b6" stroke-width="1.5"/>
+          <text x="930" y="215" text-anchor="middle" fill="#9b59b6" font-size="10" font-weight="600" font-family="Montserrat">Redis</text>
+          <text x="930" y="230" text-anchor="middle" fill="#888" font-size="8" font-family="Montserrat">templates, queue</text>
+          <line x1="930" y1="175" x2="930" y2="190" stroke="#9b59b6" stroke-width="1.5" stroke-dasharray="4"/>
+
+          <!-- Highlights -->
+          <rect x="40" y="265" width="320" height="90" rx="8" fill="rgba(46,204,113,0.08)"/>
+          <text x="60" y="288" fill="#2ecc71" font-size="11" font-weight="700" font-family="Montserrat">Vantagens</text>
+          <text x="60" y="308" fill="#555" font-size="10" font-family="Montserrat">Cada serviço escala seu banco independente</text>
+          <text x="60" y="325" fill="#555" font-size="10" font-family="Montserrat">Liberdade de tecnologia (polyglot persistence)</text>
+          <text x="60" y="342" fill="#555" font-size="10" font-family="Montserrat">Falha isolada: DB do estoque cai, pagamento OK</text>
+
+          <rect x="400" y="265" width="320" height="90" rx="8" fill="rgba(231,76,60,0.08)"/>
+          <text x="420" y="288" fill="#e74c3c" font-size="11" font-weight="700" font-family="Montserrat">Desafios</text>
+          <text x="420" y="308" fill="#555" font-size="10" font-family="Montserrat">Transações distribuídas (precisa de Saga!)</text>
+          <text x="420" y="325" fill="#555" font-size="10" font-family="Montserrat">Queries entre serviços (precisa de CQRS!)</text>
+          <text x="420" y="342" fill="#555" font-size="10" font-family="Montserrat">Mais infra para gerenciar</text>
+
+          <rect x="760" y="265" width="280" height="90" rx="8" fill="rgba(237,20,91,0.08)"/>
+          <text x="780" y="288" fill="#ED145B" font-size="11" font-weight="700" font-family="Montserrat">Polyglot Persistence</text>
+          <text x="780" y="308" fill="#555" font-size="10" font-family="Montserrat">Pedidos → PostgreSQL (relacional)</text>
+          <text x="780" y="325" fill="#555" font-size="10" font-family="Montserrat">Catálogo → MongoDB (documentos)</text>
+          <text x="780" y="342" fill="#555" font-size="10" font-family="Montserrat">Cache → Redis (chave-valor)</text>
+
+          <defs>
+            <marker id="dbps-arr" markerWidth="7" markerHeight="5" refX="7" refY="2.5" orient="auto"><path d="M0,0 L7,2.5 L0,5" fill="#ED145B"/></marker>
+          </defs>
+        </svg>
+
         <div class="slide-footer">
           <div class="footer-bar">04 - Dados em Microsservicos</div>
-          <div class="footer-page">22</div>
+          <div class="footer-page">24</div>
         </div>
       </section>
 
@@ -1089,7 +1424,7 @@ const estoqueDB = new Sequelize('estoquedb', 'user', 'pass', {
         <div class="quiz-feedback"></div>
         <div class="slide-footer">
           <div class="footer-bar">04 - Dados em Microsservicos</div>
-          <div class="footer-page">23</div>
+          <div class="footer-page">25</div>
         </div>
       </section>
 
@@ -1111,7 +1446,7 @@ const estoqueDB = new Sequelize('estoquedb', 'user', 'pass', {
         <div class="quiz-feedback"></div>
         <div class="slide-footer">
           <div class="footer-bar">04 - Dados em Microsservicos</div>
-          <div class="footer-page">24</div>
+          <div class="footer-page">26</div>
         </div>
       </section>
 
@@ -1123,7 +1458,7 @@ const estoqueDB = new Sequelize('estoquedb', 'user', 'pass', {
         <p>21h00 – 21h20<br>☕ Aproveite para descansar e se preparar para o próximo bloco.</p>
         <div class="slide-footer">
           <div class="footer-bar">04 - Dados em Microsservicos</div>
-          <div class="footer-page">25</div>
+          <div class="footer-page">27</div>
         </div>
       </section>
 
@@ -1135,7 +1470,7 @@ const estoqueDB = new Sequelize('estoquedb', 'user', 'pass', {
         <h2>Bloco 2:<br>Exercício Hands-on</h2>
         <div class="slide-footer">
           <div class="footer-bar">04 - Dados em Microsservicos</div>
-          <div class="footer-page">26</div>
+          <div class="footer-page">28</div>
         </div>
       </section>
 
@@ -1145,24 +1480,44 @@ const estoqueDB = new Sequelize('estoquedb', 'user', 'pass', {
         <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
         <div class="slide-title-area">
           <div class="accent-bar"></div>
-          <h2>Exercício: Modelar fluxo Saga para sistema e-commerce</h2>
-          <h3>Pedido → Pagamento → Estoque → Envio</h3>
+          <h2>Exercício: Modelar fluxo Saga</h2>
         </div>
 
-        <div class="exercise-container">
-          <p>Passos para o exercício:</p>
-          <ol class="exercise-steps">
-            <li>Desenhe o diagrama da saga, indicando as transações e compensações.</li>
-            <li>Defina se usará orquestração ou coreografia e justifique.</li>
-            <li>Escreva pseudocódigo para o fluxo do serviço de pagamento.</li>
-            <li>Inclua exemplos de mensagens/eventos usados na comunicação.</li>
-          </ol>
-          <p>Use os recursos da aula para apoiar sua modelagem.</p>
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+          <!-- Cenário -->
+          <div class="exercise-container">
+            <h3>Cenário: E-commerce</h3>
+            <p>Um cliente faz um pedido de R$ 500. Modele a saga completa:</p>
+            <svg viewBox="0 0 400 50" style="width:100%; margin: 8px 0;">
+              <rect x="0" y="10" width="80" height="30" rx="6" fill="#3498db"/>
+              <text x="40" y="30" text-anchor="middle" fill="#fff" font-size="9" font-weight="700" font-family="Montserrat">Pedido</text>
+              <text x="97" y="30" fill="#ED145B" font-size="12" font-weight="700" font-family="Montserrat">→</text>
+              <rect x="110" y="10" width="80" height="30" rx="6" fill="#2ecc71"/>
+              <text x="150" y="30" text-anchor="middle" fill="#fff" font-size="9" font-weight="700" font-family="Montserrat">Pagamento</text>
+              <text x="207" y="30" fill="#ED145B" font-size="12" font-weight="700" font-family="Montserrat">→</text>
+              <rect x="220" y="10" width="80" height="30" rx="6" fill="#f39c12"/>
+              <text x="260" y="30" text-anchor="middle" fill="#fff" font-size="9" font-weight="700" font-family="Montserrat">Estoque</text>
+              <text x="317" y="30" fill="#ED145B" font-size="12" font-weight="700" font-family="Montserrat">→</text>
+              <rect x="330" y="10" width="65" height="30" rx="6" fill="#9b59b6"/>
+              <text x="362" y="30" text-anchor="middle" fill="#fff" font-size="9" font-weight="700" font-family="Montserrat">Envio</text>
+            </svg>
+          </div>
+
+          <!-- Tarefas -->
+          <div class="exercise-container">
+            <h3>O que entregar:</h3>
+            <ol class="exercise-steps">
+              <li>Diagrama da saga com transações <strong>e compensações</strong></li>
+              <li>Escolha: orquestração ou coreografia? Justifique</li>
+              <li>Pseudocódigo do serviço de pagamento</li>
+              <li>Liste os eventos trocados entre serviços</li>
+            </ol>
+          </div>
         </div>
 
         <div class="slide-footer">
           <div class="footer-bar">04 - Dados em Microsservicos</div>
-          <div class="footer-page">27</div>
+          <div class="footer-page">29</div>
         </div>
       </section>
 
@@ -1190,7 +1545,7 @@ async function processOrderSaga(orderId) {
         </code></pre>
         <div class="slide-footer">
           <div class="footer-bar">04 - Dados em Microsservicos</div>
-          <div class="footer-page">28</div>
+          <div class="footer-page">30</div>
         </div>
       </section>
 
@@ -1216,7 +1571,7 @@ pedidoService.on('PedidoCriado', async (order) =&gt; {
         <p>Outros serviços escutam esses eventos e agem conforme necessário.</p>
         <div class="slide-footer">
           <div class="footer-bar">04 - Dados em Microsservicos</div>
-          <div class="footer-page">29</div>
+          <div class="footer-page">31</div>
         </div>
       </section>
 
@@ -1237,7 +1592,7 @@ pedidoService.on('PedidoCriado', async (order) =&gt; {
         </ul>
         <div class="slide-footer">
           <div class="footer-bar">04 - Dados em Microsservicos</div>
-          <div class="footer-page">30</div>
+          <div class="footer-page">32</div>
         </div>
       </section>
 
@@ -1258,7 +1613,7 @@ pedidoService.on('PedidoCriado', async (order) =&gt; {
         <div class="quiz-feedback"></div>
         <div class="slide-footer">
           <div class="footer-bar">04 - Dados em Microsservicos</div>
-          <div class="footer-page">31</div>
+          <div class="footer-page">33</div>
         </div>
       </section>
 
@@ -1275,7 +1630,7 @@ pedidoService.on('PedidoCriado', async (order) =&gt; {
         </div>
         <div class="slide-footer">
           <div class="footer-bar">04 - Dados em Microsservicos</div>
-          <div class="footer-page">32</div>
+          <div class="footer-page">34</div>
         </div>
       </section>
 

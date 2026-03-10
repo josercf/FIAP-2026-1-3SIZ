@@ -1,110 +1,144 @@
 /**
  * FIAP Quiz System for Reveal.js
  * Sistema de quizzes interativos para as aulas
+ * Usa data-correct no <section> e radio buttons nas opções
  */
 
 (function () {
   'use strict';
 
-  // Inicializa todos os quizzes quando o Reveal estiver pronto
   function initQuizzes() {
-    const quizSlides = document.querySelectorAll('.quiz-slide');
-    quizSlides.forEach(initQuiz);
+    var quizSlides = document.querySelectorAll('.quiz-slide');
+    for (var i = 0; i < quizSlides.length; i++) {
+      initQuiz(quizSlides[i]);
+    }
   }
 
   function initQuiz(slide) {
-    const options = slide.querySelectorAll('.quiz-options li');
-    const feedback = slide.querySelector('.quiz-feedback');
-    let answered = false;
+    var labels = slide.querySelectorAll('.quiz-options label');
+    var feedbackEl = slide.querySelector('.quiz-feedback');
+    var correctAnswer = slide.getAttribute('data-correct');
+    var feedbackText = slide.getAttribute('data-quiz-feedback') || '';
+    var answered = false;
 
-    options.forEach(option => {
-      option.addEventListener('click', function () {
-        if (answered) return;
-        answered = true;
+    for (var i = 0; i < labels.length; i++) {
+      (function(label) {
+        label.style.cursor = 'pointer';
+        label.addEventListener('click', function () {
+          if (answered) return;
+          answered = true;
 
-        const isCorrect = this.dataset.correct === 'true';
+          var radio = label.querySelector('input[type="radio"]');
+          if (!radio) return;
+          var selectedValue = radio.value;
+          var isCorrect = selectedValue === correctAnswer;
 
-        // Marca todas as opções
-        options.forEach(opt => {
-          opt.style.pointerEvents = 'none';
-          if (opt.dataset.correct === 'true') {
-            opt.classList.add('correct');
-          } else if (opt === option && !isCorrect) {
-            opt.classList.add('incorrect');
+          // Style all labels
+          for (var j = 0; j < labels.length; j++) {
+            var lbl = labels[j];
+            var inp = lbl.querySelector('input[type="radio"]');
+            lbl.style.pointerEvents = 'none';
+            lbl.style.transition = 'all 0.3s ease';
+
+            if (inp && inp.value === correctAnswer) {
+              lbl.style.background = '#eafaf1';
+              lbl.style.borderLeft = '5px solid #27ae60';
+              lbl.style.color = '#1e8449';
+              lbl.style.fontWeight = '700';
+            } else if (lbl === label && !isCorrect) {
+              lbl.style.background = '#fdedec';
+              lbl.style.borderLeft = '5px solid #e74c3c';
+              lbl.style.color = '#c0392b';
+              lbl.style.textDecoration = 'line-through';
+            } else {
+              lbl.style.opacity = '0.4';
+            }
+          }
+
+          // Show feedback
+          if (feedbackEl) {
+            feedbackEl.style.display = 'block';
+            feedbackEl.style.marginTop = '15px';
+            feedbackEl.style.padding = '14px 20px';
+            feedbackEl.style.borderRadius = '8px';
+            feedbackEl.style.fontSize = '0.75em';
+            feedbackEl.style.fontWeight = '600';
+            feedbackEl.style.lineHeight = '1.5';
+
+            if (isCorrect) {
+              feedbackEl.style.background = '#eafaf1';
+              feedbackEl.style.borderLeft = '5px solid #27ae60';
+              feedbackEl.style.color = '#1e8449';
+              feedbackEl.innerHTML = 'Correto! ' + feedbackText;
+            } else {
+              feedbackEl.style.background = '#fdedec';
+              feedbackEl.style.borderLeft = '5px solid #e74c3c';
+              feedbackEl.style.color = '#c0392b';
+              feedbackEl.innerHTML = 'Incorreto. ' + feedbackText;
+            }
           }
         });
-
-        // Mostra feedback
-        if (feedback) {
-          feedback.classList.add('show');
-          if (isCorrect) {
-            feedback.classList.add('correct');
-            feedback.innerHTML = '<strong>Correto!</strong> ' + (feedback.dataset.correctMsg || '');
-          } else {
-            feedback.classList.add('incorrect');
-            feedback.innerHTML = '<strong>Incorreto.</strong> ' + (feedback.dataset.incorrectMsg || '');
-          }
-        }
-      });
-    });
+      })(labels[i]);
+    }
   }
 
-  // Reset quiz quando voltar ao slide
   function resetQuizOnSlideChange() {
-    Reveal.on('slidechanged', event => {
-      const prevSlide = event.previousSlide;
+    Reveal.on('slidechanged', function(event) {
+      var prevSlide = event.previousSlide;
       if (prevSlide && prevSlide.classList.contains('quiz-slide')) {
-        const options = prevSlide.querySelectorAll('.quiz-options li');
-        const feedback = prevSlide.querySelector('.quiz-feedback');
+        var labels = prevSlide.querySelectorAll('.quiz-options label');
+        var feedbackEl = prevSlide.querySelector('.quiz-feedback');
+        var radios = prevSlide.querySelectorAll('.quiz-options input[type="radio"]');
 
-        options.forEach(opt => {
-          opt.classList.remove('correct', 'incorrect');
-          opt.style.pointerEvents = '';
-        });
-
-        if (feedback) {
-          feedback.classList.remove('show', 'correct', 'incorrect');
-          feedback.innerHTML = '';
+        for (var i = 0; i < labels.length; i++) {
+          labels[i].style.pointerEvents = '';
+          labels[i].style.background = '';
+          labels[i].style.borderLeft = '';
+          labels[i].style.color = '';
+          labels[i].style.fontWeight = '';
+          labels[i].style.textDecoration = '';
+          labels[i].style.opacity = '';
         }
 
-        // Reset answered state - reinitialize
+        for (var j = 0; j < radios.length; j++) {
+          radios[j].checked = false;
+        }
+
+        if (feedbackEl) {
+          feedbackEl.style.display = 'none';
+          feedbackEl.innerHTML = '';
+        }
+
         initQuiz(prevSlide);
       }
     });
   }
 
-  // Timer para exercícios
   window.startTimer = function (elementId, minutes) {
-    const el = document.getElementById(elementId);
+    var el = document.getElementById(elementId);
     if (!el) return;
-
-    let totalSeconds = minutes * 60;
-
-    const interval = setInterval(() => {
-      const mins = Math.floor(totalSeconds / 60);
-      const secs = totalSeconds % 60;
-      el.textContent = `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
-
+    var totalSeconds = minutes * 60;
+    var interval = setInterval(function() {
+      var mins = Math.floor(totalSeconds / 60);
+      var secs = totalSeconds % 60;
+      el.textContent = (mins < 10 ? '0' : '') + mins + ':' + (secs < 10 ? '0' : '') + secs;
       if (totalSeconds <= 0) {
         clearInterval(interval);
         el.textContent = '00:00';
         el.style.color = '#e74c3c';
         el.style.fontWeight = '700';
       }
-
       totalSeconds--;
     }, 1000);
-
     return interval;
   };
 
-  // Inicialização - tenta múltiplas vezes para garantir
   function boot() {
     initQuizzes();
     if (typeof Reveal !== 'undefined' && Reveal.isReady && Reveal.isReady()) {
       resetQuizOnSlideChange();
     } else if (typeof Reveal !== 'undefined') {
-      Reveal.on('ready', () => {
+      Reveal.on('ready', function() {
         initQuizzes();
         resetQuizOnSlideChange();
       });
@@ -114,7 +148,7 @@
   if (document.readyState === 'complete') {
     setTimeout(boot, 500);
   } else {
-    window.addEventListener('load', () => setTimeout(boot, 500));
+    window.addEventListener('load', function() { setTimeout(boot, 500); });
   }
 
 })();
