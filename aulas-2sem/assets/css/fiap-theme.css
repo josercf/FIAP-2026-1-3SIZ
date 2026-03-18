@@ -421,7 +421,7 @@
 }
 
 .exercise-slide .exercise-container p {
-  font-size: 0.7em;
+  font-size: 0.78em;
   line-height: 1.5;
   color: #ccc;
   margin: 0 0 15px 0;
@@ -436,7 +436,7 @@
 
 .exercise-slide .exercise-steps li {
   counter-increment: step-counter;
-  font-size: 0.65em;
+  font-size: 0.75em;
   padding: 8px 0 8px 35px;
   position: relative;
   color: #ddd;
@@ -468,8 +468,8 @@
 .reveal h1 { font-size: 1.8em; font-weight: 800; color: var(--fiap-dark); }
 .reveal h2 { font-size: 1.3em; font-weight: 700; color: var(--fiap-dark); }
 .reveal h3 { font-size: 1em; font-weight: 600; color: var(--fiap-dark); }
-.reveal p { font-size: 0.8em; line-height: 1.6; }
-.reveal ul, .reveal ol { font-size: 0.8em; line-height: 1.6; }
+.reveal p { font-size: 0.85em; line-height: 1.6; }
+.reveal ul, .reveal ol { font-size: 0.85em; line-height: 1.6; }
 .reveal li { margin-bottom: 8px; }
 
 /* --- Blocos de Código --- */
@@ -477,7 +477,7 @@
   background: var(--fiap-code-bg);
   border-radius: 6px;
   padding: 18px;
-  font-size: 0.55em;
+  font-size: 0.65em;
   box-shadow: 0 4px 12px rgba(0,0,0,0.15);
   width: 100%;
   box-sizing: border-box;
@@ -513,7 +513,7 @@
 }
 
 .concept-card p {
-  font-size: 0.6em;
+  font-size: 0.7em;
   color: #666;
   margin: 0;
   line-height: 1.5;
@@ -523,7 +523,7 @@
 .reveal table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 0.65em;
+  font-size: 0.75em;
   margin: 15px 0;
 }
 
@@ -567,7 +567,7 @@
 
 .side-by-side .side p,
 .side-by-side .side ul {
-  font-size: 0.65em;
+  font-size: 0.75em;
 }
 
 /* --- Destaque / Callout --- */
@@ -580,7 +580,7 @@
 }
 
 .callout p {
-  font-size: 0.7em;
+  font-size: 0.78em;
   color: var(--fiap-dark);
   margin: 0;
 }
