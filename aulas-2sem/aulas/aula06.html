@@ -582,35 +582,252 @@ SET cache:product:456 '{"nome":"Notebook","preco":4500}'</code></pre>
         </div>
       </section>
 
-      <!-- ==================== SLIDE 13: Estruturas de Dados Redis ==================== -->
+      <!-- ==================== SLIDE: Estruturas de Dados Redis - Visão Geral ==================== -->
       <section class="content-slide">
         <div class="top-bar"></div>
         <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
         <div class="slide-title-area">
           <div class="accent-bar"></div>
-          <h2>Estruturas de Dados Redis</h2>
+          <h2>Estruturas de Dados Redis — Visão Geral</h2>
         </div>
+
+        <p>Redis não é apenas chave-valor de strings. Ele oferece <strong>5 estruturas nativas</strong>, cada uma otimizada para um padrão de acesso diferente:</p>
 
         <table>
           <thead>
-            <tr><th>Tipo</th><th>Comandos</th><th>Exemplo</th><th>Caso de Uso</th></tr>
+            <tr><th>Tipo</th><th>Analogia</th><th>Complexidade (maioria)</th><th>Melhor para</th></tr>
           </thead>
           <tbody>
-            <tr><td><strong>String</strong></td><td>SET, GET, INCR</td><td><code>SET contador 0</code><br><code>INCR contador</code></td><td>Cache simples, contadores</td></tr>
-            <tr><td><strong>Hash</strong></td><td>HSET, HGET, HGETALL</td><td><code>HSET user:1 nome "Ana" idade 25</code></td><td>Objetos com campos</td></tr>
-            <tr><td><strong>List</strong></td><td>LPUSH, RPUSH, LRANGE</td><td><code>LPUSH fila "tarefa1"</code></td><td>Filas, histórico</td></tr>
-            <tr><td><strong>Set</strong></td><td>SADD, SMEMBERS, SINTER</td><td><code>SADD tags:post:1 "redis" "cache"</code></td><td>Tags, unicidade</td></tr>
-            <tr><td><strong>Sorted Set</strong></td><td>ZADD, ZRANGE, ZRANK</td><td><code>ZADD ranking 100 "player1"</code></td><td>Rankings, leaderboards</td></tr>
+            <tr><td><strong>String</strong></td><td>Variável simples</td><td>O(1)</td><td>Cache, contadores, flags</td></tr>
+            <tr><td><strong>Hash</strong></td><td>Objeto / Map</td><td>O(1) por campo</td><td>Perfis, sessões, config</td></tr>
+            <tr><td><strong>List</strong></td><td>Array / Fila</td><td>O(1) push/pop</td><td>Filas, timeline, histórico</td></tr>
+            <tr><td><strong>Set</strong></td><td>Conjunto matemático</td><td>O(1) add/remove</td><td>Tags, permissões, unicidade</td></tr>
+            <tr><td><strong>Sorted Set</strong></td><td>Set com nota</td><td>O(log N)</td><td>Rankings, leaderboards, agendamentos</td></tr>
           </tbody>
         </table>
 
         <div class="callout">
-          <p><strong>Dica:</strong> Use Hash para objetos (evita serializar/deserializar JSON inteiro) e Sorted Set para rankings e filas com prioridade.</p>
+          <p><strong>Regra prática:</strong> escolha a estrutura pelo padrão de acesso, não pelo dado. Se você serializa JSON em String e depois faz parse para ler um campo, provavelmente deveria estar usando Hash.</p>
         </div>
 
         <div class="slide-footer">
           <div class="footer-bar">06 - Cache com Redis</div>
           <div class="footer-page">17</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: String ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>String</h2>
+          <h3>A estrutura mais simples e versátil do Redis</h3>
+        </div>
+
+        <p>Armazena texto, números ou dados binários (até 512 MB). É a base do cache simples e de contadores atômicos.</p>
+
+        <pre><code class="language-bash"># Cache simples (JSON serializado)
+SET cache:product:42 '{"nome":"Notebook","preco":4500}' EX 600
+
+# Contadores atômicos (thread-safe, sem race condition)
+SET api:requests:today 0
+INCR api:requests:today          # retorna 1
+INCRBY api:requests:today 10     # retorna 11
+
+# Flags e controles
+SET feature:dark-mode:user:123 "enabled" EX 86400
+SETNX lock:pedido:789 "worker-1"  # SET se NÃO existir (distributed lock!)
+
+# Operações úteis
+MSET user:1:name "Ana" user:1:email "ana@mail.com"   # SET múltiplo
+MGET user:1:name user:1:email                         # GET múltiplo</code></pre>
+
+        <div class="callout">
+          <p><strong>Caso real:</strong> <code>INCR</code> é usado massivamente para <strong>rate limiting</strong>. A cada request, <code>INCR api:rate:{ip}</code> com TTL de 60s. Se ultrapassar o limite, retorna 429. Atômico, sem locks, ~100k ops/s.</p>
+        </div>
+
+        <div class="slide-footer">
+          <div class="footer-bar">06 - Cache com Redis</div>
+          <div class="footer-page">18</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: Hash ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Hash</h2>
+          <h3>Objetos com campos — como uma linha de banco no cache</h3>
+        </div>
+
+        <p>Armazena pares campo-valor dentro de uma chave. Ideal para representar entidades sem serializar/deserializar JSON.</p>
+
+        <pre><code class="language-bash"># Criar/atualizar campos de um usuário
+HSET user:123 nome "Ana" email "ana@mail.com" idade 28 plano "premium"
+
+# Ler um campo específico (sem trazer o objeto inteiro!)
+HGET user:123 plano               # "premium"
+
+# Ler todos os campos
+HGETALL user:123                   # retorna todos os pares campo-valor
+
+# Incrementar campo numérico
+HINCRBY user:123 idade 1           # aniversário! agora 29
+
+# Verificar se campo existe
+HEXISTS user:123 telefone          # 0 (não existe)
+
+# Remover campo
+HDEL user:123 plano</code></pre>
+
+        <div class="side-by-side">
+          <div class="side" style="border-top: 3px solid #27ae60;">
+            <h4 style="color:#27ae60;">Use Hash quando...</h4>
+            <ul>
+              <li>Precisa ler/atualizar campos individuais</li>
+              <li>Objetos com muitos campos (perfil, sessão, carrinho)</li>
+              <li>Quer economizar memória vs múltiplas Strings</li>
+            </ul>
+          </div>
+          <div class="side" style="border-top: 3px solid #e74c3c;">
+            <h4 style="color:#e74c3c;">Evite Hash quando...</h4>
+            <ul>
+              <li>O objeto inteiro é sempre lido/escrito junto (use String + JSON)</li>
+              <li>Precisa de TTL por campo (TTL é por chave, não por campo)</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="slide-footer">
+          <div class="footer-bar">06 - Cache com Redis</div>
+          <div class="footer-page">19</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: List ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>List</h2>
+          <h3>Listas ordenadas por inserção — filas e timelines</h3>
+        </div>
+
+        <p>Lista duplamente encadeada. Inserção/remoção nas pontas em O(1). Ideal para filas (FIFO), pilhas (LIFO) e históricos limitados.</p>
+
+        <pre><code class="language-bash"># Fila de tarefas (FIFO): produtor insere à esquerda, consumidor retira da direita
+LPUSH fila:emails "msg-001" "msg-002" "msg-003"
+RPOP fila:emails                    # "msg-001" (primeiro a entrar, primeiro a sair)
+
+# Fila bloqueante (consumidor espera se fila vazia — ideal para workers)
+BRPOP fila:emails 30               # bloqueia até 30s esperando item
+
+# Timeline / histórico (últimas N ações)
+LPUSH timeline:user:123 '{"acao":"login","ts":"2026-03-24T19:30:00"}'
+LPUSH timeline:user:123 '{"acao":"compra","ts":"2026-03-24T19:45:00"}'
+LTRIM timeline:user:123 0 99       # mantém apenas os últimos 100 itens
+LRANGE timeline:user:123 0 9       # últimos 10 itens
+
+# Verificar tamanho
+LLEN fila:emails                    # quantos itens na fila</code></pre>
+
+        <div class="callout">
+          <p><strong>Caso real:</strong> O <strong>Sidekiq</strong> (Ruby) e o <strong>BullMQ</strong> (Node.js) usam Redis Lists como fila de jobs. <code>LPUSH</code> para enfileirar, <code>BRPOP</code> para consumir. Milhões de jobs/dia com latência de milissegundos.</p>
+        </div>
+
+        <div class="slide-footer">
+          <div class="footer-bar">06 - Cache com Redis</div>
+          <div class="footer-page">20</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: Set ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Set</h2>
+          <h3>Coleção de valores únicos — operações de conjunto</h3>
+        </div>
+
+        <p>Conjunto não-ordenado de strings únicas. Suporta operações matemáticas de conjuntos (união, interseção, diferença) em O(N).</p>
+
+        <pre><code class="language-bash"># Tags de um post
+SADD tags:post:42 "redis" "cache" "nosql" "performance"
+SADD tags:post:77 "redis" "docker" "devops"
+
+# Verificar se elemento existe (O(1))
+SISMEMBER tags:post:42 "redis"     # 1 (existe)
+SISMEMBER tags:post:42 "java"      # 0 (não existe)
+
+# Operações de conjunto
+SINTER tags:post:42 tags:post:77   # {"redis"} — tags em comum
+SUNION tags:post:42 tags:post:77   # todas as tags únicas
+SDIFF tags:post:42 tags:post:77    # {"cache","nosql","performance"} — só no 42
+
+# Controle de sessões ativas
+SADD online:users "user:123" "user:456" "user:789"
+SCARD online:users                 # 3 (quantos online)
+SREM online:users "user:456"       # usuário saiu
+
+# Elemento aleatório (sorteios, A/B test)
+SRANDMEMBER tags:post:42 2         # 2 tags aleatórias</code></pre>
+
+        <div class="callout">
+          <p><strong>Caso real:</strong> O <strong>Instagram</strong> usa Sets para armazenar quem curtiu cada foto. <code>SISMEMBER</code> responde instantaneamente "este usuário já curtiu?" e <code>SCARD</code> retorna a contagem total sem varrer todos os registros.</p>
+        </div>
+
+        <div class="slide-footer">
+          <div class="footer-bar">06 - Cache com Redis</div>
+          <div class="footer-page">21</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE: Sorted Set ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Sorted Set (ZSet)</h2>
+          <h3>Set com score — rankings, leaderboards e agendamentos</h3>
+        </div>
+
+        <p>Cada membro tem um score numérico. Membros são únicos, ordenados automaticamente por score. Inserção e busca por rank em O(log N).</p>
+
+        <pre><code class="language-bash"># Leaderboard de um jogo
+ZADD ranking:game 1500 "player:ana" 1200 "player:bob" 1800 "player:carol"
+ZADD ranking:game 1600 "player:ana"        # atualiza score da Ana
+
+# Top 3 jogadores (maior score primeiro)
+ZREVRANGE ranking:game 0 2 WITHSCORES
+# "player:carol" 1800, "player:ana" 1600, "player:bob" 1200
+
+# Posição de um jogador (0-indexed)
+ZREVRANK ranking:game "player:ana"         # 1 (segunda posição)
+
+# Quantos jogadores com score entre 1000 e 1500?
+ZCOUNT ranking:game 1000 1500              # filtra por range de score
+
+# Agendamento de tarefas (score = timestamp unix)
+ZADD scheduler:jobs 1711310400 "job:enviar-email"
+ZADD scheduler:jobs 1711314000 "job:gerar-relatorio"
+# Buscar jobs prontos para executar (score <= agora)
+ZRANGEBYSCORE scheduler:jobs 0 1711312000</code></pre>
+
+        <div class="callout">
+          <p><strong>Caso real:</strong> O <strong>Twitter Trends</strong> usa Sorted Sets para calcular trending topics. O score é a contagem de menções em janela de tempo. <code>ZINCRBY</code> incrementa atomicamente a cada tweet, e <code>ZREVRANGE</code> retorna os top N em tempo real.</p>
+        </div>
+
+        <div class="slide-footer">
+          <div class="footer-bar">06 - Cache com Redis</div>
+          <div class="footer-page">22</div>
         </div>
       </section>
 
@@ -623,24 +840,33 @@ SET cache:product:456 '{"nome":"Notebook","preco":4500}'</code></pre>
           <h2>Expiração de Chaves: TTL em Detalhe</h2>
         </div>
 
-        <pre><code class="language-bash"># Definir TTL ao criar
-SET session:abc '{"user":"Ana"}' EX 3600    # expira em 1 hora
-SET temp:data "valor" PX 500                # expira em 500ms
+        <div class="side-by-side">
+          <div class="side" style="border-top: 3px solid #f39c12; padding: 12px;">
+            <h4 style="color:#f39c12; margin:0 0 8px;">Definir e consultar TTL</h4>
+            <pre style="margin:0;"><code class="language-bash"># TTL ao criar (segundos / ms)
+SET session:abc '{"u":"Ana"}' EX 3600
+SET temp:x "val" PX 500
 
 # Adicionar TTL a chave existente
-EXPIRE user:123:profile 600                 # 10 minutos
-PEXPIRE user:123:profile 600000             # mesmo, em milissegundos
+EXPIRE user:123:profile 600
 
 # Consultar TTL restante
-TTL session:abc          # retorna segundos restantes (-1 = sem TTL, -2 = não existe)
+TTL session:abc    # -1=sem TTL, -2=não existe
 
-# Remover TTL (chave fica permanente)
+# Remover TTL (fica permanente)
 PERSIST session:abc</code></pre>
-
-        <ul>
-          <li>Chave sem TTL = permanente (até eviction ou DEL manual)</li>
-          <li><code>TTL</code> retorna <code>-1</code> se a chave existe sem expiração; <code>-2</code> se não existe</li>
-        </ul>
+          </div>
+          <div class="side" style="border-top: 3px solid #3498db; padding: 12px;">
+            <h4 style="color:#3498db; margin:0 0 8px;">Comportamento</h4>
+            <ul style="font-size:0.75em; margin:0;">
+              <li>Chave sem TTL = permanente (até eviction ou DEL)</li>
+              <li><code>TTL</code> retorna <code>-1</code> (sem expiração) ou <code>-2</code> (não existe)</li>
+              <li>Redis verifica expiração de forma lazy (no acesso) + ativa (sampling periódico)</li>
+              <li><code>EX</code> = segundos, <code>PX</code> = milissegundos</li>
+              <li><code>PEXPIRE</code> / <code>PTTL</code> para precisão em ms</li>
+            </ul>
+          </div>
+        </div>
 
         <div class="callout">
           <p><strong>Regra de ouro:</strong> SEMPRE defina TTL para chaves de cache. Chaves sem TTL acumulam silenciosamente e causam estouro de memória.</p>
@@ -648,7 +874,7 @@ PERSIST session:abc</code></pre>
 
         <div class="slide-footer">
           <div class="footer-bar">06 - Cache com Redis</div>
-          <div class="footer-page">18</div>
+          <div class="footer-page">23</div>
         </div>
       </section>
 
@@ -661,7 +887,10 @@ PERSIST session:abc</code></pre>
           <h2>Subindo Redis com Docker</h2>
         </div>
 
-        <pre><code class="language-bash"># Opção 1: docker run simples
+        <div class="side-by-side">
+          <div class="side" style="border-top: 3px solid #3498db; padding: 12px;">
+            <h4 style="color:#3498db; margin:0 0 8px;">docker run (rápido)</h4>
+            <pre style="margin:0;"><code class="language-bash"># Subir Redis
 docker run -d \
   --name meu-redis \
   -p 6379:6379 \
@@ -670,30 +899,37 @@ docker run -d \
 # Conectar via CLI
 docker exec -it meu-redis redis-cli
 
-# Testar conexão
-docker exec -it meu-redis redis-cli PING
-# Resposta: PONG</code></pre>
-
-        <pre><code class="language-yaml"># Opção 2: docker-compose.yml
-services:
+# Testar
+docker exec -it meu-redis \
+  redis-cli PING
+# PONG</code></pre>
+          </div>
+          <div class="side" style="border-top: 3px solid #27ae60; padding: 12px;">
+            <h4 style="color:#27ae60; margin:0 0 8px;">docker-compose.yml</h4>
+            <pre style="margin:0;"><code class="language-yaml">services:
   redis:
     image: redis:7-alpine
     ports:
       - "6379:6379"
     volumes:
       - redis-data:/data
-    command: redis-server --maxmemory 256mb --maxmemory-policy allkeys-lru
+    command: >
+      redis-server
+      --maxmemory 256mb
+      --maxmemory-policy allkeys-lru
 
 volumes:
   redis-data:</code></pre>
+          </div>
+        </div>
 
         <div class="callout">
-          <p><strong>Dica:</strong> Use <code>redis:7-alpine</code> (~13 MB) em vez de <code>redis:latest</code> (~140 MB). O flag <code>--maxmemory</code> evita que Redis consuma toda a RAM do container.</p>
+          <p><strong>Dica:</strong> Use <code>redis:7-alpine</code> (~13 MB) em vez de <code>redis:latest</code> (~140 MB). O <code>--maxmemory</code> evita que Redis consuma toda a RAM do container.</p>
         </div>
 
         <div class="slide-footer">
           <div class="footer-bar">06 - Cache com Redis</div>
-          <div class="footer-page">19</div>
+          <div class="footer-page">24</div>
         </div>
       </section>
 
@@ -739,7 +975,7 @@ volumes:
 
         <div class="slide-footer">
           <div class="footer-bar">06 - Cache com Redis</div>
-          <div class="footer-page">20</div>
+          <div class="footer-page">25</div>
         </div>
       </section>
 
@@ -763,7 +999,7 @@ volumes:
 
         <div class="slide-footer">
           <div class="footer-bar">06 - Cache com Redis</div>
-          <div class="footer-page">21</div>
+          <div class="footer-page">26</div>
         </div>
       </section>
 
@@ -792,7 +1028,7 @@ public User getUserById(String id) {
 
         <div class="slide-footer">
           <div class="footer-bar">06 - Cache com Redis</div>
-          <div class="footer-page">22</div>
+          <div class="footer-page">27</div>
         </div>
       </section>
 
@@ -818,7 +1054,7 @@ public User getUserById(String id) {
 
         <div class="slide-footer">
           <div class="footer-bar">06 - Cache com Redis</div>
-          <div class="footer-page">23</div>
+          <div class="footer-page">28</div>
         </div>
       </section>
 
@@ -844,7 +1080,7 @@ async function getUser(id) {
 
         <div class="slide-footer">
           <div class="footer-bar">06 - Cache com Redis</div>
-          <div class="footer-page">24</div>
+          <div class="footer-page">29</div>
         </div>
       </section>
 
@@ -859,7 +1095,7 @@ async function getUser(id) {
         </div>
         <div class="slide-footer">
           <div class="footer-bar">06 - Cache com Redis</div>
-          <div class="footer-page">25</div>
+          <div class="footer-page">30</div>
         </div>
       </section>
 
@@ -871,7 +1107,7 @@ async function getUser(id) {
         <h2>Bloco 2<br>Exercício prático e Quiz</h2>
         <div class="slide-footer">
           <div class="footer-bar">06 - Cache com Redis</div>
-          <div class="footer-page">26</div>
+          <div class="footer-page">31</div>
         </div>
       </section>
 
@@ -904,7 +1140,7 @@ async function getUser(id) {
 
         <div class="slide-footer">
           <div class="footer-bar">06 - Cache com Redis</div>
-          <div class="footer-page">27</div>
+          <div class="footer-page">32</div>
         </div>
       </section>
 
@@ -955,7 +1191,7 @@ app.listen(3000, () => console.log('API rodando na porta 3000'));</code></pre>
 
         <div class="slide-footer">
           <div class="footer-bar">06 - Cache com Redis</div>
-          <div class="footer-page">28</div>
+          <div class="footer-page">33</div>
         </div>
       </section>
 
@@ -979,7 +1215,7 @@ app.listen(3000, () => console.log('API rodando na porta 3000'));</code></pre>
 
         <div class="slide-footer">
           <div class="footer-bar">06 - Cache com Redis</div>
-          <div class="footer-page">29</div>
+          <div class="footer-page">34</div>
         </div>
       </section>
 
@@ -1003,7 +1239,7 @@ app.listen(3000, () => console.log('API rodando na porta 3000'));</code></pre>
 
         <div class="slide-footer">
           <div class="footer-bar">06 - Cache com Redis</div>
-          <div class="footer-page">30</div>
+          <div class="footer-page">35</div>
         </div>
       </section>
 
@@ -1027,7 +1263,7 @@ app.listen(3000, () => console.log('API rodando na porta 3000'));</code></pre>
 
         <div class="slide-footer">
           <div class="footer-bar">06 - Cache com Redis</div>
-          <div class="footer-page">31</div>
+          <div class="footer-page">36</div>
         </div>
       </section>
 
@@ -1051,7 +1287,7 @@ app.listen(3000, () => console.log('API rodando na porta 3000'));</code></pre>
 
         <div class="slide-footer">
           <div class="footer-bar">06 - Cache com Redis</div>
-          <div class="footer-page">32</div>
+          <div class="footer-page">37</div>
         </div>
       </section>
 
@@ -1070,7 +1306,7 @@ app.listen(3000, () => console.log('API rodando na porta 3000'));</code></pre>
 
         <div class="slide-footer">
           <div class="footer-bar">06 - Cache com Redis</div>
-          <div class="footer-page">33</div>
+          <div class="footer-page">38</div>
         </div>
       </section>
 
