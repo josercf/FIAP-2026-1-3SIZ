@@ -106,29 +106,296 @@
         </div>
       </section>
 
-      <!-- ==================== SLIDE 6: Estratégias de Cache ==================== -->
+      <!-- ==================== SLIDE 6: Visão Geral - Estratégias de Cache ==================== -->
       <section class="content-slide">
         <div class="top-bar"></div>
         <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
         <div class="slide-title-area">
           <div class="accent-bar"></div>
-          <h2>Estratégias de Cache</h2>
+          <h2>Estratégias de Cache — Visão Geral</h2>
         </div>
 
-        <dl>
-          <dt><strong>Cache-Aside (Lazy Loading)</strong></dt>
-          <dd>Aplicação consulta cache; se não existir, busca no banco, atualiza cache e retorna.</dd>
-          <dt><strong>Write-Through</strong></dt>
-          <dd>Dados escritos simultaneamente no cache e no banco, garantindo sincronização.</dd>
-          <dt><strong>Write-Behind (Write-Back)</strong></dt>
-          <dd>Dados escritos no cache e sincronizados no banco depois, em background.</dd>
-          <dt><strong>Read-Through</strong></dt>
-          <dd>Cache é responsável por buscar no banco caso dado não esteja em cache.</dd>
-        </dl>
+        <table>
+          <thead>
+            <tr><th>Estratégia</th><th>Quem lê do banco?</th><th>Quem escreve no cache?</th><th>Melhor para</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><strong>Cache-Aside</strong></td><td>Aplicação</td><td>Aplicação</td><td>Leitura pesada, cache seletivo</td></tr>
+            <tr><td><strong>Read-Through</strong></td><td>Cache (transparente)</td><td>Cache (automático)</td><td>Simplificar código da aplicação</td></tr>
+            <tr><td><strong>Write-Through</strong></td><td>—</td><td>Aplicação → Cache → Banco</td><td>Consistência forte</td></tr>
+            <tr><td><strong>Write-Behind</strong></td><td>—</td><td>Aplicação → Cache → (async) Banco</td><td>Alta throughput de escrita</td></tr>
+          </tbody>
+        </table>
+
+        <div class="callout">
+          <p>As estratégias de <strong>leitura</strong> (Cache-Aside, Read-Through) e <strong>escrita</strong> (Write-Through, Write-Behind) podem ser combinadas. Ex: Cache-Aside para leitura + Write-Through para escrita.</p>
+        </div>
 
         <div class="slide-footer">
           <div class="footer-bar">06 - Cache com Redis</div>
           <div class="footer-page">6</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE 6a: Cache-Aside ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Cache-Aside (Lazy Loading)</h2>
+        </div>
+
+        <!-- Diagrama de fluxo inline SVG -->
+        <svg viewBox="0 0 900 180" style="width:100%;max-width:900px;margin:0 auto;display:block;" xmlns="http://www.w3.org/2000/svg">
+          <!-- App -->
+          <rect x="10" y="55" width="130" height="70" rx="10" fill="#ed145b" opacity="0.12" stroke="#ed145b" stroke-width="2"/>
+          <text x="75" y="95" text-anchor="middle" font-family="Montserrat,sans-serif" font-size="15" font-weight="700" fill="#1a1a2e">App</text>
+          <!-- Cache -->
+          <rect x="250" y="10" width="130" height="70" rx="10" fill="#f39c12" opacity="0.15" stroke="#f39c12" stroke-width="2"/>
+          <text x="315" y="50" text-anchor="middle" font-family="Montserrat,sans-serif" font-size="15" font-weight="700" fill="#1a1a2e">Redis Cache</text>
+          <!-- DB -->
+          <rect x="250" y="100" width="130" height="70" rx="10" fill="#3498db" opacity="0.15" stroke="#3498db" stroke-width="2"/>
+          <text x="315" y="140" text-anchor="middle" font-family="Montserrat,sans-serif" font-size="15" font-weight="700" fill="#1a1a2e">Banco de Dados</text>
+          <!-- Setas -->
+          <line x1="140" y1="75" x2="248" y2="50" stroke="#ed145b" stroke-width="2" marker-end="url(#arrowPink)"/>
+          <text x="180" y="52" font-family="Montserrat,sans-serif" font-size="11" fill="#555">1. GET</text>
+          <line x1="248" y1="55" x2="142" y2="82" stroke="#f39c12" stroke-width="2" marker-end="url(#arrowOrange)" stroke-dasharray="6,3"/>
+          <text x="175" y="78" font-family="Montserrat,sans-serif" font-size="11" fill="#555">2. miss?</text>
+          <line x1="140" y1="105" x2="248" y2="130" stroke="#3498db" stroke-width="2" marker-end="url(#arrowBlue)"/>
+          <text x="170" y="128" font-family="Montserrat,sans-serif" font-size="11" fill="#555">3. SELECT</text>
+          <line x1="142" y1="85" x2="248" y2="40" stroke="#27ae60" stroke-width="2" marker-end="url(#arrowGreen)" stroke-dasharray="6,3"/>
+          <text x="420" y="50" font-family="Montserrat,sans-serif" font-size="11" fill="#555">4. SET (popula cache)</text>
+          <!-- Resultado -->
+          <rect x="500" y="55" width="390" height="120" rx="10" fill="#f4f4f4" stroke="#ddd" stroke-width="1"/>
+          <text x="520" y="80" font-family="Montserrat,sans-serif" font-size="13" font-weight="700" fill="#1a1a2e">Fluxo:</text>
+          <text x="520" y="100" font-family="Montserrat,sans-serif" font-size="12" fill="#555">1. App consulta Redis → se HIT, retorna</text>
+          <text x="520" y="118" font-family="Montserrat,sans-serif" font-size="12" fill="#555">2. Se MISS → App busca no banco</text>
+          <text x="520" y="136" font-family="Montserrat,sans-serif" font-size="12" fill="#555">3. App salva resultado no Redis com TTL</text>
+          <text x="520" y="154" font-family="Montserrat,sans-serif" font-size="12" fill="#555">4. App retorna dado ao cliente</text>
+          <!-- Arrow markers -->
+          <defs>
+            <marker id="arrowPink" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6Z" fill="#ed145b"/></marker>
+            <marker id="arrowOrange" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6Z" fill="#f39c12"/></marker>
+            <marker id="arrowBlue" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6Z" fill="#3498db"/></marker>
+            <marker id="arrowGreen" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6Z" fill="#27ae60"/></marker>
+          </defs>
+        </svg>
+
+        <table>
+          <thead><tr><th>Vantagens</th><th>Desvantagens</th></tr></thead>
+          <tbody>
+            <tr>
+              <td>Só carrega no cache o que realmente é lido</td>
+              <td>Primeiro request sempre tem latência total (cold start)</td>
+            </tr>
+            <tr>
+              <td>Cache falhar não derruba a aplicação</td>
+              <td>Dados podem ficar stale entre TTL e atualização no banco</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="callout">
+          <p><strong>Caso real:</strong> Netflix usa Cache-Aside para catálogo de filmes. ~90% dos requests são servidos pelo cache. Dados atualizados a cada 15-30 min via TTL — aceitável porque metadados de filmes mudam raramente.</p>
+        </div>
+
+        <div class="slide-footer">
+          <div class="footer-bar">06 - Cache com Redis</div>
+          <div class="footer-page">7</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE 6b: Read-Through ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Read-Through</h2>
+        </div>
+
+        <svg viewBox="0 0 900 180" style="width:100%;max-width:900px;margin:0 auto;display:block;" xmlns="http://www.w3.org/2000/svg">
+          <rect x="10" y="55" width="130" height="70" rx="10" fill="#ed145b" opacity="0.12" stroke="#ed145b" stroke-width="2"/>
+          <text x="75" y="95" text-anchor="middle" font-family="Montserrat,sans-serif" font-size="15" font-weight="700" fill="#1a1a2e">App</text>
+          <rect x="250" y="55" width="150" height="70" rx="10" fill="#f39c12" opacity="0.15" stroke="#f39c12" stroke-width="2"/>
+          <text x="325" y="85" text-anchor="middle" font-family="Montserrat,sans-serif" font-size="14" font-weight="700" fill="#1a1a2e">Cache Provider</text>
+          <text x="325" y="105" text-anchor="middle" font-family="Montserrat,sans-serif" font-size="11" fill="#555">(Redis + loader)</text>
+          <rect x="510" y="55" width="130" height="70" rx="10" fill="#3498db" opacity="0.15" stroke="#3498db" stroke-width="2"/>
+          <text x="575" y="95" text-anchor="middle" font-family="Montserrat,sans-serif" font-size="15" font-weight="700" fill="#1a1a2e">Banco de Dados</text>
+          <line x1="140" y1="80" x2="248" y2="80" stroke="#ed145b" stroke-width="2" marker-end="url(#arrowPink2)"/>
+          <text x="185" y="73" font-family="Montserrat,sans-serif" font-size="11" fill="#555">1. GET</text>
+          <line x1="400" y1="85" x2="508" y2="85" stroke="#f39c12" stroke-width="2" marker-end="url(#arrowOrange2)" stroke-dasharray="6,3"/>
+          <text x="440" y="78" font-family="Montserrat,sans-serif" font-size="11" fill="#555">2. miss → SELECT</text>
+          <line x1="508" y1="100" x2="402" y2="100" stroke="#3498db" stroke-width="2" marker-end="url(#arrowBlue2)"/>
+          <text x="440" y="116" font-family="Montserrat,sans-serif" font-size="11" fill="#555">3. resultado</text>
+          <line x1="248" y1="100" x2="142" y2="100" stroke="#27ae60" stroke-width="2" marker-end="url(#arrowGreen2)"/>
+          <text x="183" y="116" font-family="Montserrat,sans-serif" font-size="11" fill="#555">4. retorna</text>
+          <rect x="680" y="20" width="210" height="140" rx="10" fill="#f4f4f4" stroke="#ddd" stroke-width="1"/>
+          <text x="700" y="46" font-family="Montserrat,sans-serif" font-size="13" font-weight="700" fill="#1a1a2e">Diferença do Cache-Aside:</text>
+          <text x="700" y="68" font-family="Montserrat,sans-serif" font-size="12" fill="#555">A App NÃO sabe que</text>
+          <text x="700" y="84" font-family="Montserrat,sans-serif" font-size="12" fill="#555">existe um banco por trás.</text>
+          <text x="700" y="108" font-family="Montserrat,sans-serif" font-size="12" fill="#555">O cache provider gerencia</text>
+          <text x="700" y="124" font-family="Montserrat,sans-serif" font-size="12" fill="#555">tudo: busca, popula e</text>
+          <text x="700" y="140" font-family="Montserrat,sans-serif" font-size="12" fill="#555">retorna transparentemente.</text>
+          <defs>
+            <marker id="arrowPink2" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6Z" fill="#ed145b"/></marker>
+            <marker id="arrowOrange2" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6Z" fill="#f39c12"/></marker>
+            <marker id="arrowBlue2" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6Z" fill="#3498db"/></marker>
+            <marker id="arrowGreen2" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6Z" fill="#27ae60"/></marker>
+          </defs>
+        </svg>
+
+        <table>
+          <thead><tr><th>Vantagens</th><th>Desvantagens</th></tr></thead>
+          <tbody>
+            <tr>
+              <td>Código da aplicação mais limpo — não gerencia cache</td>
+              <td>Precisa de um cache provider que suporte loaders</td>
+            </tr>
+            <tr>
+              <td>Centraliza a lógica de carregamento no provider</td>
+              <td>Debugging mais difícil (lógica escondida na camada de cache)</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="callout">
+          <p><strong>Na prática:</strong> bibliotecas como <strong>Caffeine</strong> (Java) e <strong>NCache</strong> (.NET) implementam Read-Through nativamente. Você configura um loader e a lib cuida do resto. Redis puro não suporta Read-Through — precisa de uma camada wrapper na aplicação.</p>
+        </div>
+
+        <div class="slide-footer">
+          <div class="footer-bar">06 - Cache com Redis</div>
+          <div class="footer-page">8</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE 6c: Write-Through ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Write-Through</h2>
+        </div>
+
+        <svg viewBox="0 0 900 180" style="width:100%;max-width:900px;margin:0 auto;display:block;" xmlns="http://www.w3.org/2000/svg">
+          <rect x="10" y="55" width="130" height="70" rx="10" fill="#ed145b" opacity="0.12" stroke="#ed145b" stroke-width="2"/>
+          <text x="75" y="95" text-anchor="middle" font-family="Montserrat,sans-serif" font-size="15" font-weight="700" fill="#1a1a2e">App</text>
+          <rect x="250" y="55" width="130" height="70" rx="10" fill="#f39c12" opacity="0.15" stroke="#f39c12" stroke-width="2"/>
+          <text x="315" y="95" text-anchor="middle" font-family="Montserrat,sans-serif" font-size="15" font-weight="700" fill="#1a1a2e">Redis Cache</text>
+          <rect x="500" y="55" width="130" height="70" rx="10" fill="#3498db" opacity="0.15" stroke="#3498db" stroke-width="2"/>
+          <text x="565" y="95" text-anchor="middle" font-family="Montserrat,sans-serif" font-size="15" font-weight="700" fill="#1a1a2e">Banco de Dados</text>
+          <line x1="140" y1="80" x2="248" y2="80" stroke="#ed145b" stroke-width="2" marker-end="url(#arrowPink3)"/>
+          <text x="175" y="73" font-family="Montserrat,sans-serif" font-size="11" fill="#555">1. SET</text>
+          <line x1="380" y1="80" x2="498" y2="80" stroke="#f39c12" stroke-width="2" marker-end="url(#arrowOrange3)"/>
+          <text x="415" y="73" font-family="Montserrat,sans-serif" font-size="11" fill="#555">2. INSERT/UPDATE</text>
+          <line x1="498" y1="100" x2="382" y2="100" stroke="#3498db" stroke-width="2" marker-end="url(#arrowBlue3)"/>
+          <text x="425" y="116" font-family="Montserrat,sans-serif" font-size="11" fill="#555">3. OK</text>
+          <line x1="248" y1="100" x2="142" y2="100" stroke="#27ae60" stroke-width="2" marker-end="url(#arrowGreen3)"/>
+          <text x="175" y="116" font-family="Montserrat,sans-serif" font-size="11" fill="#555">4. OK</text>
+          <rect x="670" y="15" width="220" height="155" rx="10" fill="#f4f4f4" stroke="#ddd" stroke-width="1"/>
+          <text x="690" y="40" font-family="Montserrat,sans-serif" font-size="13" font-weight="700" fill="#1a1a2e">Característica chave:</text>
+          <text x="690" y="62" font-family="Montserrat,sans-serif" font-size="12" fill="#555">Escrita é SÍNCRONA:</text>
+          <text x="690" y="78" font-family="Montserrat,sans-serif" font-size="12" fill="#555">cache + banco precisam</text>
+          <text x="690" y="94" font-family="Montserrat,sans-serif" font-size="12" fill="#555">confirmar antes de retornar.</text>
+          <text x="690" y="120" font-family="Montserrat,sans-serif" font-size="12" fill="#e74c3c" font-weight="600">Latência de escrita maior</text>
+          <text x="690" y="140" font-family="Montserrat,sans-serif" font-size="12" fill="#27ae60" font-weight="600">Consistência garantida</text>
+          <defs>
+            <marker id="arrowPink3" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6Z" fill="#ed145b"/></marker>
+            <marker id="arrowOrange3" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6Z" fill="#f39c12"/></marker>
+            <marker id="arrowBlue3" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6Z" fill="#3498db"/></marker>
+            <marker id="arrowGreen3" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6Z" fill="#27ae60"/></marker>
+          </defs>
+        </svg>
+
+        <table>
+          <thead><tr><th>Vantagens</th><th>Desvantagens</th></tr></thead>
+          <tbody>
+            <tr>
+              <td>Cache sempre consistente com o banco</td>
+              <td>Latência de escrita ~2x (escreve em dois lugares)</td>
+            </tr>
+            <tr>
+              <td>Leituras subsequentes sempre HIT</td>
+              <td>Pode cachear dados que nunca serão lidos (desperdício de memória)</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="callout">
+          <p><strong>Caso real:</strong> DynamoDB Accelerator (DAX) da AWS usa Write-Through. Toda escrita no DynamoDB passa pelo DAX automaticamente, garantindo que leituras sempre retornem dados atualizados com latência de microsegundos.</p>
+        </div>
+
+        <div class="slide-footer">
+          <div class="footer-bar">06 - Cache com Redis</div>
+          <div class="footer-page">9</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE 6d: Write-Behind ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Write-Behind (Write-Back)</h2>
+        </div>
+
+        <svg viewBox="0 0 900 180" style="width:100%;max-width:900px;margin:0 auto;display:block;" xmlns="http://www.w3.org/2000/svg">
+          <rect x="10" y="55" width="130" height="70" rx="10" fill="#ed145b" opacity="0.12" stroke="#ed145b" stroke-width="2"/>
+          <text x="75" y="95" text-anchor="middle" font-family="Montserrat,sans-serif" font-size="15" font-weight="700" fill="#1a1a2e">App</text>
+          <rect x="250" y="55" width="130" height="70" rx="10" fill="#f39c12" opacity="0.15" stroke="#f39c12" stroke-width="2"/>
+          <text x="315" y="95" text-anchor="middle" font-family="Montserrat,sans-serif" font-size="15" font-weight="700" fill="#1a1a2e">Redis Cache</text>
+          <rect x="500" y="55" width="130" height="70" rx="10" fill="#3498db" opacity="0.15" stroke="#3498db" stroke-width="2"/>
+          <text x="565" y="95" text-anchor="middle" font-family="Montserrat,sans-serif" font-size="15" font-weight="700" fill="#1a1a2e">Banco de Dados</text>
+          <!-- Worker async -->
+          <rect x="370" y="140" width="120" height="35" rx="8" fill="#9b59b6" opacity="0.15" stroke="#9b59b6" stroke-width="2"/>
+          <text x="430" y="163" text-anchor="middle" font-family="Montserrat,sans-serif" font-size="12" font-weight="600" fill="#1a1a2e">Worker Async</text>
+          <line x1="140" y1="82" x2="248" y2="82" stroke="#ed145b" stroke-width="2" marker-end="url(#arrowPink4)"/>
+          <text x="175" y="75" font-family="Montserrat,sans-serif" font-size="11" fill="#555">1. SET</text>
+          <line x1="248" y1="95" x2="142" y2="95" stroke="#27ae60" stroke-width="2" marker-end="url(#arrowGreen4)"/>
+          <text x="175" y="112" font-family="Montserrat,sans-serif" font-size="11" fill="#555">2. OK (rápido!)</text>
+          <line x1="350" y1="125" x2="390" y2="142" stroke="#9b59b6" stroke-width="2" marker-end="url(#arrowPurple4)" stroke-dasharray="6,3"/>
+          <text x="310" y="146" font-family="Montserrat,sans-serif" font-size="11" fill="#555">3. fila</text>
+          <line x1="490" y1="152" x2="530" y2="120" stroke="#9b59b6" stroke-width="2" marker-end="url(#arrowPurple4)" stroke-dasharray="6,3"/>
+          <text x="520" y="148" font-family="Montserrat,sans-serif" font-size="11" fill="#555">4. batch INSERT</text>
+          <rect x="670" y="15" width="220" height="155" rx="10" fill="#f4f4f4" stroke="#ddd" stroke-width="1"/>
+          <text x="690" y="40" font-family="Montserrat,sans-serif" font-size="13" font-weight="700" fill="#1a1a2e">Característica chave:</text>
+          <text x="690" y="62" font-family="Montserrat,sans-serif" font-size="12" fill="#555">Escrita é ASSÍNCRONA:</text>
+          <text x="690" y="78" font-family="Montserrat,sans-serif" font-size="12" fill="#555">App recebe OK assim que</text>
+          <text x="690" y="94" font-family="Montserrat,sans-serif" font-size="12" fill="#555">o cache confirma. Worker</text>
+          <text x="690" y="110" font-family="Montserrat,sans-serif" font-size="12" fill="#555">persiste no banco depois.</text>
+          <text x="690" y="136" font-family="Montserrat,sans-serif" font-size="12" fill="#27ae60" font-weight="600">Escrita ultra rápida</text>
+          <text x="690" y="156" font-family="Montserrat,sans-serif" font-size="12" fill="#e74c3c" font-weight="600">Risco de perda se cache cair</text>
+          <defs>
+            <marker id="arrowPink4" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6Z" fill="#ed145b"/></marker>
+            <marker id="arrowGreen4" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6Z" fill="#27ae60"/></marker>
+            <marker id="arrowPurple4" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6Z" fill="#9b59b6"/></marker>
+          </defs>
+        </svg>
+
+        <table>
+          <thead><tr><th>Vantagens</th><th>Desvantagens</th></tr></thead>
+          <tbody>
+            <tr>
+              <td>Latência de escrita mínima (só cache)</td>
+              <td>Risco de perda de dados se o cache falhar antes do sync</td>
+            </tr>
+            <tr>
+              <td>Permite agrupar escritas em batch (reduz carga no banco)</td>
+              <td>Complexidade de implementação (fila, retries, dead-letter)</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="callout">
+          <p><strong>Caso real:</strong> Sistemas de <strong>analytics e contadores</strong> (views, likes, page hits) usam Write-Behind. O Facebook acumula contadores de likes em memória e faz flush para o banco a cada poucos segundos — perder um ou dois likes é aceitável, mas a latência de escrita precisa ser mínima.</p>
+        </div>
+
+        <div class="slide-footer">
+          <div class="footer-bar">06 - Cache com Redis</div>
+          <div class="footer-page">10</div>
         </div>
       </section>
 
@@ -152,7 +419,7 @@
 
         <div class="slide-footer">
           <div class="footer-bar">06 - Cache com Redis</div>
-          <div class="footer-page">7</div>
+          <div class="footer-page">11</div>
         </div>
       </section>
 
@@ -189,7 +456,7 @@ CONFIG SET maxmemory-policy allkeys-lru</code></pre>
 
         <div class="slide-footer">
           <div class="footer-bar">06 - Cache com Redis</div>
-          <div class="footer-page">8</div>
+          <div class="footer-page">12</div>
         </div>
       </section>
 
@@ -212,7 +479,7 @@ CONFIG SET maxmemory-policy allkeys-lru</code></pre>
 
         <div class="slide-footer">
           <div class="footer-bar">06 - Cache com Redis</div>
-          <div class="footer-page">9</div>
+          <div class="footer-page">13</div>
         </div>
       </section>
 
@@ -246,7 +513,7 @@ CONFIG SET maxmemory-policy allkeys-lru</code></pre>
 
         <div class="slide-footer">
           <div class="footer-bar">06 - Cache com Redis</div>
-          <div class="footer-page">10</div>
+          <div class="footer-page">14</div>
         </div>
       </section>
 
@@ -279,7 +546,7 @@ MONITOR</code></pre>
 
         <div class="slide-footer">
           <div class="footer-bar">06 - Cache com Redis</div>
-          <div class="footer-page">11</div>
+          <div class="footer-page">15</div>
         </div>
       </section>
 
@@ -311,7 +578,7 @@ SET cache:product:456 '{"nome":"Notebook","preco":4500}'</code></pre>
 
         <div class="slide-footer">
           <div class="footer-bar">06 - Cache com Redis</div>
-          <div class="footer-page">12</div>
+          <div class="footer-page">16</div>
         </div>
       </section>
 
@@ -343,7 +610,7 @@ SET cache:product:456 '{"nome":"Notebook","preco":4500}'</code></pre>
 
         <div class="slide-footer">
           <div class="footer-bar">06 - Cache com Redis</div>
-          <div class="footer-page">13</div>
+          <div class="footer-page">17</div>
         </div>
       </section>
 
@@ -381,7 +648,7 @@ PERSIST session:abc</code></pre>
 
         <div class="slide-footer">
           <div class="footer-bar">06 - Cache com Redis</div>
-          <div class="footer-page">14</div>
+          <div class="footer-page">18</div>
         </div>
       </section>
 
@@ -426,7 +693,7 @@ volumes:
 
         <div class="slide-footer">
           <div class="footer-bar">06 - Cache com Redis</div>
-          <div class="footer-page">15</div>
+          <div class="footer-page">19</div>
         </div>
       </section>
 
@@ -472,7 +739,7 @@ volumes:
 
         <div class="slide-footer">
           <div class="footer-bar">06 - Cache com Redis</div>
-          <div class="footer-page">16</div>
+          <div class="footer-page">20</div>
         </div>
       </section>
 
@@ -496,7 +763,7 @@ volumes:
 
         <div class="slide-footer">
           <div class="footer-bar">06 - Cache com Redis</div>
-          <div class="footer-page">17</div>
+          <div class="footer-page">21</div>
         </div>
       </section>
 
@@ -525,7 +792,7 @@ public User getUserById(String id) {
 
         <div class="slide-footer">
           <div class="footer-bar">06 - Cache com Redis</div>
-          <div class="footer-page">18</div>
+          <div class="footer-page">22</div>
         </div>
       </section>
 
@@ -551,7 +818,7 @@ public User getUserById(String id) {
 
         <div class="slide-footer">
           <div class="footer-bar">06 - Cache com Redis</div>
-          <div class="footer-page">19</div>
+          <div class="footer-page">23</div>
         </div>
       </section>
 
@@ -577,7 +844,7 @@ async function getUser(id) {
 
         <div class="slide-footer">
           <div class="footer-bar">06 - Cache com Redis</div>
-          <div class="footer-page">20</div>
+          <div class="footer-page">24</div>
         </div>
       </section>
 
@@ -592,7 +859,7 @@ async function getUser(id) {
         </div>
         <div class="slide-footer">
           <div class="footer-bar">06 - Cache com Redis</div>
-          <div class="footer-page">21</div>
+          <div class="footer-page">25</div>
         </div>
       </section>
 
@@ -604,7 +871,7 @@ async function getUser(id) {
         <h2>Bloco 2<br>Exercício prático e Quiz</h2>
         <div class="slide-footer">
           <div class="footer-bar">06 - Cache com Redis</div>
-          <div class="footer-page">22</div>
+          <div class="footer-page">26</div>
         </div>
       </section>
 
@@ -637,7 +904,7 @@ async function getUser(id) {
 
         <div class="slide-footer">
           <div class="footer-bar">06 - Cache com Redis</div>
-          <div class="footer-page">23</div>
+          <div class="footer-page">27</div>
         </div>
       </section>
 
@@ -688,7 +955,7 @@ app.listen(3000, () => console.log('API rodando na porta 3000'));</code></pre>
 
         <div class="slide-footer">
           <div class="footer-bar">06 - Cache com Redis</div>
-          <div class="footer-page">24</div>
+          <div class="footer-page">28</div>
         </div>
       </section>
 
@@ -712,7 +979,7 @@ app.listen(3000, () => console.log('API rodando na porta 3000'));</code></pre>
 
         <div class="slide-footer">
           <div class="footer-bar">06 - Cache com Redis</div>
-          <div class="footer-page">25</div>
+          <div class="footer-page">29</div>
         </div>
       </section>
 
@@ -736,7 +1003,7 @@ app.listen(3000, () => console.log('API rodando na porta 3000'));</code></pre>
 
         <div class="slide-footer">
           <div class="footer-bar">06 - Cache com Redis</div>
-          <div class="footer-page">26</div>
+          <div class="footer-page">30</div>
         </div>
       </section>
 
@@ -760,7 +1027,7 @@ app.listen(3000, () => console.log('API rodando na porta 3000'));</code></pre>
 
         <div class="slide-footer">
           <div class="footer-bar">06 - Cache com Redis</div>
-          <div class="footer-page">27</div>
+          <div class="footer-page">31</div>
         </div>
       </section>
 
@@ -784,7 +1051,7 @@ app.listen(3000, () => console.log('API rodando na porta 3000'));</code></pre>
 
         <div class="slide-footer">
           <div class="footer-bar">06 - Cache com Redis</div>
-          <div class="footer-page">28</div>
+          <div class="footer-page">32</div>
         </div>
       </section>
 
@@ -803,7 +1070,7 @@ app.listen(3000, () => console.log('API rodando na porta 3000'));</code></pre>
 
         <div class="slide-footer">
           <div class="footer-bar">06 - Cache com Redis</div>
-          <div class="footer-page">29</div>
+          <div class="footer-page">33</div>
         </div>
       </section>
 
