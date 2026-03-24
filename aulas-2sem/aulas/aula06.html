@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>AULA 06 - Testes de Integracao | FIAP</title>
+  <title>Aula 06 – Cache com Redis | FIAP</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.css" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/theme/white.css" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/plugin/highlight/monokai.css" />
@@ -16,25 +16,25 @@
   <div class="reveal">
     <div class="slides">
 
-      <!-- ==================== SLIDE: CAPA FIAP ==================== -->
+      <!-- ==================== SLIDE 1: CAPA FIAP ==================== -->
       <section class="cover-slide">
         <img src="../assets/img/fiap-logo-graduacao.png" alt="FIAP Graduação" class="fiap-logo-full" />
       </section>
 
-      <!-- ==================== SLIDE: TÍTULO DA AULA ==================== -->
+      <!-- ==================== SLIDE 2: TÍTULO DA AULA ==================== -->
       <section class="title-slide">
         <div class="top-bar"></div>
         <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
         <div class="title-card">
           <div class="accent-bar"></div>
-          <h1>Sistemas de Informação</h1>
-          <h2>Testes de Integração</h2>
+          <h1>06 - Cache com Redis</h1>
+          <h2>Microservice and Web Engineering</h2>
           <h3>Prof. José Romualdo</h3>
         </div>
-        <div class="lesson-bar">06 - Testes de Integracao</div>
+        <div class="lesson-bar">AULA 06 – Cache com Redis</div>
       </section>
 
-      <!-- ==================== SLIDE: AGENDA ==================== -->
+      <!-- ==================== SLIDE 3: AGENDA ==================== -->
       <section class="content-slide">
         <div class="top-bar"></div>
         <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
@@ -48,562 +48,747 @@
             <tr><th>Bloco</th><th>Horário</th><th>Conteúdo</th></tr>
           </thead>
           <tbody>
-            <tr><td><strong>Bloco 1</strong></td><td>19h30 – 21h00</td><td>Diferenca entre testes de unidade e integracao, Testcontainers, testes de API com supertest e RestAssured, Contract Testing com Pact, Caso real Nubank</td></tr>
+            <tr><td><strong>Bloco 1</strong></td><td>19h30 – 21h00</td><td>Por que cache? (com números), Estratégias, Eviction Policies, Redis: keys, tipos de dados, TTL, Docker e caso real</td></tr>
             <tr><td><strong>Intervalo</strong></td><td>21h00 – 21h20</td><td>☕ Pausa</td></tr>
-            <tr><td><strong>Bloco 2</strong></td><td>21h20 – 22h45</td><td>Exercício prático: Testcontainers com PostgreSQL + CRUD + Quiz</td></tr>
+            <tr><td><strong>Bloco 2</strong></td><td>21h20 – 22h45</td><td>Exercício prático Cache-Aside com Redis e Node.js + Quiz interativo</td></tr>
           </tbody>
         </table>
 
         <div class="slide-footer">
-          <div class="footer-bar">06 - Testes de Integracao</div>
+          <div class="footer-bar">06 - Cache com Redis</div>
           <div class="footer-page">3</div>
         </div>
       </section>
 
-      <!-- ==================== SLIDE: SEÇÃO - Bloco 1 ==================== -->
+      <!-- ==================== SLIDE 4: SEÇÃO - B1 ==================== -->
       <section class="section-slide">
         <div class="top-bar"></div>
         <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
         <div class="accent-bar"></div>
-        <h2>Bloco 1<br>Testes de Integração</h2>
+        <h2>Bloco 1<br>Por que cache? Estratégias e conceitos</h2>
         <div class="slide-footer">
-          <div class="footer-bar">06 - Testes de Integracao</div>
+          <div class="footer-bar">06 - Cache com Redis</div>
           <div class="footer-page">4</div>
         </div>
       </section>
 
-      <!-- ==================== SLIDE: Diferença entre Testes de Unidade e Integração ==================== -->
+      <!-- ==================== SLIDE 5: Por que cache? (com números) ==================== -->
       <section class="content-slide">
         <div class="top-bar"></div>
         <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
         <div class="slide-title-area">
           <div class="accent-bar"></div>
-          <h2>Diferença entre Testes de Unidade e Integração</h2>
+          <h2>Por que usar cache? Os números</h2>
         </div>
 
-        <ul>
-          <li><strong>Teste de Unidade:</strong> Verifica o funcionamento isolado de uma unidade (função, método).</li>
-          <li><strong>Teste de Integração:</strong> Valida a interação entre múltiplos componentes ou sistemas.</li>
-          <li>Testes de integração geralmente envolvem banco de dados, APIs, serviços externos ou microsserviços.</li>
-          <li>Mais complexos e mais lentos que testes de unidade, porém essenciais para garantir a integração correta.</li>
-        </ul>
+        <table>
+          <thead>
+            <tr><th>Operação</th><th>Latência</th><th>Comparação</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>L1 Cache (CPU)</td><td>~1 ns</td><td>-</td></tr>
+            <tr><td>RAM</td><td>~100 ns</td><td>100x L1</td></tr>
+            <tr><td><strong>Redis (rede local)</strong></td><td><strong>~0.5 ms</strong></td><td><strong>5,000x RAM</strong></td></tr>
+            <tr><td>SSD (leitura aleatória)</td><td>~0.1 ms</td><td>-</td></tr>
+            <tr><td>PostgreSQL (query simples)</td><td>~1-5 ms</td><td>2-10x Redis</td></tr>
+            <tr><td>Round-trip (mesmo datacenter)</td><td>~0.5 ms</td><td>-</td></tr>
+            <tr><td>Round-trip (cross-region)</td><td>~50-150 ms</td><td>100-300x Redis</td></tr>
+          </tbody>
+        </table>
+
+        <div class="callout">
+          <p><strong>Na prática:</strong> Redis é ~100x mais rápido que uma query PostgreSQL típica. Em um sistema com 10.000 req/s, cache pode reduzir a carga do banco em 90%+ para dados lidos com frequência.</p>
+        </div>
 
         <div class="slide-footer">
-          <div class="footer-bar">06 - Testes de Integracao</div>
+          <div class="footer-bar">06 - Cache com Redis</div>
           <div class="footer-page">5</div>
         </div>
       </section>
 
-      <!-- ==================== SLIDE: Testcontainers - Banco de Dados em Container para Testes ==================== -->
+      <!-- ==================== SLIDE 6: Estratégias de Cache ==================== -->
       <section class="content-slide">
         <div class="top-bar"></div>
         <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
         <div class="slide-title-area">
           <div class="accent-bar"></div>
-          <h2>Testcontainers</h2>
-          <h3>Rodando banco de dados em container para testes</h3>
+          <h2>Estratégias de Cache</h2>
         </div>
 
-        <p>Testcontainers é uma biblioteca que permite rodar containers Docker para bancos e serviços durante testes automatizados.</p>
-        <ul>
-          <li>Garante ambiente isolado e consistente para testes de integração.</li>
-          <li>Evita problemas de configuração de banco local ou falta de dados.</li>
-          <li>Suporta diversos bancos: PostgreSQL, MySQL, MongoDB, Kafka, etc.</li>
-        </ul>
+        <dl>
+          <dt><strong>Cache-Aside (Lazy Loading)</strong></dt>
+          <dd>Aplicação consulta cache; se não existir, busca no banco, atualiza cache e retorna.</dd>
+          <dt><strong>Write-Through</strong></dt>
+          <dd>Dados escritos simultaneamente no cache e no banco, garantindo sincronização.</dd>
+          <dt><strong>Write-Behind (Write-Back)</strong></dt>
+          <dd>Dados escritos no cache e sincronizados no banco depois, em background.</dd>
+          <dt><strong>Read-Through</strong></dt>
+          <dd>Cache é responsável por buscar no banco caso dado não esteja em cache.</dd>
+        </dl>
 
         <div class="slide-footer">
-          <div class="footer-bar">06 - Testes de Integracao</div>
+          <div class="footer-bar">06 - Cache com Redis</div>
           <div class="footer-page">6</div>
         </div>
       </section>
 
-      <!-- ==================== SLIDE: Testes de API com Supertest (Node.js) ==================== -->
-      <section class="content-slide">
+      <!-- ==================== SLIDE 7: Quiz 1 - Estratégias ==================== -->
+      <section class="quiz-slide content-slide" data-correct="cache-aside" data-quiz-feedback="A estratégia Cache-Aside é eficiente para cargas com leituras frequentes e escrita esporádica.">
         <div class="top-bar"></div>
         <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
         <div class="slide-title-area">
           <div class="accent-bar"></div>
-          <h2>Testes de API com Supertest (Node.js)</h2>
+          <h2>Quiz: Qual estratégia é mais adequada para leituras frequentes e poucas escritas?</h2>
         </div>
 
-        <p>Supertest é uma biblioteca para testar APIs HTTP em aplicações Node.js.</p>
-        <pre><code class="language-js">
-// Exemplo básico com Express + Supertest
-const request = require('supertest');
-const app = require('../app');
+        <ul class="quiz-options">
+          <label><input type="radio" name="q-estrategia" value="write-through"> Write-Through</label>
+          <label><input type="radio" name="q-estrategia" value="cache-aside"> Cache-Aside</label>
+          <label><input type="radio" name="q-estrategia" value="write-behind"> Write-Behind</label>
+          <label><input type="radio" name="q-estrategia" value="read-through"> Read-Through</label>
+        </ul>
 
-describe('GET /api/users', () => {
-  it('Retorna status 200 e lista de usuários', async () => {
-    const res = await request(app).get('/api/users');
-    expect(res.statusCode).toEqual(200);
-    expect(res.body).toBeInstanceOf(Array);
-  });
-});
-        </code></pre>
+        <div class="quiz-feedback"></div>
 
         <div class="slide-footer">
-          <div class="footer-bar">06 - Testes de Integracao</div>
+          <div class="footer-bar">06 - Cache com Redis</div>
           <div class="footer-page">7</div>
         </div>
       </section>
 
-      <!-- ==================== SLIDE: Testes de API com RestAssured (Java/Spring Boot) ==================== -->
+      <!-- ==================== SLIDE 8: Redis Eviction Policies (maxmemory-policy) ==================== -->
       <section class="content-slide">
         <div class="top-bar"></div>
         <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
         <div class="slide-title-area">
           <div class="accent-bar"></div>
-          <h2>Testes de API com RestAssured (Java/Spring Boot)</h2>
+          <h2>Redis: Políticas de Eviction (<code>maxmemory-policy</code>)</h2>
         </div>
 
-        <p>RestAssured é uma biblioteca Java para testes de APIs REST, muito utilizada com Spring Boot.</p>
-        <pre><code class="language-java">
-import io.restassured.RestAssured;
-import org.junit.jupiter.api.Test;
-import static org.hamcrest.Matchers.*;
+        <table>
+          <thead>
+            <tr><th>Policy</th><th>Comportamento</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><code>noeviction</code></td><td>Retorna erro quando memória cheia <strong>(padrão)</strong></td></tr>
+            <tr><td><code>allkeys-lru</code></td><td>Remove chave menos acessada recentemente <strong>(recomendado para cache)</strong></td></tr>
+            <tr><td><code>volatile-lru</code></td><td>LRU apenas em chaves com TTL definido</td></tr>
+            <tr><td><code>allkeys-lfu</code></td><td>Remove chave com menor frequência de acesso</td></tr>
+            <tr><td><code>volatile-lfu</code></td><td>LFU apenas em chaves com TTL definido</td></tr>
+            <tr><td><code>volatile-ttl</code></td><td>Remove chave com menor TTL restante</td></tr>
+          </tbody>
+        </table>
 
-public class UserApiTest {
+        <pre><code class="language-bash"># Configurar limite de memória e política
+CONFIG SET maxmemory 256mb
+CONFIG SET maxmemory-policy allkeys-lru</code></pre>
 
-  @Test
-  public void testGetUsers() {
-    RestAssured.given()
-      .when().get("/api/users")
-      .then()
-      .statusCode(200)
-      .body("$", not(empty()));
-  }
-}
-        </code></pre>
+        <div class="callout">
+          <p><strong>Regra prática:</strong> para cache puro, use <code>allkeys-lru</code>. Para mix de cache + dados persistentes, use <code>volatile-lru</code> (só remove chaves com TTL).</p>
+        </div>
 
         <div class="slide-footer">
-          <div class="footer-bar">06 - Testes de Integracao</div>
+          <div class="footer-bar">06 - Cache com Redis</div>
           <div class="footer-page">8</div>
         </div>
       </section>
 
-      <!-- ==================== SLIDE: Contract Testing com Pact ==================== -->
+      <!-- ==================== SLIDE 9: Redis como Cache Distribuído ==================== -->
       <section class="content-slide">
         <div class="top-bar"></div>
         <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
         <div class="slide-title-area">
           <div class="accent-bar"></div>
-          <h2>Contract Testing com Pact</h2>
+          <h2>Redis como Cache Distribuído</h2>
         </div>
 
-        <p>Contract Testing é uma técnica para validar contratos entre serviços (consumidores e provedores).</p>
         <ul>
-          <li>Pact é uma ferramenta popular para testes de contrato.</li>
-          <li>Garante que serviços independentes evoluam sem quebrar integrações.</li>
-          <li>Evita testes end-to-end caros e frágeis.</li>
+          <li>Armazenamento chave-valor em memória, escrito em C</li>
+          <li>Suporta múltiplas estruturas: strings, hashes, listas, sets, sorted sets</li>
+          <li>Alta disponibilidade com replicação (master-replica) e persistência opcional</li>
+          <li>Suporte a clusters para escalabilidade horizontal (particionamento automático)</li>
+          <li>Ideal para cache distribuído em arquiteturas de microsserviços</li>
         </ul>
 
-        <pre><code class="language-json">
-// Exemplo de contrato Pact (simplificado)
-{
-  "consumer": { "name": "frontend" },
-  "provider": { "name": "user-service" },
-  "interactions": [
-    {
-      "description": "Busca usuário por ID",
-      "request": {
-        "method": "GET",
-        "path": "/users/123"
-      },
-      "response": {
-        "status": 200,
-        "body": {
-          "id": 123,
-          "name": "João"
-        }
-      }
-    }
-  ]
-}
-        </code></pre>
-
         <div class="slide-footer">
-          <div class="footer-bar">06 - Testes de Integracao</div>
+          <div class="footer-bar">06 - Cache com Redis</div>
           <div class="footer-page">9</div>
         </div>
       </section>
 
-      <!-- ==================== SLIDE: Caso Real: Nubank e Testes de Integração com Contratos ==================== -->
+      <!-- ==================== SLIDE 10: Redis - Números de Performance ==================== -->
       <section class="content-slide">
         <div class="top-bar"></div>
         <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
         <div class="slide-title-area">
           <div class="accent-bar"></div>
-          <h2>Caso Real: Nubank</h2>
-          <h3>Como o Nubank testa integrações entre microsserviços com contratos</h3>
+          <h2>Redis: Números de Performance</h2>
         </div>
 
-        <p>O Nubank utiliza Contract Testing para garantir a comunicação correta entre seus microsserviços.</p>
-        <ul>
-          <li>Equipes independentes produzem pactos que definem expectativas.</li>
-          <li>Testes automáticos validam que mudanças não quebrem integrações.</li>
-          <li>Redução significativa de bugs em produção e retrabalho.</li>
-        </ul>
+        <table>
+          <thead>
+            <tr><th>Métrica</th><th>Valor</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Throughput (GET/SET)</td><td>~100.000+ ops/s em instância única</td></tr>
+            <tr><td>Latência média</td><td>&lt; 1 ms para operações simples</td></tr>
+            <tr><td>Com pipelining</td><td>até ~1.000.000 ops/s</td></tr>
+            <tr><td>Modelo de execução</td><td>Single-threaded com I/O multiplexing (epoll/kqueue)</td></tr>
+            <tr><td>Capacidade por GB</td><td>~15-17 milhões de chaves string simples</td></tr>
+            <tr><td>Tamanho máximo de chave</td><td>512 MB</td></tr>
+            <tr><td>Tamanho máximo de valor</td><td>512 MB</td></tr>
+          </tbody>
+        </table>
+
+        <div class="callout">
+          <p><strong>Por que single-threaded?</strong> Evita overhead de locks e context switching. O gargalo geralmente é a rede, não a CPU. Redis 7+ usa threads auxiliares para I/O de rede, mantendo a execução de comandos single-threaded.</p>
+        </div>
 
         <div class="slide-footer">
-          <div class="footer-bar">06 - Testes de Integracao</div>
+          <div class="footer-bar">06 - Cache com Redis</div>
           <div class="footer-page">10</div>
         </div>
       </section>
 
-      <!-- ==================== SLIDE: QUIZ 1 - Testcontainers ==================== -->
-      <section class="quiz-slide content-slide" data-correct="b" data-quiz-feedback="Resposta correta! Testcontainers facilita a execução de bancos em containers para testes.">
+      <!-- ==================== SLIDE 11: Redis CLI ==================== -->
+      <section class="content-slide">
         <div class="top-bar"></div>
         <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
         <div class="slide-title-area">
           <div class="accent-bar"></div>
-          <h2>Quiz 1: Testcontainers</h2>
+          <h2>Comandos básicos Redis CLI</h2>
         </div>
 
-        <p>Qual a principal vantagem de usar Testcontainers em testes de integração?</p>
-        <form>
-          <input type="radio" name="q1" id="q1a" value="a" />
-          <label for="q1a">a) Evitar o uso de containers Docker</label><br/>
-          <input type="radio" name="q1" id="q1b" value="b" />
-          <label for="q1b">b) Prover um ambiente isolado e consistente para testes com bancos</label><br/>
-          <input type="radio" name="q1" id="q1c" value="c" />
-          <label for="q1c">c) Substituir testes unitários por testes manuais</label><br/>
-        </form>
+        <pre><code class="language-bash"># Conectar ao Redis
+redis-cli
+
+# Setar valor com TTL 60 segundos
+SET usuario:123 '{"nome":"João"}' EX 60
+
+# Obter valor
+GET usuario:123
+
+# Remover chave
+DEL usuario:123
+
+# Busca segura em produção (nunca use KEYS * em prod!)
+SCAN 0 MATCH usuario:* COUNT 100
+
+# Monitorar comandos em tempo real
+MONITOR</code></pre>
 
         <div class="slide-footer">
-          <div class="footer-bar">06 - Testes de Integracao</div>
+          <div class="footer-bar">06 - Cache com Redis</div>
           <div class="footer-page">11</div>
         </div>
       </section>
 
-      <!-- ==================== SLIDE: QUIZ 2 - Contract Testing ==================== -->
-      <section class="quiz-slide content-slide" data-correct="a" data-quiz-feedback="Correto! Contract Testing previne que alterações quebrem a integração entre serviços.">
+      <!-- ==================== SLIDE 12: Redis Keys - Padrão e Convenções ==================== -->
+      <section class="content-slide">
         <div class="top-bar"></div>
         <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
         <div class="slide-title-area">
           <div class="accent-bar"></div>
-          <h2>Quiz 2: Contract Testing</h2>
+          <h2>Redis Keys: Padrão e Convenções</h2>
         </div>
 
-        <p>Qual o principal objetivo do Contract Testing?</p>
-        <form>
-          <input type="radio" name="q2" id="q2a" value="a" />
-          <label for="q2a">a) Garantir que os contratos entre consumidores e provedores sejam respeitados</label><br/>
-          <input type="radio" name="q2" id="q2b" value="b" />
-          <label for="q2b">b) Testar a performance da API sob carga</label><br/>
-          <input type="radio" name="q2" id="q2c" value="c" />
-          <label for="q2c">c) Substituir testes de unidade por testes end-to-end</label><br/>
-        </form>
+        <dl>
+          <dt><strong>Formato recomendado:</strong> <code>objeto:id:atributo</code></dt>
+          <dd>Exemplos: <code>user:123:profile</code>, <code>session:abc-def</code>, <code>cache:product:456</code></dd>
+          <dt><strong>Separador padrão:</strong> <code>:</code> (dois-pontos)</dt>
+          <dd>Convenção universal no ecossistema Redis. Facilita organização e busca.</dd>
+          <dt><strong>Prefixos por serviço (microsserviços):</strong></dt>
+          <dd><code>order-svc:order:789</code>, <code>auth-svc:session:abc</code> — evita colisão entre serviços</dd>
+          <dt><strong>Evitar:</strong></dt>
+          <dd>Chaves &gt; 1 KB, espaços, caracteres especiais. Chaves curtas = menos memória.</dd>
+        </dl>
+
+        <pre><code class="language-bash"># Boas práticas de nomeação
+SET user:123:name "João"
+SET user:123:email "joao@email.com"
+SET session:abc-def-ghi '{"userId":"123"}'
+SET cache:product:456 '{"nome":"Notebook","preco":4500}'</code></pre>
 
         <div class="slide-footer">
-          <div class="footer-bar">06 - Testes de Integracao</div>
+          <div class="footer-bar">06 - Cache com Redis</div>
           <div class="footer-page">12</div>
         </div>
       </section>
 
-      <!-- ==================== SLIDE: INTERVALO ==================== -->
-      <section class="break-slide">
+      <!-- ==================== SLIDE 13: Estruturas de Dados Redis ==================== -->
+      <section class="content-slide">
         <div class="top-bar"></div>
         <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
-        <h2>Intervalo</h2>
-        <p>21h00 – 21h20<br>☕ Aproveite para descansar e se preparar para o próximo bloco.</p>
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Estruturas de Dados Redis</h2>
+        </div>
+
+        <table>
+          <thead>
+            <tr><th>Tipo</th><th>Comandos</th><th>Exemplo</th><th>Caso de Uso</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><strong>String</strong></td><td>SET, GET, INCR</td><td><code>SET contador 0</code><br><code>INCR contador</code></td><td>Cache simples, contadores</td></tr>
+            <tr><td><strong>Hash</strong></td><td>HSET, HGET, HGETALL</td><td><code>HSET user:1 nome "Ana" idade 25</code></td><td>Objetos com campos</td></tr>
+            <tr><td><strong>List</strong></td><td>LPUSH, RPUSH, LRANGE</td><td><code>LPUSH fila "tarefa1"</code></td><td>Filas, histórico</td></tr>
+            <tr><td><strong>Set</strong></td><td>SADD, SMEMBERS, SINTER</td><td><code>SADD tags:post:1 "redis" "cache"</code></td><td>Tags, unicidade</td></tr>
+            <tr><td><strong>Sorted Set</strong></td><td>ZADD, ZRANGE, ZRANK</td><td><code>ZADD ranking 100 "player1"</code></td><td>Rankings, leaderboards</td></tr>
+          </tbody>
+        </table>
+
+        <div class="callout">
+          <p><strong>Dica:</strong> Use Hash para objetos (evita serializar/deserializar JSON inteiro) e Sorted Set para rankings e filas com prioridade.</p>
+        </div>
 
         <div class="slide-footer">
-          <div class="footer-bar">06 - Testes de Integracao</div>
+          <div class="footer-bar">06 - Cache com Redis</div>
           <div class="footer-page">13</div>
         </div>
       </section>
 
-      <!-- ==================== SLIDE: SEÇÃO - Bloco 2 ==================== -->
-      <section class="section-slide">
+      <!-- ==================== SLIDE 14: Expiração de Chaves - TTL em Detalhe ==================== -->
+      <section class="content-slide">
         <div class="top-bar"></div>
         <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
-        <div class="accent-bar"></div>
-        <h2>Bloco 2<br>Exercício Prático</h2>
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Expiração de Chaves: TTL em Detalhe</h2>
+        </div>
+
+        <pre><code class="language-bash"># Definir TTL ao criar
+SET session:abc '{"user":"Ana"}' EX 3600    # expira em 1 hora
+SET temp:data "valor" PX 500                # expira em 500ms
+
+# Adicionar TTL a chave existente
+EXPIRE user:123:profile 600                 # 10 minutos
+PEXPIRE user:123:profile 600000             # mesmo, em milissegundos
+
+# Consultar TTL restante
+TTL session:abc          # retorna segundos restantes (-1 = sem TTL, -2 = não existe)
+
+# Remover TTL (chave fica permanente)
+PERSIST session:abc</code></pre>
+
+        <ul>
+          <li>Chave sem TTL = permanente (até eviction ou DEL manual)</li>
+          <li><code>TTL</code> retorna <code>-1</code> se a chave existe sem expiração; <code>-2</code> se não existe</li>
+        </ul>
+
+        <div class="callout">
+          <p><strong>Regra de ouro:</strong> SEMPRE defina TTL para chaves de cache. Chaves sem TTL acumulam silenciosamente e causam estouro de memória.</p>
+        </div>
+
         <div class="slide-footer">
-          <div class="footer-bar">06 - Testes de Integracao</div>
+          <div class="footer-bar">06 - Cache com Redis</div>
           <div class="footer-page">14</div>
         </div>
       </section>
 
-      <!-- ==================== SLIDE: Exercício hands-on - Criar testes de integração com Testcontainers ==================== -->
+      <!-- ==================== SLIDE 15: Subindo Redis com Docker ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Subindo Redis com Docker</h2>
+        </div>
+
+        <pre><code class="language-bash"># Opção 1: docker run simples
+docker run -d \
+  --name meu-redis \
+  -p 6379:6379 \
+  redis:7-alpine
+
+# Conectar via CLI
+docker exec -it meu-redis redis-cli
+
+# Testar conexão
+docker exec -it meu-redis redis-cli PING
+# Resposta: PONG</code></pre>
+
+        <pre><code class="language-yaml"># Opção 2: docker-compose.yml
+services:
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    command: redis-server --maxmemory 256mb --maxmemory-policy allkeys-lru
+
+volumes:
+  redis-data:</code></pre>
+
+        <div class="callout">
+          <p><strong>Dica:</strong> Use <code>redis:7-alpine</code> (~13 MB) em vez de <code>redis:latest</code> (~140 MB). O flag <code>--maxmemory</code> evita que Redis consuma toda a RAM do container.</p>
+        </div>
+
+        <div class="slide-footer">
+          <div class="footer-bar">06 - Cache com Redis</div>
+          <div class="footer-page">15</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE 16: Docker Compose com Persistência ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Docker Compose: Redis com Persistência e GUI</h2>
+        </div>
+
+        <pre><code class="language-yaml">services:
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    command: >
+      redis-server
+      --maxmemory 256mb
+      --maxmemory-policy allkeys-lru
+      --save 60 1000
+      --appendonly yes
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+
+  redis-insight:
+    image: redis/redisinsight:latest
+    ports:
+      - "5540:5540"
+
+volumes:
+  redis-data:</code></pre>
+
+        <ul>
+          <li><code>--save 60 1000</code> → snapshot RDB a cada 60s se houve 1000+ escritas</li>
+          <li><code>--appendonly yes</code> → AOF log (append-only file) para durabilidade máxima</li>
+          <li><strong>RedisInsight</strong> → GUI em <code>http://localhost:5540</code> para visualizar dados e monitorar</li>
+        </ul>
+
+        <div class="slide-footer">
+          <div class="footer-bar">06 - Cache com Redis</div>
+          <div class="footer-page">16</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE 17: Caso real Twitter ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Caso Real: Cache Invalidation no Twitter</h2>
+        </div>
+
+        <p>O Twitter enfrenta o desafio de manter timelines atualizadas em cache para milhões de usuários.</p>
+        <p><strong>Problema:</strong> Como invalidar corretamente o cache da timeline ao publicar, deletar ou retweetar?</p>
+        <p><strong>Solução:</strong> Uso de mecanismos de invalidação seletiva, como remoção ou atualização das chaves relacionadas, para evitar dados obsoletos.</p>
+        <p>Cache Invalidation é conhecido como um dos problemas mais difíceis em sistemas distribuídos.</p>
+
+        <div class="callout">
+          <p><em>"There are only two hard things in Computer Science: cache invalidation and naming things."</em> — Phil Karlton</p>
+        </div>
+
+        <div class="slide-footer">
+          <div class="footer-bar">06 - Cache com Redis</div>
+          <div class="footer-page">17</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE 18: Exemplo Java/Spring Boot Cache-Aside ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Exemplo Cache-Aside com Java/Spring Boot</h2>
+        </div>
+
+        <pre><code class="language-java">// Método para obter usuário com cache Redis
+public User getUserById(String id) {
+  String cacheKey = "user:" + id;
+  String cached = redisTemplate.opsForValue().get(cacheKey);
+  if (cached != null) {
+    return objectMapper.readValue(cached, User.class);
+  }
+  User user = userRepository.findById(id);
+  redisTemplate.opsForValue().set(
+    cacheKey, objectMapper.writeValueAsString(user), 10, TimeUnit.MINUTES
+  );
+  return user;
+}</code></pre>
+
+        <div class="slide-footer">
+          <div class="footer-bar">06 - Cache com Redis</div>
+          <div class="footer-page">18</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE 19: Exemplo .NET/C# Write-Through ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Exemplo Write-Through com .NET / C#</h2>
+        </div>
+
+        <pre><code class="language-csharp">public async Task SaveProductAsync(Product product) {
+  // Atualiza banco
+  await _dbContext.Products.UpdateAsync(product);
+  await _dbContext.SaveChangesAsync();
+
+  // Atualiza cache Redis
+  var cacheKey = $"product:{product.Id}";
+  var json = JsonSerializer.Serialize(product);
+  await _redisDb.StringSetAsync(cacheKey, json, TimeSpan.FromMinutes(15));
+}</code></pre>
+
+        <div class="slide-footer">
+          <div class="footer-bar">06 - Cache com Redis</div>
+          <div class="footer-page">19</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE 20: Exemplo Node.js Cache-Aside ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Exemplo Cache-Aside com Node.js</h2>
+        </div>
+
+        <pre><code class="language-javascript">// Supondo client Redis e db simulados
+async function getUser(id) {
+  const cacheKey = `user:${id}`;
+  let cached = await redisClient.get(cacheKey);
+  if (cached) return JSON.parse(cached);
+
+  const user = await database.findUserById(id);
+  await redisClient.set(cacheKey, JSON.stringify(user), { EX: 600 }); // 10 min TTL
+  return user;
+}</code></pre>
+
+        <div class="slide-footer">
+          <div class="footer-bar">06 - Cache com Redis</div>
+          <div class="footer-page">20</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE 21: Intervalo ==================== -->
+      <section class="break-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="break-text">
+          <h2>Intervalo</h2>
+          <h3>21h00 – 21h20</h3>
+          <p>☕ Aproveite para descansar um pouco</p>
+        </div>
+        <div class="slide-footer">
+          <div class="footer-bar">06 - Cache com Redis</div>
+          <div class="footer-page">21</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE 22: SEÇÃO - B2 ==================== -->
+      <section class="section-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="accent-bar"></div>
+        <h2>Bloco 2<br>Exercício prático e Quiz</h2>
+        <div class="slide-footer">
+          <div class="footer-bar">06 - Cache com Redis</div>
+          <div class="footer-page">22</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE 23: Exercício hands-on ==================== -->
       <section class="exercise-slide content-slide">
         <div class="top-bar"></div>
         <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
         <div class="slide-title-area">
           <div class="accent-bar"></div>
-          <h2>Exercício Prático</h2>
-          <h3>Criar testes de integração com Testcontainers</h3>
+          <h2>Exercício: Implementar Cache-Aside com Redis e Node.js</h2>
         </div>
 
         <div class="exercise-container">
-          <p>Objetivo: Subir um container PostgreSQL para testar operações CRUD em uma API REST.</p>
+          <p><strong>Objetivo:</strong> Criar uma API Node.js que consulta um banco simulado e utiliza Redis como cache seguindo o padrão Cache-Aside.</p>
+          <p><strong>Passos:</strong></p>
           <ol class="exercise-steps">
-            <li>Configure o Testcontainers para iniciar um container PostgreSQL na inicialização dos testes.</li>
-            <li>Implemente testes que inserem, consultam, atualizam e removem dados via a API.</li>
-            <li>Utilize a biblioteca de testes da sua stack:<br/>
+            <li>Subir Redis com Docker:<br><code>docker run -d --name meu-redis -p 6379:6379 redis:7-alpine</code></li>
+            <li>Configurar cliente Redis na aplicação Node.js (<code>npm install redis express</code>)</li>
+            <li>Implementar endpoint GET /users/:id que:
               <ul>
-                <li><em>Java/Spring Boot:</em> JUnit + Testcontainers + RestAssured</li>
-                <li><em>.NET/C#:</em> xUnit + Testcontainers.DotNet + HttpClient</li>
-                <li><em>Node.js:</em> Jest + testcontainers-node + supertest</li>
+                <li>Verifica cache Redis</li>
+                <li>Se não existir, consulta banco simulado (array ou JSON)</li>
+                <li>Armazena resultado no Redis com TTL (ex: 10 minutos)</li>
+                <li>Retorna o dado ao cliente com indicação da fonte (cache ou banco)</li>
               </ul>
             </li>
-            <li>Verifique se os testes passam com sucesso utilizando o banco do container.</li>
+            <li>Testar com diversas requisições e monitorar via <code>redis-cli MONITOR</code></li>
           </ol>
         </div>
 
         <div class="slide-footer">
-          <div class="footer-bar">06 - Testes de Integracao</div>
-          <div class="footer-page">15</div>
+          <div class="footer-bar">06 - Cache com Redis</div>
+          <div class="footer-page">23</div>
         </div>
       </section>
 
-      <!-- ==================== SLIDE: Exemplo Java/Spring Boot com Testcontainers e RestAssured ==================== -->
+      <!-- ==================== SLIDE 24: Código exemplo exercício ==================== -->
       <section class="content-slide">
         <div class="top-bar"></div>
         <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
         <div class="slide-title-area">
           <div class="accent-bar"></div>
-          <h2>Exemplo Java/Spring Boot</h2>
-          <h3>Testcontainers + RestAssured</h3>
+          <h2>Exemplo de código Node.js para Cache-Aside</h2>
         </div>
 
-        <pre><code class="language-java">
-import org.junit.jupiter.api.Test;
-import org.testcontainers.containers.PostgreSQLContainer;
-import io.restassured.RestAssured;
-import static io.restassured.RestAssured.*;
-import static org.hamcrest.Matchers.*;
+        <pre><code class="language-javascript">const express = require('express');
+const redis = require('redis');
+const app = express();
+const redisClient = redis.createClient();
 
-public class UserIntegrationTest {
+const users = [
+  { id: '1', name: 'Ana' },
+  { id: '2', name: 'Bruno' },
+  { id: '3', name: 'Carla' }
+];
 
-  static PostgreSQLContainer<?> postgreSQLContainer = new PostgreSQLContainer<>("postgres:14")
-    .withDatabaseName("testdb")
-    .withUsername("test")
-    .withPassword("test");
+redisClient.connect();
 
-  static {
-    postgreSQLContainer.start();
-    System.setProperty("DB_URL", postgreSQLContainer.getJdbcUrl());
-    System.setProperty("DB_USER", postgreSQLContainer.getUsername());
-    System.setProperty("DB_PASS", postgreSQLContainer.getPassword());
+app.get('/users/:id', async (req, res) => {
+  const id = req.params.id;
+  const cacheKey = `user:${id}`;
+
+  try {
+    const cachedUser = await redisClient.get(cacheKey);
+    if (cachedUser) {
+      return res.json({ source: 'cache', data: JSON.parse(cachedUser) });
+    }
+
+    const user = users.find(u => u.id === id);
+    if (!user) return res.status(404).json({ error: 'User not found' });
+
+    await redisClient.set(cacheKey, JSON.stringify(user), { EX: 600 });
+    res.json({ source: 'database', data: user });
+
+  } catch (err) {
+    res.status(500).json({ error: 'Internal server error' });
   }
-
-  @Test
-  public void testCreateAndGetUser() {
-    RestAssured.baseURI = "http://localhost:8080";
-
-    // Cria usuário
-    given()
-      .contentType("application/json")
-      .body("{\"name\":\"Maria\"}")
-    .when()
-      .post("/users")
-    .then()
-      .statusCode(201)
-      .body("name", equalTo("Maria"));
-
-    // Consulta usuário
-    when()
-      .get("/users")
-    .then()
-      .statusCode(200)
-      .body("name", hasItem("Maria"));
-  }
-}
-        </code></pre>
-
-        <div class="slide-footer">
-          <div class="footer-bar">06 - Testes de Integracao</div>
-          <div class="footer-page">16</div>
-        </div>
-      </section>
-
-      <!-- ==================== SLIDE: Exemplo .NET/C# com Testcontainers.DotNet ==================== -->
-      <section class="content-slide">
-        <div class="top-bar"></div>
-        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
-        <div class="slide-title-area">
-          <div class="accent-bar"></div>
-          <h2>Exemplo .NET/C#</h2>
-          <h3>Testcontainers.DotNet + xUnit + HttpClient</h3>
-        </div>
-
-        <pre><code class="language-csharp">
-using System.Net.Http;
-using System.Text;
-using System.Threading.Tasks;
-using Xunit;
-using DotNet.Testcontainers.Builders;
-using DotNet.Testcontainers.Containers;
-
-public class UserIntegrationTests : IAsyncLifetime {
-  private readonly TestcontainerDatabase _postgresContainer;
-  private readonly HttpClient _client = new HttpClient { BaseAddress = new Uri("http://localhost:5000") };
-
-  public UserIntegrationTests() {
-    _postgresContainer = new TestcontainersBuilder<PostgreSqlTestcontainer>()
-      .WithDatabase(new PostgreSqlTestcontainerConfiguration {
-        Database = "testdb",
-        Username = "test",
-        Password = "test"
-      }).Build();
-  }
-
-  public async Task InitializeAsync() {
-    await _postgresContainer.StartAsync();
-    // Configure a string de conexão na aplicação
-  }
-
-  public async Task DisposeAsync() {
-    await _postgresContainer.StopAsync();
-  }
-
-  [Fact]
-  public async Task TestCreateAndGetUser() {
-    var json = "{\"name\":\"Carlos\"}";
-    var content = new StringContent(json, Encoding.UTF8, "application/json");
-
-    var postResponse = await _client.PostAsync("/users", content);
-    Assert.True(postResponse.IsSuccessStatusCode);
-
-    var getResponse = await _client.GetAsync("/users");
-    var responseBody = await getResponse.Content.ReadAsStringAsync();
-    Assert.Contains("Carlos", responseBody);
-  }
-}
-        </code></pre>
-
-        <div class="slide-footer">
-          <div class="footer-bar">06 - Testes de Integracao</div>
-          <div class="footer-page">17</div>
-        </div>
-      </section>
-
-      <!-- ==================== SLIDE: Exemplo Node.js com testcontainers-node e supertest ==================== -->
-      <section class="content-slide">
-        <div class="top-bar"></div>
-        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
-        <div class="slide-title-area">
-          <div class="accent-bar"></div>
-          <h2>Exemplo Node.js</h2>
-          <h3>testcontainers + supertest + Jest</h3>
-        </div>
-
-        <pre><code class="language-js">
-const { PostgreSqlContainer } = require('testcontainers');
-const request = require('supertest');
-const app = require('../app');
-
-let container;
-
-beforeAll(async () => {
-  container = await new PostgreSqlContainer('postgres:14')
-    .withDatabase('testdb')
-    .withUsername('test')
-    .withPassword('test')
-    .start();
-
-  process.env.DB_HOST = container.getHost();
-  process.env.DB_PORT = container.getPort();
-  process.env.DB_USER = 'test';
-  process.env.DB_PASS = 'test';
-  process.env.DB_NAME = 'testdb';
-
-  await app.connectDatabase(); // exemplo de método para conectar o DB
 });
 
-afterAll(async () => {
-  await container.stop();
-});
-
-test('POST /users cria usuário e GET /users retorna lista', async () => {
-  await request(app)
-    .post('/users')
-    .send({ name: 'Ana' })
-    .expect(201);
-
-  const res = await request(app).get('/users').expect(200);
-  expect(res.body).toEqual(
-    expect.arrayContaining([
-      expect.objectContaining({ name: 'Ana' }),
-    ])
-  );
-});
-        </code></pre>
+app.listen(3000, () => console.log('API rodando na porta 3000'));</code></pre>
 
         <div class="slide-footer">
-          <div class="footer-bar">06 - Testes de Integracao</div>
-          <div class="footer-page">18</div>
+          <div class="footer-bar">06 - Cache com Redis</div>
+          <div class="footer-page">24</div>
         </div>
       </section>
 
-      <!-- ==================== SLIDE: Quiz 3 - Testcontainers & Contract Testing ==================== -->
-      <section class="quiz-slide content-slide" data-correct="a" data-quiz-feedback="Muito bem! Testcontainers ajuda a criar ambientes isolados para testes.">
+      <!-- ==================== SLIDE 25: Quiz 2 - Write-Through ==================== -->
+      <section class="quiz-slide content-slide" data-correct="write-through" data-quiz-feedback="Write-Through é recomendado quando é crucial que cache e banco estejam sempre sincronizados, mesmo com custo de escrita maior.">
         <div class="top-bar"></div>
         <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
         <div class="slide-title-area">
           <div class="accent-bar"></div>
-          <h2>Quiz 3</h2>
+          <h2>Quiz: Quando usar Write-Through ao invés de Cache-Aside?</h2>
         </div>
 
-        <p>Por que utilizar Testcontainers em testes de integração?</p>
-        <form>
-          <input type="radio" id="q3a" name="q3" value="a" /><label for="q3a">a) Para garantir ambiente limpo e idêntico ao de produção</label><br/>
-          <input type="radio" id="q3b" name="q3" value="b" /><label for="q3b">b) Para evitar testes automatizados</label><br/>
-          <input type="radio" id="q3c" name="q3" value="c" /><label for="q3c">c) Para executar testes unitários mais rápido</label><br/>
-        </form>
+        <ul class="quiz-options">
+          <label><input type="radio" name="q-write" value="write-behind"> Quando a escrita pode ser atrasada</label>
+          <label><input type="radio" name="q-write" value="write-through"> Quando é necessário garantir consistência imediata entre cache e banco</label>
+          <label><input type="radio" name="q-write" value="cache-aside"> Quando há poucas escritas e muitas leituras</label>
+          <label><input type="radio" name="q-write" value="read-through"> Quando o cache gerencia a leitura automaticamente</label>
+        </ul>
+
+        <div class="quiz-feedback"></div>
 
         <div class="slide-footer">
-          <div class="footer-bar">06 - Testes de Integracao</div>
-          <div class="footer-page">19</div>
+          <div class="footer-bar">06 - Cache com Redis</div>
+          <div class="footer-page">25</div>
         </div>
       </section>
 
-      <!-- ==================== SLIDE: Quiz 4 - Contratos e Microsserviços ==================== -->
-      <section class="quiz-slide content-slide" data-correct="b" data-quiz-feedback="Exato! Contratos evitam que alterações quebrem a comunicação entre microsserviços.">
+      <!-- ==================== SLIDE 26: Quiz 3 - Eviction ==================== -->
+      <section class="quiz-slide content-slide" data-correct="allkeys-lru" data-quiz-feedback="allkeys-lru é a política mais recomendada para cache puro — remove as chaves menos acessadas recentemente quando a memória está cheia.">
         <div class="top-bar"></div>
         <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
         <div class="slide-title-area">
           <div class="accent-bar"></div>
-          <h2>Quiz 4</h2>
+          <h2>Quiz: Qual política de eviction é mais adequada para um cache puro?</h2>
         </div>
 
-        <p>Como Contract Testing ajuda em microsserviços?</p>
-        <form>
-          <input type="radio" id="q4a" name="q4" value="a" /><label for="q4a">a) Realizando testes de performance entre serviços</label><br/>
-          <input type="radio" id="q4b" name="q4" value="b" /><label for="q4b">b) Validando contratos para evitar quebra de comunicação</label><br/>
-          <input type="radio" id="q4c" name="q4" value="c" /><label for="q4c">c) Automatizando deploys de microsserviços</label><br/>
-        </form>
+        <ul class="quiz-options">
+          <label><input type="radio" name="q-eviction" value="noeviction"> noeviction</label>
+          <label><input type="radio" name="q-eviction" value="volatile-lfu"> volatile-lfu</label>
+          <label><input type="radio" name="q-eviction" value="allkeys-lru"> allkeys-lru</label>
+          <label><input type="radio" name="q-eviction" value="volatile-ttl"> volatile-ttl</label>
+        </ul>
+
+        <div class="quiz-feedback"></div>
 
         <div class="slide-footer">
-          <div class="footer-bar">06 - Testes de Integracao</div>
-          <div class="footer-page">20</div>
+          <div class="footer-bar">06 - Cache com Redis</div>
+          <div class="footer-page">26</div>
         </div>
       </section>
 
-      <!-- ==================== SLIDE: Considerações Finais ==================== -->
+      <!-- ==================== SLIDE 27: Quiz 4 - Redis Keys ==================== -->
+      <section class="quiz-slide content-slide" data-correct="scan" data-quiz-feedback="KEYS bloqueia o Redis enquanto varre todas as chaves. SCAN itera de forma incremental sem bloquear — seguro para produção.">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Quiz: Qual comando deve ser usado em produção para buscar chaves por padrão?</h2>
+        </div>
+
+        <ul class="quiz-options">
+          <label><input type="radio" name="q-keys" value="keys"> <code>KEYS user:*</code></label>
+          <label><input type="radio" name="q-keys" value="scan"> <code>SCAN 0 MATCH user:* COUNT 100</code></label>
+          <label><input type="radio" name="q-keys" value="get"> <code>GET user:*</code></label>
+          <label><input type="radio" name="q-keys" value="find"> <code>FIND user:*</code></label>
+        </ul>
+
+        <div class="quiz-feedback"></div>
+
+        <div class="slide-footer">
+          <div class="footer-bar">06 - Cache com Redis</div>
+          <div class="footer-page">27</div>
+        </div>
+      </section>
+
+      <!-- ==================== SLIDE 28: Resumo e Aprendizados ==================== -->
       <section class="content-slide">
         <div class="top-bar"></div>
         <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
         <div class="slide-title-area">
           <div class="accent-bar"></div>
-          <h2>Considerações Finais</h2>
+          <h2>Resumo e Aprendizados</h2>
         </div>
 
         <ul>
-          <li>Testes de integração são essenciais para garantir a qualidade das aplicações complexas.</li>
-          <li>Testcontainers facilita a criação de ambientes isolados e confiáveis.</li>
-          <li>Contract Testing protege a comunicação entre microsserviços, reduzindo falhas em produção.</li>
-          <li>Ferramentas e bibliotecas para diferentes stacks tornam a integração contínua mais segura.</li>
+          <li>Cache reduz latência em ~100x comparado a queries de banco de dados</li>
+          <li>Redis: ~100k ops/s, latência &lt; 1ms, single-threaded por design</li>
+          <li>Convenção de chaves: <code>objeto:id:atributo</code> com prefixo por serviço</li>
+          <li>SEMPRE definir TTL; usar <code>allkeys-lru</code> para cache puro</li>
+          <li>Docker: <code>redis:7-alpine</code> com <code>--maxmemory</code> para ambientes controlados</li>
+          <li>Cache Invalidation continua sendo um dos problemas mais difíceis em sistemas distribuídos</li>
         </ul>
 
         <div class="slide-footer">
-          <div class="footer-bar">06 - Testes de Integracao</div>
-          <div class="footer-page">21</div>
+          <div class="footer-bar">06 - Cache com Redis</div>
+          <div class="footer-page">28</div>
         </div>
       </section>
 
-      <!-- ==================== SLIDE: Dúvidas ou curiosidades? ==================== -->
+      <!-- ==================== SLIDE 29: Dúvidas ==================== -->
       <section class="content-slide">
         <div class="top-bar"></div>
         <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
@@ -617,12 +802,12 @@ test('POST /users cria usuário e GET /users retorna lista', async () => {
         </div>
 
         <div class="slide-footer">
-          <div class="footer-bar">06 - Testes de Integracao</div>
-          <div class="footer-page">22</div>
+          <div class="footer-bar">06 - Cache com Redis</div>
+          <div class="footer-page">29</div>
         </div>
       </section>
 
-      <!-- ==================== SLIDE: ENCERRAMENTO ==================== -->
+      <!-- ==================== SLIDE 30: ENCERRAMENTO ==================== -->
       <section class="end-slide">
         <img src="../assets/img/fiap-logo-graduacao.png" alt="FIAP Graduação" style="max-width:350px;" />
         <div class="copyright">
@@ -646,9 +831,9 @@ test('POST /users cria usuário e GET /users retorna lista', async () => {
       slideNumber: false,
       width: 1280,
       height: 720,
-      margin: 0,
+      margin: 0.04,
       minScale: 0.2,
-      maxScale: 2.0,
+      maxScale: 3.0,
       center: false,
         pdfMaxPagesPerSlide: 1,
         pdfSeparateFragments: false,
