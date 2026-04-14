@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>AULA 08 - Testes de Unidade e Integracao | FIAP</title>
+  <title>AULA 08 – TDD na Prática com C# | FIAP</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.css" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/theme/white.css" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/plugin/highlight/monokai.css" />
@@ -11,30 +11,80 @@
   <link rel="stylesheet" href="../assets/css/fiap-print.css">
   <script>if(/print-pdf/gi.test(window.location.search)){var link=document.createElement('link');link.rel='stylesheet';link.href='https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/css/print/pdf.css';document.head.appendChild(link);}</script>
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+  <style>
+    /* ---- Timer de Exercício ---- */
+    .exercise-timer {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      background: #1a1a2e;
+      border-radius: 12px;
+      padding: 0.6rem 1.4rem;
+      margin: 0.8rem auto 0;
+      width: fit-content;
+    }
+    .timer-label { color: #aaa; font-size: 0.75em; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; }
+    .timer-display { font-family: 'JetBrains Mono', monospace; font-size: 2.2em; font-weight: 700; color: #ed145b; min-width: 3.5ch; }
+    .timer-display.warning { color: #f5a623; }
+    .timer-display.done { color: #27ae60; }
+    .timer-btn {
+      background: #ed145b; color: #fff; border: none; border-radius: 6px;
+      padding: 0.3rem 0.8rem; font-size: 0.75em; font-weight: 700; cursor: pointer;
+    }
+    .timer-btn:hover { background: #c9134f; }
+    /* ---- Pill tags ---- */
+    .pill { display: inline-block; border-radius: 999px; padding: 0.15em 0.8em; font-size: 0.72em; font-weight: 700; margin: 0 0.2em; }
+    .pill-red   { background: #fde8ef; color: #c0392b; }
+    .pill-green { background: #e8f8f0; color: #1e8449; }
+    .pill-blue  { background: #e8f0ff; color: #2041b0; }
+    /* ---- Conceito card ---- */
+    .concept-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem; margin-top: 0.8rem; }
+    .concept-card { background: #f8f9fa; border-left: 4px solid #ed145b; border-radius: 0 8px 8px 0; padding: 0.7rem 1rem; }
+    .concept-card h4 { margin: 0 0 0.3rem; color: #ed145b; font-size: 0.85em; }
+    .concept-card p  { margin: 0; font-size: 0.72em; color: #444; }
+    /* ---- Nível badge ---- */
+    .nivel-badge {
+      display: inline-flex; align-items: center; gap: 0.4rem;
+      background: linear-gradient(135deg, #ed145b, #8e1844);
+      color: #fff; border-radius: 999px; padding: 0.25em 1em;
+      font-size: 0.75em; font-weight: 700; margin-bottom: 0.6rem;
+    }
+    /* ---- Checklist ---- */
+    .checklist { list-style: none; padding: 0; }
+    .checklist li::before { content: "☐ "; color: #ed145b; font-weight: 700; }
+    /* ---- Two columns ---- */
+    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; align-items: start; }
+    .iso-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.5rem; margin-top: 0.6rem; }
+    .iso-card { background: #f0f4ff; border-radius: 8px; padding: 0.5rem 0.7rem; }
+    .iso-card h5 { margin: 0 0 0.2rem; color: #2041b0; font-size: 0.7em; }
+    .iso-card p  { margin: 0; font-size: 0.62em; color: #555; }
+    .iso-highlight { background: #fdeef3; }
+    .iso-highlight h5 { color: #c0392b; }
+  </style>
 </head>
 <body>
   <div class="reveal">
     <div class="slides">
 
-      <!-- ==================== SLIDE: CAPA FIAP ==================== -->
+      <!-- ==================== CAPA ==================== -->
       <section class="cover-slide">
         <img src="../assets/img/fiap-logo-graduacao.png" alt="FIAP Graduação" class="fiap-logo-full" />
       </section>
 
-      <!-- ==================== SLIDE: TÍTULO DA AULA ==================== -->
+      <!-- ==================== TÍTULO ==================== -->
       <section class="title-slide">
         <div class="top-bar"></div>
         <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
         <div class="title-card">
           <div class="accent-bar"></div>
-          <h1>Testes de Unidade e Integração</h1>
+          <h1>TDD na Prática com C#</h1>
           <h2>Microservice and Web Engineering</h2>
           <h3>Prof. José Romualdo</h3>
         </div>
-        <div class="lesson-bar">08 - Testes de Unidade e Integracao</div>
+        <div class="lesson-bar">08 – Test-Driven Development</div>
       </section>
 
-      <!-- ==================== SLIDE: AGENDA ==================== -->
+      <!-- ==================== AGENDA ==================== -->
       <section class="content-slide">
         <div class="top-bar"></div>
         <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
@@ -47,1019 +97,993 @@
             <tr><th>Bloco</th><th>Horário</th><th>Conteúdo</th></tr>
           </thead>
           <tbody>
-            <tr><td><strong>Bloco 1</strong></td><td>19h30 – 21h00</td><td>Pirâmide de Testes, TDD, Mocks/Stubs/Fakes, DI, Frameworks, Caso Real Spotify, Exercício TDD</td></tr>
+            <tr><td><strong>Bloco 1</strong></td><td>19h30 – 21h00</td><td>ISO 25010, Por que TDD, Red-Green-Refactor, Interfaces, IoC/DI, Mocks/Stubs/Fakes, Live Coding</td></tr>
             <tr><td><strong>Intervalo</strong></td><td>21h00 – 21h20</td><td>☕ Pausa</td></tr>
-            <tr><td><strong>Bloco 2</strong></td><td>21h20 – 22h45</td><td>Testes de Integração, Testcontainers, Contract Testing, Caso Nubank, Exercício Prático + Quiz</td></tr>
+            <tr><td><strong>Bloco 2</strong></td><td>21h20 – 22h45</td><td>Exercícios práticos em 4 níveis progressivos com C# + Quiz</td></tr>
           </tbody>
         </table>
         <div class="slide-footer">
-          <div class="footer-bar">08 - Testes de Unidade e Integracao</div>
+          <div class="footer-bar">08 – Test-Driven Development</div>
           <div class="footer-page">3</div>
         </div>
       </section>
 
-      <!-- ==================== SLIDE: SEÇÃO PIRÂMIDE DE TESTES ==================== -->
+      <!-- ==================== SEÇÃO: POR QUE QUALIDADE? ==================== -->
       <section class="section-slide">
         <div class="top-bar"></div>
         <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
         <div class="accent-bar"></div>
-        <h2>Pirâmide de Testes</h2>
-        <p>Estratégia para balancear testes em diferentes níveis:</p>
-        <ul>
-          <li><strong>Testes de Unidade:</strong> pequenos, rápidos, isolados.</li>
-          <li><strong>Testes de Integração:</strong> verificam interação entre componentes.</li>
-          <li><strong>Testes End-to-End (E2E):</strong> validam o sistema completo do ponto de vista do usuário.</li>
-        </ul>
+        <h2>Qualidade de Software</h2>
+        <p>Antes de falar de testes, precisamos entender o que queremos garantir.</p>
         <div class="slide-footer">
-          <div class="footer-bar">08 - Testes de Unidade e Integracao</div>
+          <div class="footer-bar">08 – Test-Driven Development</div>
           <div class="footer-page">4</div>
         </div>
       </section>
 
-      <!-- ==================== SLIDE: PIRÂMIDE DE TESTES GRÁFICO ==================== -->
+      <!-- ==================== ISO 25010 ==================== -->
       <section class="content-slide">
         <div class="top-bar"></div>
         <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
         <div class="slide-title-area">
           <div class="accent-bar"></div>
-          <h2>Visualizando a Pirâmide</h2>
+          <h2>ISO/IEC 25010 – Qualidade de Produto de Software</h2>
         </div>
-        <img src="../assets/img/testing-pyramid.png" alt="Pirâmide de Testes" style="max-width:600px; margin: 0 auto; display:block;"/>
-        <p style="text-align:center; margin-top:1em;">Fonte: Mike Cohn - <em>Test Pyramid</em></p>
+        <p style="font-size:0.8em">Norma internacional que define o modelo de qualidade de software. TDD contribui diretamente para várias características:</p>
+        <div class="iso-grid">
+          <div class="iso-card iso-highlight">
+            <h5>Confiabilidade</h5>
+            <p>Maturidade, disponibilidade, tolerância a falhas. TDD detecta bugs antes de chegarem à produção.</p>
+          </div>
+          <div class="iso-card iso-highlight">
+            <h5>Manutenibilidade</h5>
+            <p>Modularidade, reusabilidade, testabilidade. TDD força código desacoplado e coeso.</p>
+          </div>
+          <div class="iso-card iso-highlight">
+            <h5>Adequação Funcional</h5>
+            <p>Completude, correção. Os testes documentam o comportamento esperado.</p>
+          </div>
+          <div class="iso-card">
+            <h5>Segurança</h5>
+            <p>Confidencialidade, integridade. Testes de borda previnem falhas de segurança.</p>
+          </div>
+          <div class="iso-card">
+            <h5>Portabilidade</h5>
+            <p>Adaptabilidade, instalabilidade. Suíte de testes valida comportamento em novos ambientes.</p>
+          </div>
+          <div class="iso-card">
+            <h5>Desempenho</h5>
+            <p>Comportamento temporal, utilização de recursos. Testes de performance integram a suite.</p>
+          </div>
+        </div>
         <div class="slide-footer">
-          <div class="footer-bar">08 - Testes de Unidade e Integracao</div>
+          <div class="footer-bar">08 – Test-Driven Development</div>
           <div class="footer-page">5</div>
         </div>
       </section>
 
-      <!-- ==================== SLIDE: TDD - RED GREEN REFACTOR ==================== -->
+      <!-- ==================== O PROBLEMA SEM TESTES ==================== -->
       <section class="content-slide">
         <div class="top-bar"></div>
         <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
         <div class="slide-title-area">
           <div class="accent-bar"></div>
-          <h2>TDD (Test Driven Development)</h2>
+          <h2>O Problema: Código sem Testes</h2>
         </div>
-        <p>Fluxo em três etapas para desenvolvimento orientado a testes:</p>
-        <ol>
-          <li><strong>Red:</strong> escrever um teste que falha.</li>
-          <li><strong>Green:</strong> implementar código mínimo para passar no teste.</li>
-          <li><strong>Refactor:</strong> melhorar o código mantendo os testes verdes.</li>
-        </ol>
+        <div class="two-col">
+          <div>
+            <h3 style="color:#c0392b; font-size:0.9em">Sintomas comuns</h3>
+            <ul style="font-size:0.78em">
+              <li>Medo de refatorar — "se funciona, não mexa"</li>
+              <li>Regressões frequentes em produção</li>
+              <li>Bugs encontrados pelo cliente, não pela equipe</li>
+              <li>Integração entre times quebra silenciosamente</li>
+              <li>Onboarding lento: "rodou aqui, não sei por quê"</li>
+            </ul>
+          </div>
+          <div>
+            <h3 style="color:#1e8449; font-size:0.9em">Com TDD</h3>
+            <ul style="font-size:0.78em">
+              <li>Confiança para refatorar — testes provam que nada quebrou</li>
+              <li>Feedback imediato a cada mudança</li>
+              <li>Testes são documentação executável do comportamento</li>
+              <li>Design naturalmente desacoplado (testável)</li>
+              <li>Redução do custo de bug: detectar cedo é barato</li>
+            </ul>
+          </div>
+        </div>
+        <blockquote style="font-size:0.72em; margin-top:0.8rem; border-left: 4px solid #ed145b; padding-left:1rem; color:#555">
+          "Toda vez que você sente tentação de escrever um print para testar algo, escreva um teste em vez disso." — Kent Beck
+        </blockquote>
         <div class="slide-footer">
-          <div class="footer-bar">08 - Testes de Unidade e Integracao</div>
+          <div class="footer-bar">08 – Test-Driven Development</div>
           <div class="footer-page">6</div>
         </div>
       </section>
 
-      <!-- ==================== SLIDE: MOCKS, STUBS E FAKES ==================== -->
-      <section class="content-slide">
+      <!-- ==================== SEÇÃO: TDD ==================== -->
+      <section class="section-slide">
         <div class="top-bar"></div>
         <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
-        <div class="slide-title-area">
-          <div class="accent-bar"></div>
-          <h2>Mocks, Stubs e Fakes</h2>
-        </div>
-        <p>Objetos utilizados para simular comportamentos e dependências em testes:</p>
-        <ul>
-          <li><strong>Stub:</strong> retorna dados pré-definidos para chamadas específicas.</li>
-          <li><strong>Mock:</strong> objeto que verifica se métodos foram chamados corretamente.</li>
-          <li><strong>Fake:</strong> implementação simplificada que funciona para testes.</li>
-        </ul>
+        <div class="accent-bar"></div>
+        <h2>Test-Driven Development</h2>
+        <p>Red → Green → Refactor</p>
         <div class="slide-footer">
-          <div class="footer-bar">08 - Testes de Unidade e Integracao</div>
+          <div class="footer-bar">08 – Test-Driven Development</div>
           <div class="footer-page">7</div>
         </div>
       </section>
 
-      <!-- ==================== SLIDE: DEPENDENCY INJECTION PARA TESTABILIDADE ==================== -->
+      <!-- ==================== CICLO RED-GREEN-REFACTOR ==================== -->
       <section class="content-slide">
         <div class="top-bar"></div>
         <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
         <div class="slide-title-area">
           <div class="accent-bar"></div>
-          <h2>Dependency Injection (DI) para Testabilidade</h2>
+          <h2>O Ciclo TDD</h2>
         </div>
-        <p>DI facilita testes ao permitir que dependências sejam substituídas por mocks/stubs:</p>
-        <ul>
-          <li>Promove código desacoplado e modular.</li>
-          <li>Permite injetar implementações fake na classe testada.</li>
-          <li>Frameworks comuns: Spring Boot, .NET Core DI, inversify.js (Node.js).</li>
-        </ul>
+        <div class="concept-grid" style="grid-template-columns: 1fr 1fr 1fr;">
+          <div class="concept-card" style="border-color:#c0392b">
+            <h4 style="color:#c0392b">🔴 RED</h4>
+            <p>Escreva um teste para o comportamento que você quer implementar.<br><br>O teste <strong>deve falhar</strong> — o código ainda não existe.</p>
+          </div>
+          <div class="concept-card" style="border-color:#1e8449">
+            <h4 style="color:#1e8449">🟢 GREEN</h4>
+            <p>Implemente o <strong>mínimo possível</strong> para o teste passar.<br><br>Não se preocupe com elegância ainda — apenas faça passar.</p>
+          </div>
+          <div class="concept-card" style="border-color:#2041b0">
+            <h4 style="color:#2041b0">🔵 REFACTOR</h4>
+            <p>Melhore o código sem alterar o comportamento.<br><br>Os testes garantem que você não quebrou nada.</p>
+          </div>
+        </div>
+        <p style="text-align:center; margin-top:1rem; font-size:0.78em; color:#555">
+          As duas regras de Kent Beck: <em>(1) só escreva código para fazer um teste falho passar</em> &bull; <em>(2) elimine toda duplicação</em>
+        </p>
         <div class="slide-footer">
-          <div class="footer-bar">08 - Testes de Unidade e Integracao</div>
+          <div class="footer-bar">08 – Test-Driven Development</div>
           <div class="footer-page">8</div>
         </div>
       </section>
 
-      <!-- ==================== SLIDE: FRAMEWORKS DE TESTES ==================== -->
+      <!-- ==================== PADRÃO AAA ==================== -->
       <section class="content-slide">
         <div class="top-bar"></div>
         <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
         <div class="slide-title-area">
           <div class="accent-bar"></div>
-          <h2>Frameworks Populares de Testes Unitários</h2>
+          <h2>Padrão AAA – Arrange, Act, Assert</h2>
         </div>
-        <table>
-          <thead>
-            <tr><th>Plataforma</th><th>Framework</th><th>Características</th></tr>
-          </thead>
-          <tbody>
-            <tr><td>Java</td><td>JUnit 5</td><td>Suporte a extensões, anotações modernas, integração Maven/Gradle</td></tr>
-            <tr><td>.NET</td><td>xUnit</td><td>Moderno, extensível, integração com .NET Core CLI</td></tr>
-            <tr><td>Node.js</td><td>Jest</td><td>Testes unitários e integração, mocks embutidos, snapshots</td></tr>
-          </tbody>
-        </table>
+        <p style="font-size:0.82em">Toda boa estrutura de teste segue três etapas:</p>
+        <pre><code class="language-csharp">
+[Fact]
+public void Divisao_PorZero_LancaExcecao()
+{
+    // ARRANGE – monte o cenário
+    var calculadora = new Calculadora();
+
+    // ACT – execute a ação
+    Action acao = () => calculadora.Divisao(10, 0);
+
+    // ASSERT – verifique o resultado
+    acao.Should()
+        .Throw&lt;DivideByZeroException&gt;()
+        .WithMessage("Divisão por zero não é permitida.");
+}
+        </code></pre>
         <div class="slide-footer">
-          <div class="footer-bar">08 - Testes de Unidade e Integracao</div>
+          <div class="footer-bar">08 – Test-Driven Development</div>
           <div class="footer-page">9</div>
         </div>
       </section>
 
-      <!-- ==================== SLIDE: EXEMPLOS DE CÓDIGO ==================== -->
+      <!-- ==================== FERRAMENTAS C# ==================== -->
       <section class="content-slide">
         <div class="top-bar"></div>
         <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
         <div class="slide-title-area">
           <div class="accent-bar"></div>
-          <h2>Exemplos de Testes Unitários</h2>
+          <h2>Ferramentas: xUnit + FluentAssertions + Moq</h2>
         </div>
-        <h3>Java - JUnit 5</h3>
-        <pre><code class="language-java">
-import static org.junit.jupiter.api.Assertions.*;
-import org.junit.jupiter.api.Test;
-
-class CalculadoraTest {
-  @Test
-  void somaDoisNumeros() {
-    Calculadora calc = new Calculadora();
-    assertEquals(5, calc.soma(2, 3));
-  }
-}
-        </code></pre>
-
-        <h3>C# - xUnit</h3>
-        <pre><code class="language-csharp">
-using Xunit;
-
-public class CalculadoraTests {
-  [Fact]
-  public void SomaDoisNumeros() {
-    var calc = new Calculadora();
-    Assert.Equal(5, calc.Soma(2, 3));
-  }
-}
-        </code></pre>
-
-        <h3>Node.js - Jest</h3>
-        <pre><code class="language-javascript">
-const calculadora = require('./calculadora');
-
-test('soma dois números', () => {
-  expect(calculadora.soma(2, 3)).toBe(5);
-});
-        </code></pre>
-
+        <div class="concept-grid">
+          <div class="concept-card">
+            <h4>xUnit</h4>
+            <p>Framework de testes. <code>[Fact]</code> para casos únicos, <code>[Theory]</code> + <code>[InlineData]</code> para testes parametrizados.</p>
+          </div>
+          <div class="concept-card">
+            <h4>FluentAssertions</h4>
+            <p>Assertions legíveis em inglês: <code>.Should().Be()</code>, <code>.Should().Throw&lt;&gt;()</code>. Mensagens de erro muito melhores.</p>
+          </div>
+          <div class="concept-card">
+            <h4>Moq</h4>
+            <p>Criação de Mocks e Stubs para dependências externas. <code>mock.Setup()</code> configura comportamento, <code>mock.Verify()</code> confirma interações.</p>
+          </div>
+          <div class="concept-card">
+            <h4>Instalar</h4>
+            <p><code style="font-size:0.85em">dotnet add package xunit<br>dotnet add package FluentAssertions<br>dotnet add package Moq</code></p>
+          </div>
+        </div>
         <div class="slide-footer">
-          <div class="footer-bar">08 - Testes de Unidade e Integracao</div>
+          <div class="footer-bar">08 – Test-Driven Development</div>
           <div class="footer-page">10</div>
         </div>
       </section>
 
-      <!-- ==================== SLIDE: CASO REAL SPOTIFY ==================== -->
+      <!-- ==================== SEÇÃO: INTERFACES E DI ==================== -->
+      <section class="section-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="accent-bar"></div>
+        <h2>Interfaces, IoC e Injeção de Dependência</h2>
+        <p>Os pilares que tornam o código testável</p>
+        <div class="slide-footer">
+          <div class="footer-bar">08 – Test-Driven Development</div>
+          <div class="footer-page">11</div>
+        </div>
+      </section>
+
+      <!-- ==================== O PROBLEMA SEM INTERFACES ==================== -->
       <section class="content-slide">
         <div class="top-bar"></div>
         <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
         <div class="slide-title-area">
           <div class="accent-bar"></div>
-          <h2>Caso Real: Spotify e TDD</h2>
+          <h2>O Problema: Código Acoplado</h2>
         </div>
-        <p>O Spotify adota TDD em squads autônomos para:</p>
-        <ul>
-          <li>Garantir alta qualidade e confiabilidade dos serviços.</li>
-          <li>Permitir entregas rápidas com segurança.</li>
-          <li>Fomentar cultura de responsabilidade e feedback contínuo.</li>
-        </ul>
-        <p>Testes são parte integrante do ciclo de desenvolvimento, garantindo que cada novo recurso seja confiável desde o início.</p>
+        <pre><code class="language-csharp">
+// ❌ Código acoplado — impossível testar sem enviar e-mail de verdade
+public class PedidoService
+{
+    public void Confirmar(Pedido pedido)
+    {
+        // Regra de negócio misturada com infraestrutura
+        var smtp = new SmtpClient("smtp.empresa.com"); // criação direta!
+        smtp.Send("cliente@email.com", "Pedido confirmado!");
+    }
+}
+        </code></pre>
+        <div class="concept-card" style="margin-top:0.6rem">
+          <h4>Problemas</h4>
+          <p>Não dá para testar sem servidor SMTP &bull; Teste lento e frágil &bull; Viola SRP e DIP (SOLID) &bull; Impossível substituir por outro provedor</p>
+        </div>
         <div class="slide-footer">
-          <div class="footer-bar">08 - Testes de Unidade e Integracao</div>
-          <div class="footer-page">11</div>
+          <div class="footer-bar">08 – Test-Driven Development</div>
+          <div class="footer-page">12</div>
         </div>
       </section>
 
-      <!-- ==================== SLIDE: QUIZ SOBRE TDD ==================== -->
+      <!-- ==================== SOLUÇÃO: INTERFACES ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Solução: Interfaces + Inversão de Controle</h2>
+        </div>
+        <pre><code class="language-csharp">
+// ✅ Depende da abstração, não da implementação concreta
+public interface INotificacaoService
+{
+    void Notificar(string destinatario, string mensagem);
+}
+
+public class PedidoService
+{
+    private readonly INotificacaoService _notificacao;
+
+    // Injeção de Dependência via construtor
+    public PedidoService(INotificacaoService notificacao)
+        => _notificacao = notificacao;
+
+    public void Confirmar(Pedido pedido)
+    {
+        // Regra de negócio pura — sem infraestrutura aqui
+        _notificacao.Notificar(pedido.ClienteEmail, "Pedido confirmado!");
+    }
+}
+        </code></pre>
+        <p style="font-size:0.75em; color:#555; margin-top:0.5rem">
+          <strong>IoC (Inversão de Controle):</strong> o controle de <em>qual</em> implementação usar sai da classe e vai para quem a constrói (framework DI, teste, main).
+        </p>
+        <div class="slide-footer">
+          <div class="footer-bar">08 – Test-Driven Development</div>
+          <div class="footer-page">13</div>
+        </div>
+      </section>
+
+      <!-- ==================== BENEFÍCIO NO TESTE ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>DI no Teste: Substituindo Dependências</h2>
+        </div>
+        <pre><code class="language-csharp">
+// ✅ No teste, injetamos o que quisermos — sem SMTP real!
+[Fact]
+public void Confirmar_PedidoValido_NotificaCliente()
+{
+    // Arrange
+    var mockNotificacao = new Mock&lt;INotificacaoService&gt;();
+    var service = new PedidoService(mockNotificacao.Object); // &lt;-- injeção!
+    var pedido = new Pedido("cliente@email.com");
+
+    // Act
+    service.Confirmar(pedido);
+
+    // Assert — verificar se a notificação foi enviada
+    mockNotificacao.Verify(
+        n => n.Notificar("cliente@email.com", "Pedido confirmado!"),
+        Times.Once
+    );
+}
+        </code></pre>
+        <div class="slide-footer">
+          <div class="footer-bar">08 – Test-Driven Development</div>
+          <div class="footer-page">14</div>
+        </div>
+      </section>
+
+      <!-- ==================== SEÇÃO: DUBLÊS DE TESTE ==================== -->
+      <section class="section-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="accent-bar"></div>
+        <h2>Test Doubles</h2>
+        <p>Mocks, Stubs e Fakes: quando e como usar</p>
+        <div class="slide-footer">
+          <div class="footer-bar">08 – Test-Driven Development</div>
+          <div class="footer-page">15</div>
+        </div>
+      </section>
+
+      <!-- ==================== STUB ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Stub — Controla Entradas</h2>
+        </div>
+        <p style="font-size:0.8em"><strong>Stub</strong> retorna valores pré-definidos. Você não verifica <em>como</em> foi chamado, só configura <em>o que</em> retorna.</p>
+        <pre><code class="language-csharp">
+// Cenário: PagamentoService consulta IDetectorFraude antes de processar
+[Fact]
+public void Pagar_TransacaoLimpa_ProcessaGateway()
+{
+    // Arrange — STUB: configura o retorno sem verificar chamadas
+    var stubFraude = new Mock&lt;IDetectorFraude&gt;();
+    stubFraude.Setup(f =&gt; f.EhSuspeito(It.IsAny&lt;string&gt;(), It.IsAny&lt;decimal&gt;()))
+              .Returns(false); // &lt;--- retorno fixo: nunca é fraude
+
+    var stubGateway = new Mock&lt;IGatewayPagamento&gt;();
+    stubGateway.Setup(g =&gt; g.Processar(It.IsAny&lt;string&gt;(), It.IsAny&lt;decimal&gt;()))
+               .Returns(new ResultadoPagamento(true));
+
+    var service = new PagamentoService(stubGateway.Object, stubFraude.Object);
+
+    // Act
+    var resultado = service.Pagar("4111-1111-1111-1111", 100m);
+
+    // Assert — foco no resultado, não nas interações
+    resultado.Sucesso.Should().BeTrue();
+}
+        </code></pre>
+        <div class="slide-footer">
+          <div class="footer-bar">08 – Test-Driven Development</div>
+          <div class="footer-page">16</div>
+        </div>
+      </section>
+
+      <!-- ==================== MOCK ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Mock — Verifica Interações</h2>
+        </div>
+        <p style="font-size:0.8em"><strong>Mock</strong> vai além do Stub: você <em>verifica</em> se determinados métodos foram chamados, com quais argumentos e quantas vezes.</p>
+        <pre><code class="language-csharp">
+[Fact]
+public void Pagar_TransacaoSuspeita_NuncaChamaGateway()
+{
+    // Arrange
+    var mockFraude = new Mock&lt;IDetectorFraude&gt;();
+    mockFraude.Setup(f =&gt; f.EhSuspeito(It.IsAny&lt;string&gt;(), It.IsAny&lt;decimal&gt;()))
+              .Returns(true); // transação suspeita
+
+    var mockGateway = new Mock&lt;IGatewayPagamento&gt;();
+    var service = new PagamentoService(mockGateway.Object, mockFraude.Object);
+
+    // Act
+    service.Pagar("4111-1111-1111-1111", 100m);
+
+    // Assert — MOCK: verifica que o gateway NUNCA foi chamado
+    mockGateway.Verify(
+        g =&gt; g.Processar(It.IsAny&lt;string&gt;(), It.IsAny&lt;decimal&gt;()),
+        Times.Never  // &lt;--- verificação de interação!
+    );
+}
+        </code></pre>
+        <div class="slide-footer">
+          <div class="footer-bar">08 – Test-Driven Development</div>
+          <div class="footer-page">17</div>
+        </div>
+      </section>
+
+      <!-- ==================== FAKE ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Fake — Implementação Simplificada</h2>
+        </div>
+        <p style="font-size:0.8em"><strong>Fake</strong> é uma implementação real mas simplificada — ex: banco em memória em vez de PostgreSQL.</p>
+        <pre><code class="language-csharp">
+// Fake: repositório em memória (sem banco de dados)
+public class FakePedidoRepository : IPedidoRepository
+{
+    private readonly List&lt;Pedido&gt; _pedidos = new();
+
+    public void Salvar(Pedido pedido) =&gt; _pedidos.Add(pedido);
+
+    public Pedido? BuscarPorId(int id)
+        =&gt; _pedidos.FirstOrDefault(p =&gt; p.Id == id);
+}
+
+// No teste: usa o Fake em vez do banco real
+[Fact]
+public void BuscarPedido_PedidoExistente_RetornaPedido()
+{
+    var repo = new FakePedidoRepository(); // &lt;-- fake, não SQL!
+    repo.Salvar(new Pedido { Id = 1, Total = 500m });
+
+    var resultado = repo.BuscarPorId(1);
+
+    resultado.Should().NotBeNull();
+    resultado!.Total.Should().Be(500m);
+}
+        </code></pre>
+        <div class="slide-footer">
+          <div class="footer-bar">08 – Test-Driven Development</div>
+          <div class="footer-page">18</div>
+        </div>
+      </section>
+
+      <!-- ==================== COMPARATIVO MOCK/STUB/FAKE ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>Resumo: Stub vs Mock vs Fake</h2>
+        </div>
+        <table>
+          <thead>
+            <tr><th>Tipo</th><th>O que faz</th><th>Verifica interações?</th><th>Quando usar</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Stub</strong></td>
+              <td>Retorna dados fixos</td>
+              <td>Não</td>
+              <td>Controlar entradas do sistema em teste</td>
+            </tr>
+            <tr>
+              <td><strong>Mock</strong></td>
+              <td>Retorna dados + verifica chamadas</td>
+              <td>Sim</td>
+              <td>Garantir que efeitos colaterais aconteceram</td>
+            </tr>
+            <tr>
+              <td><strong>Fake</strong></td>
+              <td>Implementação leve e funcional</td>
+              <td>Não normalmente</td>
+              <td>Banco em memória, APIs internas, repositórios</td>
+            </tr>
+          </tbody>
+        </table>
+        <p style="font-size:0.72em; color:#666; margin-top:0.8rem">
+          <strong>Dica prática:</strong> Em C#, <strong>Moq</strong> cria tanto Stubs quanto Mocks. Use <code>.Setup()</code> para Stub e adicione <code>.Verify()</code> para transformar em Mock.
+        </p>
+        <div class="slide-footer">
+          <div class="footer-bar">08 – Test-Driven Development</div>
+          <div class="footer-page">19</div>
+        </div>
+      </section>
+
+      <!-- ==================== SEÇÃO: LIVE CODING ==================== -->
+      <section class="section-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="accent-bar"></div>
+        <h2>Live Coding</h2>
+        <p>Calculadora — do zero, com TDD</p>
+        <div class="slide-footer">
+          <div class="footer-bar">08 – Test-Driven Development</div>
+          <div class="footer-page">20</div>
+        </div>
+      </section>
+
+      <!-- ==================== LIVE: RED ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2><span class="pill pill-red">🔴 RED</span> – Escrever o teste que falha</h2>
+        </div>
+        <pre><code class="language-csharp">
+// 1. Criamos o projeto de testes primeiro!
+//    dotnet new xunit -n Calculadora.Tests
+//    dotnet add package FluentAssertions
+
+using FluentAssertions;
+using Xunit;
+
+public class CalculadoraTests
+{
+    [Fact]
+    public void Soma_DoisNumeros_RetornaSoma()
+    {
+        // Arrange
+        var calc = new Calculadora(); // ← ainda não existe!
+
+        // Act
+        var resultado = calc.Soma(3, 7);
+
+        // Assert
+        resultado.Should().Be(10);
+    }
+}
+// → Compilação falha: 'Calculadora' não existe. ISSO É O RED!
+        </code></pre>
+        <div class="slide-footer">
+          <div class="footer-bar">08 – Test-Driven Development</div>
+          <div class="footer-page">21</div>
+        </div>
+      </section>
+
+      <!-- ==================== LIVE: GREEN ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2><span class="pill pill-green">🟢 GREEN</span> – Implementação mínima</h2>
+        </div>
+        <pre><code class="language-csharp">
+// 2. Implementação mínima — apenas o suficiente para o teste passar
+
+public class Calculadora
+{
+    public int Soma(int a, int b) => a + b;
+}
+
+// → dotnet test → PASSED ✓
+
+// 3. Vamos adicionar mais testes antes de continuar
+[Theory]
+[InlineData(2, 3, 5)]
+[InlineData(0, 0, 0)]
+[InlineData(-5, 5, 0)]
+[InlineData(-3, -2, -5)]
+public void Soma_VariosCasos_RetornaResultadoCorreto(int a, int b, int esperado)
+{
+    var calc = new Calculadora();
+    calc.Soma(a, b).Should().Be(esperado);
+}
+        </code></pre>
+        <div class="slide-footer">
+          <div class="footer-bar">08 – Test-Driven Development</div>
+          <div class="footer-page">22</div>
+        </div>
+      </section>
+
+      <!-- ==================== LIVE: DIVISÃO POR ZERO ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2><span class="pill pill-red">🔴</span> Novo teste: Divisão por Zero</h2>
+        </div>
+        <pre><code class="language-csharp">
+// Teste que descreve o comportamento esperado para caso de borda
+[Fact]
+public void Divisao_PorZero_LancaExcecao()
+{
+    var calc = new Calculadora();
+
+    Action acao = () => calc.Divisao(10, 0);
+
+    acao.Should()
+        .Throw&lt;DivideByZeroException&gt;()
+        .WithMessage("Divisão por zero não é permitida.");
+}
+
+// GREEN: implementação
+public double Divisao(double dividendo, double divisor)
+{
+    if (divisor == 0)
+        throw new DivideByZeroException("Divisão por zero não é permitida.");
+
+    return dividendo / divisor;
+}
+        </code></pre>
+        <div class="slide-footer">
+          <div class="footer-bar">08 – Test-Driven Development</div>
+          <div class="footer-page">23</div>
+        </div>
+      </section>
+
+      <!-- ==================== CASO REAL ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
+        <div class="slide-title-area">
+          <div class="accent-bar"></div>
+          <h2>TDD na Indústria</h2>
+        </div>
+        <div class="concept-grid">
+          <div class="concept-card">
+            <h4>Microsoft</h4>
+            <p>Times do Azure e .NET usam TDD com xUnit. A própria biblioteca ASP.NET Core tem 40k+ testes automatizados.</p>
+          </div>
+          <div class="concept-card">
+            <h4>Spotify</h4>
+            <p>Squads autônomos com ownership de serviços praticam TDD para garantir entregas rápidas sem regressões.</p>
+          </div>
+          <div class="concept-card">
+            <h4>Nubank</h4>
+            <p>~90% de cobertura de testes reportada. TDD é pré-requisito cultural — código sem testes não passa em code review.</p>
+          </div>
+          <div class="concept-card">
+            <h4>Google</h4>
+            <p>Publicou "Testing on the Toilet" como padrão interno. Mais de 3 bilhões de testes rodam diariamente.</p>
+          </div>
+        </div>
+        <div class="slide-footer">
+          <div class="footer-bar">08 – Test-Driven Development</div>
+          <div class="footer-page">24</div>
+        </div>
+      </section>
+
+      <!-- ==================== QUIZ 1 ==================== -->
       <section class="quiz-slide content-slide" data-quiz-id="tdd-quiz-1">
         <div class="top-bar"></div>
         <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
         <div class="slide-title-area">
           <div class="accent-bar"></div>
-          <h2>Quiz: TDD - Test Driven Development</h2>
+          <h2>Quiz – Bloco 1</h2>
         </div>
         <form>
-          <p>Qual é a ordem correta das fases do TDD?</p>
-          <label><input type="radio" name="q1" data-correct="false"> Green - Refactor - Red</label><br />
-          <label><input type="radio" name="q1" data-correct="true"> Red - Green - Refactor</label><br />
-          <label><input type="radio" name="q1" data-correct="false"> Refactor - Red - Green</label><br />
-          <label><input type="radio" name="q1" data-correct="false"> Green - Red - Refactor</label><br />
+          <p><strong>1.</strong> No TDD, a fase GREEN exige que você:</p>
+          <label><input type="radio" name="q1" data-correct="false"> Escreva o código mais elegante e performático possível.</label><br />
+          <label><input type="radio" name="q1" data-correct="true"> Implemente o mínimo necessário para o teste passar.</label><br />
+          <label><input type="radio" name="q1" data-correct="false"> Refatore o código sem alterar os testes.</label><br />
+          <label><input type="radio" name="q1" data-correct="false"> Delete o teste e reescreva-o.</label><br />
         </form>
         <div class="quiz-feedback" data-feedback="q1">
-          <p><strong>Resposta correta:</strong> Red - Green - Refactor. Primeiro o teste falha, depois implementa para passar, e por fim refatora o código.</p>
+          <p><strong>Correto!</strong> GREEN = mínimo para passar. Elegância vem no REFACTOR.</p>
         </div>
-        <div class="slide-footer">
-          <div class="footer-bar">08 - Testes de Unidade e Integracao</div>
-          <div class="footer-page">12</div>
-        </div>
-      </section>
-
-      <!-- ==================== SLIDE: QUIZ MOCK VS STUB ==================== -->
-      <section class="quiz-slide content-slide" data-quiz-id="mock-stub-quiz-2">
-        <div class="top-bar"></div>
-        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
-        <div class="slide-title-area">
-          <div class="accent-bar"></div>
-          <h2>Quiz: Mock vs Stub</h2>
-        </div>
-        <form>
-          <p>Qual a principal diferença entre Mock e Stub?</p>
-          <label><input type="radio" name="q2" data-correct="false"> Ambos são objetos reais usados em produção.</label><br />
-          <label><input type="radio" name="q2" data-correct="true"> Stub retorna dados pré-definidos; Mock verifica interações.</label><br />
-          <label><input type="radio" name="q2" data-correct="false"> Mock é uma implementação fake completa.</label><br />
-          <label><input type="radio" name="q2" data-correct="false"> Stub grava logs do teste.</label><br />
+        <form style="margin-top:0.8rem">
+          <p><strong>2.</strong> Qual a diferença entre Mock e Stub?</p>
+          <label><input type="radio" name="q2" data-correct="false"> Stub verifica interações; Mock retorna dados fixos.</label><br />
+          <label><input type="radio" name="q2" data-correct="true"> Stub retorna dados fixos; Mock verifica se métodos foram chamados.</label><br />
+          <label><input type="radio" name="q2" data-correct="false"> São sinônimos — ambos verificam comportamento.</label><br />
+          <label><input type="radio" name="q2" data-correct="false"> Fake e Mock são a mesma coisa.</label><br />
         </form>
         <div class="quiz-feedback" data-feedback="q2">
-          <p><strong>Resposta correta:</strong> Stub retorna dados pré-definidos para testes, enquanto Mock verifica se métodos foram chamados como esperado.</p>
+          <p><strong>Correto!</strong> Stub → controla entradas &bull; Mock → verifica interações.</p>
         </div>
         <div class="slide-footer">
-          <div class="footer-bar">08 - Testes de Unidade e Integracao</div>
-          <div class="footer-page">13</div>
+          <div class="footer-bar">08 – Test-Driven Development</div>
+          <div class="footer-page">25</div>
         </div>
       </section>
 
-      <!-- ==================== SLIDE: INTERVALO ==================== -->
+      <!-- ==================== INTERVALO ==================== -->
       <section class="break-slide">
         <div class="top-bar"></div>
         <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
         <div class="break-title">
           <h2>Intervalo</h2>
           <p>21h00 – 21h20</p>
-          <p>☕ Aproveite para descansar</p>
+          <p>☕ Aproveite para baixar o repositório!</p>
+          <p style="font-size:0.75em; margin-top:1rem; color:#aaa">github.com/josercf/fiap-2026-1-tdd</p>
         </div>
         <div class="slide-footer">
-          <div class="footer-bar">08 - Testes de Unidade e Integracao</div>
-          <div class="footer-page">14</div>
+          <div class="footer-bar">08 – Test-Driven Development</div>
+          <div class="footer-page">26</div>
         </div>
       </section>
 
-      <!-- ==================== SLIDE: SEÇÃO EXERCÍCIO PRÁTICO ==================== -->
+      <!-- ==================== BLOCO 2 ==================== -->
       <section class="section-slide">
         <div class="top-bar"></div>
         <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
         <div class="accent-bar"></div>
-        <h2>Exercício Hands-on</h2>
-        <h3>API de Cálculo de Frete usando TDD</h3>
-        <p>Objetivo: Escrever testes unitários para a API de cálculo de frete antes de implementar a lógica.</p>
-        <p>Passos:</p>
-        <ol>
-          <li>Crie um teste unitário que verifique o cálculo do frete para um determinado CEP.</li>
-          <li>Implemente a lógica mínima para passar no teste.</li>
-          <li>Refatore o código mantendo os testes verdes.</li>
-        </ol>
+        <h2>Bloco 2</h2>
+        <p>Exercícios Práticos em 4 Níveis</p>
         <div class="slide-footer">
-          <div class="footer-bar">08 - Testes de Unidade e Integracao</div>
-          <div class="footer-page">15</div>
+          <div class="footer-bar">08 – Test-Driven Development</div>
+          <div class="footer-page">27</div>
         </div>
       </section>
 
-      <!-- ==================== SLIDE: EXERCÍCIO CONTAINER E PASSOS ==================== -->
-      <section class="exercise-slide content-slide">
+      <!-- ==================== REPOSITÓRIO ==================== -->
+      <section class="content-slide">
         <div class="top-bar"></div>
         <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
         <div class="slide-title-area">
           <div class="accent-bar"></div>
-          <h2>Exercício: Implementação TDD</h2>
+          <h2>Repositório de Exercícios</h2>
         </div>
-        <div class="exercise-container">
-          <div class="exercise-steps">
-            <h3>Passo 1: Escreva o teste unitário</h3>
-            <pre><code class="language-java">
-// Exemplo inicial em Java com JUnit 5
-import static org.junit.jupiter.api.Assertions.*;
-import org.junit.jupiter.api.Test;
+        <pre><code class="language-bash">
+# Clone e instale
+git clone https://github.com/josercf/fiap-2026-1-tdd.git
+cd fiap-2026-1-tdd
+dotnet restore &amp;&amp; dotnet build
 
-class FreteServiceTest {
-  @Test
-  void calculaFreteParaCEPValido() {
-    FreteService service = new FreteService();
-    double frete = service.calculaFrete("01310-000");
-    assertEquals(15.0, frete);
-  }
-}
-            </code></pre>
+# Rode os testes
+dotnet test
 
-            <h3>Passo 2: Implemente o método para passar no teste</h3>
-            <pre><code class="language-java">
-class FreteService {
-  double calculaFrete(String cep) {
-    if ("01310-000".equals(cep)) {
-      return 15.0;
-    }
-    return 0.0;
-  }
-}
-            </code></pre>
-
-            <h3>Passo 3: Refatore e adicione mais testes</h3>
-            <pre><code class="language-java">
-// Adicione mais testes para outros CEPs e refatore o código para usar tabelas ou regras.</code></pre>
+# Se precisar do gabarito (somente em último caso!)
+git checkout gabarito
+        </code></pre>
+        <div class="concept-grid" style="margin-top:0.8rem">
+          <div class="concept-card" style="border-color:#2041b0">
+            <h4>Estrutura</h4>
+            <p><code>src/</code> → código de produção<br><code>tests/</code> → testes automatizados<br>4 projetos, dificuldade crescente</p>
+          </div>
+          <div class="concept-card" style="border-color:#1e8449">
+            <h4>Branch <code>gabarito</code></h4>
+            <p>Exercícios resolvidos — consulte <em>depois</em> de tentar. O aprendizado está no processo de resolver!</p>
           </div>
         </div>
         <div class="slide-footer">
-          <div class="footer-bar">08 - Testes de Unidade e Integracao</div>
-          <div class="footer-page">16</div>
+          <div class="footer-bar">08 – Test-Driven Development</div>
+          <div class="footer-page">28</div>
         </div>
       </section>
 
-      <!-- ==================== SLIDE: EXERCÍCIO - EXEMPLOS .NET ==================== -->
-      <section class="content-slide">
-        <div class="top-bar"></div>
-        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
-        <div class="slide-title-area">
-          <div class="accent-bar"></div>
-          <h2>Exemplo .NET - xUnit</h2>
-        </div>
-        <pre><code class="language-csharp">
-using Xunit;
-
-public class FreteServiceTests {
-  [Fact]
-  public void CalculaFreteParaCEPValido() {
-    var service = new FreteService();
-    var frete = service.CalculaFrete("01310-000");
-    Assert.Equal(15.0, frete);
-  }
-}
-
-public class FreteService {
-  public double CalculaFrete(string cep) {
-    if (cep == "01310-000")
-      return 15.0;
-    return 0.0;
-  }
-}
-        </code></pre>
-        <div class="slide-footer">
-          <div class="footer-bar">08 - Testes de Unidade e Integracao</div>
-          <div class="footer-page">17</div>
-        </div>
-      </section>
-
-      <!-- ==================== SLIDE: EXERCÍCIO - EXEMPLOS NODE.JS ==================== -->
-      <section class="content-slide">
-        <div class="top-bar"></div>
-        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
-        <div class="slide-title-area">
-          <div class="accent-bar"></div>
-          <h2>Exemplo Node.js - Jest</h2>
-        </div>
-        <pre><code class="language-javascript">
-// freteService.js
-function calculaFrete(cep) {
-  if (cep === "01310-000") return 15.0;
-  return 0.0;
-}
-module.exports = { calculaFrete };
-
-// freteService.test.js
-const { calculaFrete } = require('./freteService');
-
-test('Calcula frete para CEP válido', () => {
-  expect(calculaFrete("01310-000")).toBe(15.0);
-});
-        </code></pre>
-        <div class="slide-footer">
-          <div class="footer-bar">08 - Testes de Unidade e Integracao</div>
-          <div class="footer-page">18</div>
-        </div>
-      </section>
-
-      <!-- ==================== SLIDE: QUIZ SOBRE TDD E MOCKS/STUBS ==================== -->
-      <section class="quiz-slide content-slide" data-quiz-id="tdd-mocks-quiz-3">
-        <div class="top-bar"></div>
-        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
-        <div class="slide-title-area">
-          <div class="accent-bar"></div>
-          <h2>Quiz: TDD e Mocks/Stubs</h2>
-        </div>
-        <form>
-          <p>Por que TDD é considerado uma prática importante?</p>
-          <label><input type="radio" name="q3" data-correct="true"> Ajuda a garantir qualidade e design melhor do código.</label><br />
-          <label><input type="radio" name="q3" data-correct="false"> É usado apenas para testes manuais.</label><br />
-          <label><input type="radio" name="q3" data-correct="false"> Impede o uso de mocks e stubs.</label><br />
-          <label><input type="radio" name="q3" data-correct="false"> Substitui a necessidade de testes de integração.</label><br />
-        </form>
-        <div class="quiz-feedback" data-feedback="q3">
-          <p><strong>Resposta correta:</strong> TDD ajuda a criar código testável, confiável e com design mais limpo.</p>
-        </div>
-        <form>
-          <p>Qual das afirmativas sobre mocks e stubs está correta?</p>
-          <label><input type="radio" name="q4" data-correct="false"> Mocks são usados apenas para gerar dados aleatórios.</label><br />
-          <label><input type="radio" name="q4" data-correct="true"> Stubs fornecem respostas pré-definidas, mocks verificam interações.</label><br />
-          <label><input type="radio" name="q4" data-correct="false"> Fakes não são usados em testes unitários.</label><br />
-          <label><input type="radio" name="q4" data-correct="false"> Mock e stub são termos intercambiáveis e significam a mesma coisa.</label><br />
-        </form>
-        <div class="quiz-feedback" data-feedback="q4">
-          <p><strong>Resposta correta:</strong> Stubs retornam dados fixos, mocks verificam chamadas feitas durante o teste.</p>
-        </div>
-        <div class="slide-footer">
-          <div class="footer-bar">08 - Testes de Unidade e Integracao</div>
-          <div class="footer-page">19</div>
-        </div>
-      </section>
-
-      <!-- ==================== SLIDE: INTERVALO ==================== -->
-      <section class="break-slide">
-        <div class="top-bar"></div>
-        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
-        <div class="break-title">
-          <h2>Intervalo</h2>
-          <p>21h00 – 21h20</p>
-          <p>☕ Aproveite para descansar</p>
-        </div>
-        <div class="slide-footer">
-          <div class="footer-bar">08 - Testes de Unidade e Integracao</div>
-          <div class="footer-page">20</div>
-        </div>
-      </section>
-
-      <!-- ==================== SLIDE: SEÇÃO BLOCO 2 ==================== -->
-      <section class="section-slide">
-        <div class="top-bar"></div>
-        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
-        <div class="accent-bar"></div>
-        <h2>Bloco 2:<br>Testes de Integração</h2>
-        <div class="slide-footer">
-          <div class="footer-bar">08 - Testes de Unidade e Integracao</div>
-          <div class="footer-page">21</div>
-        </div>
-      </section>
-
-      <!-- ==================== SLIDE: Diferença entre Testes de Unidade e Integração ==================== -->
-      <section class="content-slide">
-        <div class="top-bar"></div>
-        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
-        <div class="slide-title-area">
-          <div class="accent-bar"></div>
-          <h2>Diferença entre Testes de Unidade e Integração</h2>
-        </div>
-
-        <ul>
-          <li><strong>Teste de Unidade:</strong> Verifica o funcionamento isolado de uma unidade (função, método).</li>
-          <li><strong>Teste de Integração:</strong> Valida a interação entre múltiplos componentes ou sistemas.</li>
-          <li>Testes de integração geralmente envolvem banco de dados, APIs, serviços externos ou microsserviços.</li>
-          <li>Mais complexos e mais lentos que testes de unidade, porém essenciais para garantir a integração correta.</li>
-        </ul>
-
-        <div class="slide-footer">
-          <div class="footer-bar">08 - Testes de Unidade e Integracao</div>
-          <div class="footer-page">5</div>
-        </div>
-      </section>
-
-      <!-- ==================== SLIDE: Testcontainers - Banco de Dados em Container para Testes ==================== -->
-      <section class="content-slide">
-        <div class="top-bar"></div>
-        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
-        <div class="slide-title-area">
-          <div class="accent-bar"></div>
-          <h2>Testcontainers</h2>
-          <h3>Rodando banco de dados em container para testes</h3>
-        </div>
-
-        <p>Testcontainers é uma biblioteca que permite rodar containers Docker para bancos e serviços durante testes automatizados.</p>
-        <ul>
-          <li>Garante ambiente isolado e consistente para testes de integração.</li>
-          <li>Evita problemas de configuração de banco local ou falta de dados.</li>
-          <li>Suporta diversos bancos: PostgreSQL, MySQL, MongoDB, Kafka, etc.</li>
-        </ul>
-
-        <div class="slide-footer">
-          <div class="footer-bar">08 - Testes de Unidade e Integracao</div>
-          <div class="footer-page">6</div>
-        </div>
-      </section>
-
-      <!-- ==================== SLIDE: Testes de API com Supertest (Node.js) ==================== -->
-      <section class="content-slide">
-        <div class="top-bar"></div>
-        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
-        <div class="slide-title-area">
-          <div class="accent-bar"></div>
-          <h2>Testes de API com Supertest (Node.js)</h2>
-        </div>
-
-        <p>Supertest é uma biblioteca para testar APIs HTTP em aplicações Node.js.</p>
-        <pre><code class="language-js">
-// Exemplo básico com Express + Supertest
-const request = require('supertest');
-const app = require('../app');
-
-describe('GET /api/users', () => {
-  it('Retorna status 200 e lista de usuários', async () => {
-    const res = await request(app).get('/api/users');
-    expect(res.statusCode).toEqual(200);
-    expect(res.body).toBeInstanceOf(Array);
-  });
-});
-        </code></pre>
-
-        <div class="slide-footer">
-          <div class="footer-bar">08 - Testes de Unidade e Integracao</div>
-          <div class="footer-page">7</div>
-        </div>
-      </section>
-
-      <!-- ==================== SLIDE: Testes de API com RestAssured (Java/Spring Boot) ==================== -->
-      <section class="content-slide">
-        <div class="top-bar"></div>
-        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
-        <div class="slide-title-area">
-          <div class="accent-bar"></div>
-          <h2>Testes de API com RestAssured (Java/Spring Boot)</h2>
-        </div>
-
-        <p>RestAssured é uma biblioteca Java para testes de APIs REST, muito utilizada com Spring Boot.</p>
-        <pre><code class="language-java">
-import io.restassured.RestAssured;
-import org.junit.jupiter.api.Test;
-import static org.hamcrest.Matchers.*;
-
-public class UserApiTest {
-
-  @Test
-  public void testGetUsers() {
-    RestAssured.given()
-      .when().get("/api/users")
-      .then()
-      .statusCode(200)
-      .body("$", not(empty()));
-  }
-}
-        </code></pre>
-
-        <div class="slide-footer">
-          <div class="footer-bar">08 - Testes de Unidade e Integracao</div>
-          <div class="footer-page">8</div>
-        </div>
-      </section>
-
-      <!-- ==================== SLIDE: Contract Testing com Pact ==================== -->
-      <section class="content-slide">
-        <div class="top-bar"></div>
-        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
-        <div class="slide-title-area">
-          <div class="accent-bar"></div>
-          <h2>Contract Testing com Pact</h2>
-        </div>
-
-        <p>Contract Testing é uma técnica para validar contratos entre serviços (consumidores e provedores).</p>
-        <ul>
-          <li>Pact é uma ferramenta popular para testes de contrato.</li>
-          <li>Garante que serviços independentes evoluam sem quebrar integrações.</li>
-          <li>Evita testes end-to-end caros e frágeis.</li>
-        </ul>
-
-        <pre><code class="language-json">
-// Exemplo de contrato Pact (simplificado)
-{
-  "consumer": { "name": "frontend" },
-  "provider": { "name": "user-service" },
-  "interactions": [
-    {
-      "description": "Busca usuário por ID",
-      "request": {
-        "method": "GET",
-        "path": "/users/123"
-      },
-      "response": {
-        "status": 200,
-        "body": {
-          "id": 123,
-          "name": "João"
-        }
-      }
-    }
-  ]
-}
-        </code></pre>
-
-        <div class="slide-footer">
-          <div class="footer-bar">08 - Testes de Unidade e Integracao</div>
-          <div class="footer-page">9</div>
-        </div>
-      </section>
-
-      <!-- ==================== SLIDE: Caso Real: Nubank e Testes de Integração com Contratos ==================== -->
-      <section class="content-slide">
-        <div class="top-bar"></div>
-        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
-        <div class="slide-title-area">
-          <div class="accent-bar"></div>
-          <h2>Caso Real: Nubank</h2>
-          <h3>Como o Nubank testa integrações entre microsserviços com contratos</h3>
-        </div>
-
-        <p>O Nubank utiliza Contract Testing para garantir a comunicação correta entre seus microsserviços.</p>
-        <ul>
-          <li>Equipes independentes produzem pactos que definem expectativas.</li>
-          <li>Testes automáticos validam que mudanças não quebrem integrações.</li>
-          <li>Redução significativa de bugs em produção e retrabalho.</li>
-        </ul>
-
-        <div class="slide-footer">
-          <div class="footer-bar">08 - Testes de Unidade e Integracao</div>
-          <div class="footer-page">10</div>
-        </div>
-      </section>
-
-      <!-- ==================== SLIDE: QUIZ 1 - Testcontainers ==================== -->
-      <section class="quiz-slide content-slide" data-correct="b" data-quiz-feedback="Resposta correta! Testcontainers facilita a execução de bancos em containers para testes.">
-        <div class="top-bar"></div>
-        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
-        <div class="slide-title-area">
-          <div class="accent-bar"></div>
-          <h2>Quiz 1: Testcontainers</h2>
-        </div>
-
-        <p>Qual a principal vantagem de usar Testcontainers em testes de integração?</p>
-        <form>
-          <input type="radio" name="q1" id="q1a" value="a" />
-          <label for="q1a">a) Evitar o uso de containers Docker</label><br/>
-          <input type="radio" name="q1" id="q1b" value="b" />
-          <label for="q1b">b) Prover um ambiente isolado e consistente para testes com bancos</label><br/>
-          <input type="radio" name="q1" id="q1c" value="c" />
-          <label for="q1c">c) Substituir testes unitários por testes manuais</label><br/>
-        </form>
-
-        <div class="slide-footer">
-          <div class="footer-bar">08 - Testes de Unidade e Integracao</div>
-          <div class="footer-page">11</div>
-        </div>
-      </section>
-
-      <!-- ==================== SLIDE: QUIZ 2 - Contract Testing ==================== -->
-      <section class="quiz-slide content-slide" data-correct="a" data-quiz-feedback="Correto! Contract Testing previne que alterações quebrem a integração entre serviços.">
-        <div class="top-bar"></div>
-        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
-        <div class="slide-title-area">
-          <div class="accent-bar"></div>
-          <h2>Quiz 2: Contract Testing</h2>
-        </div>
-
-        <p>Qual o principal objetivo do Contract Testing?</p>
-        <form>
-          <input type="radio" name="q2" id="q2a" value="a" />
-          <label for="q2a">a) Garantir que os contratos entre consumidores e provedores sejam respeitados</label><br/>
-          <input type="radio" name="q2" id="q2b" value="b" />
-          <label for="q2b">b) Testar a performance da API sob carga</label><br/>
-          <input type="radio" name="q2" id="q2c" value="c" />
-          <label for="q2c">c) Substituir testes de unidade por testes end-to-end</label><br/>
-        </form>
-
-        <div class="slide-footer">
-          <div class="footer-bar">08 - Testes de Unidade e Integracao</div>
-          <div class="footer-page">12</div>
-        </div>
-      </section>
-
-      <!-- ==================== SLIDE: INTERVALO ==================== -->
-      <section class="break-slide">
-        <div class="top-bar"></div>
-        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
-        <h2>Intervalo</h2>
-        <p>21h00 – 21h20<br>☕ Aproveite para descansar e se preparar para o próximo bloco.</p>
-
-        <div class="slide-footer">
-          <div class="footer-bar">08 - Testes de Unidade e Integracao</div>
-          <div class="footer-page">13</div>
-        </div>
-      </section>
-
-      <!-- ==================== SLIDE: SEÇÃO - Bloco 2 ==================== -->
-      <section class="section-slide">
-        <div class="top-bar"></div>
-        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
-        <div class="accent-bar"></div>
-        <h2>Bloco 2<br>Exercício Prático</h2>
-        <div class="slide-footer">
-          <div class="footer-bar">08 - Testes de Unidade e Integracao</div>
-          <div class="footer-page">14</div>
-        </div>
-      </section>
-
-      <!-- ==================== SLIDE: Exercício hands-on - Criar testes de integração com Testcontainers ==================== -->
+      <!-- ==================== EXERCÍCIO NÍVEL 1 ==================== -->
       <section class="exercise-slide content-slide">
         <div class="top-bar"></div>
         <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
         <div class="slide-title-area">
           <div class="accent-bar"></div>
-          <h2>Exercício Prático</h2>
-          <h3>Criar testes de integração com Testcontainers</h3>
+          <h2><span class="nivel-badge">Nível 1 – Exemplo Completo</span> Calculadora</h2>
         </div>
-
-        <div class="exercise-container">
-          <p>Objetivo: Subir um container PostgreSQL para testar operações CRUD em uma API REST.</p>
-          <ol class="exercise-steps">
-            <li>Configure o Testcontainers para iniciar um container PostgreSQL na inicialização dos testes.</li>
-            <li>Implemente testes que inserem, consultam, atualizam e removem dados via a API.</li>
-            <li>Utilize a biblioteca de testes da sua stack:<br/>
-              <ul>
-                <li><em>Java/Spring Boot:</em> JUnit + Testcontainers + RestAssured</li>
-                <li><em>.NET/C#:</em> xUnit + Testcontainers.DotNet + HttpClient</li>
-                <li><em>Node.js:</em> Jest + testcontainers-node + supertest</li>
-              </ul>
-            </li>
-            <li>Verifique se os testes passam com sucesso utilizando o banco do container.</li>
-          </ol>
+        <div class="two-col">
+          <div>
+            <h3 style="font-size:0.85em">O que fazer</h3>
+            <ul class="checklist" style="font-size:0.78em">
+              <li>Abra <code>tests/Nivel01.Calculadora.Tests/CalculadoraTests.cs</code></li>
+              <li>Leia os testes e entenda o padrão AAA</li>
+              <li>Observe os atributos <code>[Fact]</code> e <code>[Theory]</code></li>
+              <li>Veja o código em <code>src/Nivel01.Calculadora/Calculadora.cs</code></li>
+              <li>Rode: <code>dotnet test tests/Nivel01.Calculadora.Tests</code></li>
+            </ul>
+          </div>
+          <div>
+            <h3 style="font-size:0.85em">O que observar</h3>
+            <ul style="font-size:0.78em">
+              <li>Nomes de teste: <code>Metodo_Cenario_Resultado</code></li>
+              <li>FluentAssertions: <code>.Should().Be()</code></li>
+              <li>Teste de exceção com <code>.Should().Throw&lt;&gt;()</code></li>
+              <li>Cada teste verifica <strong>uma única coisa</strong></li>
+            </ul>
+          </div>
         </div>
-
+        <div class="exercise-timer">
+          <span class="timer-label">Tempo</span>
+          <span class="timer-display" id="timer-n1">10:00</span>
+          <button class="timer-btn" onclick="startTimer('timer-n1', 10)">▶ Iniciar</button>
+        </div>
         <div class="slide-footer">
-          <div class="footer-bar">08 - Testes de Unidade e Integracao</div>
-          <div class="footer-page">15</div>
+          <div class="footer-bar">08 – Test-Driven Development</div>
+          <div class="footer-page">29</div>
         </div>
       </section>
 
-      <!-- ==================== SLIDE: Exemplo Java/Spring Boot com Testcontainers e RestAssured ==================== -->
-      <section class="content-slide">
+      <!-- ==================== EXERCÍCIO NÍVEL 2 ==================== -->
+      <section class="exercise-slide content-slide">
         <div class="top-bar"></div>
         <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
         <div class="slide-title-area">
           <div class="accent-bar"></div>
-          <h2>Exemplo Java/Spring Boot</h2>
-          <h3>Testcontainers + RestAssured</h3>
+          <h2><span class="nivel-badge">Nível 2 – Testes Prontos</span> Validação de CPF</h2>
         </div>
-
-        <pre><code class="language-java">
-import org.junit.jupiter.api.Test;
-import org.testcontainers.containers.PostgreSQLContainer;
-import io.restassured.RestAssured;
-import static io.restassured.RestAssured.*;
-import static org.hamcrest.Matchers.*;
-
-public class UserIntegrationTest {
-
-  static PostgreSQLContainer<?> postgreSQLContainer = new PostgreSQLContainer<>("postgres:14")
-    .withDatabaseName("testdb")
-    .withUsername("test")
-    .withPassword("test");
-
-  static {
-    postgreSQLContainer.start();
-    System.setProperty("DB_URL", postgreSQLContainer.getJdbcUrl());
-    System.setProperty("DB_USER", postgreSQLContainer.getUsername());
-    System.setProperty("DB_PASS", postgreSQLContainer.getPassword());
-  }
-
-  @Test
-  public void testCreateAndGetUser() {
-    RestAssured.baseURI = "http://localhost:8080";
-
-    // Cria usuário
-    given()
-      .contentType("application/json")
-      .body("{\"name\":\"Maria\"}")
-    .when()
-      .post("/users")
-    .then()
-      .statusCode(201)
-      .body("name", equalTo("Maria"));
-
-    // Consulta usuário
-    when()
-      .get("/users")
-    .then()
-      .statusCode(200)
-      .body("name", hasItem("Maria"));
-  }
-}
-        </code></pre>
-
+        <div class="two-col">
+          <div>
+            <h3 style="font-size:0.85em">O que fazer</h3>
+            <ul class="checklist" style="font-size:0.78em">
+              <li>Leia os testes em <code>tests/Nivel02.ValidacaoCpf.Tests/</code></li>
+              <li><strong>Não altere os testes!</strong></li>
+              <li>Implemente <code>CpfValidator.IsValid()</code> em <code>src/Nivel02.ValidacaoCpf/</code></li>
+              <li>Rode os testes — eles devem falhar primeiro (RED)</li>
+              <li>Implemente até todos passarem (GREEN)</li>
+            </ul>
+          </div>
+          <div>
+            <h3 style="font-size:0.85em">Dica: Algoritmo CPF</h3>
+            <p style="font-size:0.72em">
+              1. Remove não numéricos<br>
+              2. Verifica comprimento = 11<br>
+              3. Rejeita todos dígitos iguais<br>
+              4. Calcula 1º dígito verificador<br>
+              &nbsp;&nbsp;&nbsp;soma = Σ dígito[i] × (10 − i), i=0..8<br>
+              &nbsp;&nbsp;&nbsp;resto = soma % 11<br>
+              &nbsp;&nbsp;&nbsp;d1 = (resto &lt; 2) ? 0 : 11 − resto<br>
+              5. Repete para 2º dígito (pesos 11..2)
+            </p>
+          </div>
+        </div>
+        <div class="exercise-timer">
+          <span class="timer-label">Tempo</span>
+          <span class="timer-display" id="timer-n2">20:00</span>
+          <button class="timer-btn" onclick="startTimer('timer-n2', 20)">▶ Iniciar</button>
+        </div>
         <div class="slide-footer">
-          <div class="footer-bar">08 - Testes de Unidade e Integracao</div>
-          <div class="footer-page">16</div>
+          <div class="footer-bar">08 – Test-Driven Development</div>
+          <div class="footer-page">30</div>
         </div>
       </section>
 
-      <!-- ==================== SLIDE: Exemplo .NET/C# com Testcontainers.DotNet ==================== -->
-      <section class="content-slide">
+      <!-- ==================== EXERCÍCIO NÍVEL 3 ==================== -->
+      <section class="exercise-slide content-slide">
         <div class="top-bar"></div>
         <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
         <div class="slide-title-area">
           <div class="accent-bar"></div>
-          <h2>Exemplo .NET/C#</h2>
-          <h3>Testcontainers.DotNet + xUnit + HttpClient</h3>
+          <h2><span class="nivel-badge">Nível 3 – TDD Livre</span> Carrinho de Compras</h2>
         </div>
-
-        <pre><code class="language-csharp">
-using System.Net.Http;
-using System.Text;
-using System.Threading.Tasks;
-using Xunit;
-using DotNet.Testcontainers.Builders;
-using DotNet.Testcontainers.Containers;
-
-public class UserIntegrationTests : IAsyncLifetime {
-  private readonly TestcontainerDatabase _postgresContainer;
-  private readonly HttpClient _client = new HttpClient { BaseAddress = new Uri("http://localhost:5000") };
-
-  public UserIntegrationTests() {
-    _postgresContainer = new TestcontainersBuilder<PostgreSqlTestcontainer>()
-      .WithDatabase(new PostgreSqlTestcontainerConfiguration {
-        Database = "testdb",
-        Username = "test",
-        Password = "test"
-      }).Build();
-  }
-
-  public async Task InitializeAsync() {
-    await _postgresContainer.StartAsync();
-    // Configure a string de conexão na aplicação
-  }
-
-  public async Task DisposeAsync() {
-    await _postgresContainer.StopAsync();
-  }
-
-  [Fact]
-  public async Task TestCreateAndGetUser() {
-    var json = "{\"name\":\"Carlos\"}";
-    var content = new StringContent(json, Encoding.UTF8, "application/json");
-
-    var postResponse = await _client.PostAsync("/users", content);
-    Assert.True(postResponse.IsSuccessStatusCode);
-
-    var getResponse = await _client.GetAsync("/users");
-    var responseBody = await getResponse.Content.ReadAsStringAsync();
-    Assert.Contains("Carlos", responseBody);
-  }
-}
-        </code></pre>
-
+        <div class="two-col">
+          <div>
+            <h3 style="font-size:0.85em">O que fazer</h3>
+            <ul class="checklist" style="font-size:0.78em">
+              <li>Leia as regras em <code>src/Nivel03.CarrinhoCompras/REGRAS-DE-NEGOCIO.md</code></li>
+              <li>Escreva o 1º teste em <code>tests/Nivel03.CarrinhoCompras.Tests/</code></li>
+              <li>Rode — deve falhar (RED) ✓</li>
+              <li>Implemente o mínimo em <code>src/.../CarrinhoCompras.cs</code> (GREEN)</li>
+              <li>Repita para cada regra</li>
+            </ul>
+          </div>
+          <div>
+            <h3 style="font-size:0.85em">Sugestão de ordem</h3>
+            <ol style="font-size:0.72em">
+              <li>Carrinho vazio → total zero</li>
+              <li>Adicionar 1 item → total correto</li>
+              <li>Mesmo produto → soma quantidade</li>
+              <li>Quantidade inválida → exceção</li>
+              <li>Remover item</li>
+              <li>Desconto percentual</li>
+              <li>Cupom FIAP10 / FIAP20</li>
+            </ol>
+          </div>
+        </div>
+        <div class="exercise-timer">
+          <span class="timer-label">Tempo</span>
+          <span class="timer-display" id="timer-n3">25:00</span>
+          <button class="timer-btn" onclick="startTimer('timer-n3', 25)">▶ Iniciar</button>
+        </div>
         <div class="slide-footer">
-          <div class="footer-bar">08 - Testes de Unidade e Integracao</div>
-          <div class="footer-page">17</div>
+          <div class="footer-bar">08 – Test-Driven Development</div>
+          <div class="footer-page">31</div>
         </div>
       </section>
 
-      <!-- ==================== SLIDE: Exemplo Node.js com testcontainers-node e supertest ==================== -->
-      <section class="content-slide">
+      <!-- ==================== EXERCÍCIO NÍVEL 4 ==================== -->
+      <section class="exercise-slide content-slide">
         <div class="top-bar"></div>
         <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
         <div class="slide-title-area">
           <div class="accent-bar"></div>
-          <h2>Exemplo Node.js</h2>
-          <h3>testcontainers + supertest + Jest</h3>
+          <h2><span class="nivel-badge">Nível 4 – TDD + Moq</span> Pagamento com Fraude</h2>
         </div>
+        <div class="two-col">
+          <div>
+            <h3 style="font-size:0.85em">O que fazer</h3>
+            <ul class="checklist" style="font-size:0.78em">
+              <li>Leia as regras em <code>src/Nivel04.PagamentoFraude/REGRAS-DE-NEGOCIO.md</code></li>
+              <li>Interfaces <code>IGatewayPagamento</code> e <code>IDetectorFraude</code> já estão prontas</li>
+              <li>Crie Mocks com <code>new Mock&lt;IInterface&gt;()</code></li>
+              <li>Configure com <code>.Setup()</code> e verifique com <code>.Verify()</code></li>
+              <li>Implemente <code>PagamentoService.Pagar()</code></li>
+            </ul>
+          </div>
+          <div>
+            <h3 style="font-size:0.85em">Template de teste</h3>
+            <pre style="font-size:0.6em; margin:0"><code class="language-csharp">var mockGateway = new Mock&lt;IGatewayPagamento&gt;();
+var mockFraude = new Mock&lt;IDetectorFraude&gt;();
+var service = new PagamentoService(
+    mockGateway.Object,
+    mockFraude.Object);
 
-        <pre><code class="language-js">
-const { PostgreSqlContainer } = require('testcontainers');
-const request = require('supertest');
-const app = require('../app');
-
-let container;
-
-beforeAll(async () => {
-  container = await new PostgreSqlContainer('postgres:14')
-    .withDatabase('testdb')
-    .withUsername('test')
-    .withPassword('test')
-    .start();
-
-  process.env.DB_HOST = container.getHost();
-  process.env.DB_PORT = container.getPort();
-  process.env.DB_USER = 'test';
-  process.env.DB_PASS = 'test';
-  process.env.DB_NAME = 'testdb';
-
-  await app.connectDatabase(); // exemplo de método para conectar o DB
-});
-
-afterAll(async () => {
-  await container.stop();
-});
-
-test('POST /users cria usuário e GET /users retorna lista', async () => {
-  await request(app)
-    .post('/users')
-    .send({ name: 'Ana' })
-    .expect(201);
-
-  const res = await request(app).get('/users').expect(200);
-  expect(res.body).toEqual(
-    expect.arrayContaining([
-      expect.objectContaining({ name: 'Ana' }),
-    ])
-  );
-});
-        </code></pre>
-
+// Configure e verifique!</code></pre>
+          </div>
+        </div>
+        <div class="exercise-timer">
+          <span class="timer-label">Tempo</span>
+          <span class="timer-display" id="timer-n4">20:00</span>
+          <button class="timer-btn" onclick="startTimer('timer-n4', 20)">▶ Iniciar</button>
+        </div>
         <div class="slide-footer">
-          <div class="footer-bar">08 - Testes de Unidade e Integracao</div>
-          <div class="footer-page">18</div>
+          <div class="footer-bar">08 – Test-Driven Development</div>
+          <div class="footer-page">32</div>
         </div>
       </section>
 
-      <!-- ==================== SLIDE: Quiz 3 - Testcontainers & Contract Testing ==================== -->
-      <section class="quiz-slide content-slide" data-correct="a" data-quiz-feedback="Muito bem! Testcontainers ajuda a criar ambientes isolados para testes.">
+      <!-- ==================== QUIZ FINAL ==================== -->
+      <section class="quiz-slide content-slide" data-quiz-id="tdd-quiz-final">
         <div class="top-bar"></div>
         <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
         <div class="slide-title-area">
           <div class="accent-bar"></div>
-          <h2>Quiz 3</h2>
+          <h2>Quiz Final</h2>
         </div>
-
-        <p>Por que utilizar Testcontainers em testes de integração?</p>
         <form>
-          <input type="radio" id="q3a" name="q3" value="a" /><label for="q3a">a) Para garantir ambiente limpo e idêntico ao de produção</label><br/>
-          <input type="radio" id="q3b" name="q3" value="b" /><label for="q3b">b) Para evitar testes automatizados</label><br/>
-          <input type="radio" id="q3c" name="q3" value="c" /><label for="q3c">c) Para executar testes unitários mais rápido</label><br/>
+          <p><strong>1.</strong> Por que Injeção de Dependência é fundamental para TDD?</p>
+          <label><input type="radio" name="qf1" data-correct="false"> Porque elimina a necessidade de testes unitários.</label><br />
+          <label><input type="radio" name="qf1" data-correct="true"> Porque permite substituir implementações reais por mocks/stubs nos testes.</label><br />
+          <label><input type="radio" name="qf1" data-correct="false"> Porque aumenta a performance dos testes.</label><br />
+          <label><input type="radio" name="qf1" data-correct="false"> Porque elimina a necessidade de interfaces.</label><br />
         </form>
-
+        <div class="quiz-feedback" data-feedback="qf1">
+          <p><strong>Correto!</strong> DI permite injetar qualquer implementação — real em produção, mock nos testes.</p>
+        </div>
+        <form style="margin-top:0.7rem">
+          <p><strong>2.</strong> Na ISO 25010, TDD contribui principalmente para qual característica?</p>
+          <label><input type="radio" name="qf2" data-correct="false"> Portabilidade</label><br />
+          <label><input type="radio" name="qf2" data-correct="false"> Desempenho</label><br />
+          <label><input type="radio" name="qf2" data-correct="true"> Manutenibilidade e Confiabilidade</label><br />
+          <label><input type="radio" name="qf2" data-correct="false"> Usabilidade</label><br />
+        </form>
+        <div class="quiz-feedback" data-feedback="qf2">
+          <p><strong>Correto!</strong> Código testável = mais fácil de manter e com menos falhas em produção.</p>
+        </div>
         <div class="slide-footer">
-          <div class="footer-bar">08 - Testes de Unidade e Integracao</div>
-          <div class="footer-page">19</div>
+          <div class="footer-bar">08 – Test-Driven Development</div>
+          <div class="footer-page">33</div>
         </div>
       </section>
 
-      <!-- ==================== SLIDE: Quiz 4 - Contratos e Microsserviços ==================== -->
-      <section class="quiz-slide content-slide" data-correct="b" data-quiz-feedback="Exato! Contratos evitam que alterações quebrem a comunicação entre microsserviços.">
-        <div class="top-bar"></div>
-        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
-        <div class="slide-title-area">
-          <div class="accent-bar"></div>
-          <h2>Quiz 4</h2>
-        </div>
-
-        <p>Como Contract Testing ajuda em microsserviços?</p>
-        <form>
-          <input type="radio" id="q4a" name="q4" value="a" /><label for="q4a">a) Realizando testes de performance entre serviços</label><br/>
-          <input type="radio" id="q4b" name="q4" value="b" /><label for="q4b">b) Validando contratos para evitar quebra de comunicação</label><br/>
-          <input type="radio" id="q4c" name="q4" value="c" /><label for="q4c">c) Automatizando deploys de microsserviços</label><br/>
-        </form>
-
-        <div class="slide-footer">
-          <div class="footer-bar">08 - Testes de Unidade e Integracao</div>
-          <div class="footer-page">20</div>
-        </div>
-      </section>
-
-      <!-- ==================== SLIDE: Considerações Finais ==================== -->
+      <!-- ==================== ENCERRAMENTO ==================== -->
       <section class="content-slide">
         <div class="top-bar"></div>
         <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
         <div class="slide-title-area">
           <div class="accent-bar"></div>
-          <h2>Considerações Finais</h2>
+          <h2>Resumo da Aula</h2>
         </div>
-
-        <ul>
-          <li>Testes de integração são essenciais para garantir a qualidade das aplicações complexas.</li>
-          <li>Testcontainers facilita a criação de ambientes isolados e confiáveis.</li>
-          <li>Contract Testing protege a comunicação entre microsserviços, reduzindo falhas em produção.</li>
-          <li>Ferramentas e bibliotecas para diferentes stacks tornam a integração contínua mais segura.</li>
-        </ul>
-
+        <div class="concept-grid">
+          <div class="concept-card">
+            <h4>ISO 25010</h4>
+            <p>TDD contribui para confiabilidade, manutenibilidade e adequação funcional — pilares da qualidade.</p>
+          </div>
+          <div class="concept-card">
+            <h4>Red → Green → Refactor</h4>
+            <p>Teste falha → implementação mínima → melhoria. Nunca escreva código sem um teste vermelho antes.</p>
+          </div>
+          <div class="concept-card">
+            <h4>Interfaces + DI</h4>
+            <p>IoC desacopla responsabilidades. DI via construtor é o padrão para código testável.</p>
+          </div>
+          <div class="concept-card">
+            <h4>Mock / Stub / Fake</h4>
+            <p>Stub controla entradas. Mock verifica interações. Fake é implementação leve funcional.</p>
+          </div>
+        </div>
+        <p style="text-align:center; margin-top:0.8rem; font-size:0.8em">
+          Próxima aula: <strong>Aula 09 – Processamento Distribuído</strong>
+        </p>
         <div class="slide-footer">
-          <div class="footer-bar">08 - Testes de Unidade e Integracao</div>
-          <div class="footer-page">21</div>
-        </div>
-      </section>
-
-      <!-- ==================== SLIDE: Dúvidas ou curiosidades? ==================== -->
-      <section class="content-slide">
-        <div class="top-bar"></div>
-        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header" />
-        <div class="slide-title-area">
-          <div class="accent-bar"></div>
-          <h2>Dúvidas ou curiosidades?</h2>
-        </div>
-        <div style="display:flex; align-items:center; justify-content:center; flex:1; font-size:4em; color: var(--fiap-dark); font-weight:800; opacity:0.15; margin-top:40px;">
-          ?
-        </div>
-        <div class="slide-footer">
-          <div class="footer-bar">08 - Testes de Unidade e Integracao</div>
-          <div class="footer-page">40</div>
-        </div>
-      </section>
-
-      <!-- ==================== SLIDE: ENCERRAMENTO ==================== -->
-      <section class="end-slide">
-        <img src="../assets/img/fiap-logo-graduacao.png" alt="FIAP Graduação" style="max-width:350px;" />
-        <div class="copyright">
-          Copyright &copy; 2026<br />
-          Prof.º José Romualdo da Costa Filho<br /><br />
-          Todos direitos reservados. Reprodução ou divulgação total ou parcial<br />
-          deste documento é expressamente proibido sem o consentimento formal,<br />
-          por escrito, do Professor (autor).
+          <div class="footer-bar">08 – Test-Driven Development</div>
+          <div class="footer-page">34</div>
         </div>
       </section>
 
@@ -1068,27 +1092,60 @@ test('POST /users cria usuário e GET /users retorna lista', async () => {
 
   <script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/plugin/highlight/highlight.js"></script>
-  <script src="../assets/js/fiap-quiz.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/plugin/notes/notes.js"></script>
   <script>
     Reveal.initialize({
       hash: true,
       slideNumber: false,
-      width: 1280,
-      height: 720,
-      margin: 0.04,
-      minScale: 0.2,
-      maxScale: 3.0,
-      center: false,
-        pdfMaxPagesPerSlide: 1,
-        pdfSeparateFragments: false,
       transition: 'slide',
-      transitionSpeed: 'default',
-      scrollActivationWidth: null,
-      view: null,
-      plugins: [RevealHighlight]
+      plugins: [RevealHighlight, RevealNotes],
     });
+
+    // ─── Quiz interativo ───────────────────────────────────────────
+    document.querySelectorAll('.quiz-slide form').forEach(form => {
+      form.addEventListener('change', () => {
+        const checked = form.querySelector('input[type="radio"]:checked');
+        if (!checked) return;
+        const isCorrect = checked.dataset.correct === 'true';
+        const name = checked.name;
+        const feedbackEl = document.querySelector(`.quiz-feedback[data-feedback="${name}"]`);
+        form.querySelectorAll('label').forEach(label => {
+          label.style.color = '';
+          label.style.fontWeight = '';
+        });
+        checked.closest('label').style.color = isCorrect ? '#1e8449' : '#c0392b';
+        checked.closest('label').style.fontWeight = '700';
+        if (feedbackEl) feedbackEl.style.display = isCorrect ? 'block' : 'none';
+      });
+    });
+
+    // ─── Timer de Exercício ────────────────────────────────────────
+    const timers = {};
+
+    function startTimer(id, minutes) {
+      if (timers[id]) {
+        clearInterval(timers[id]);
+        delete timers[id];
+      }
+      let seconds = minutes * 60;
+      const el = document.getElementById(id);
+      el.className = 'timer-display';
+
+      timers[id] = setInterval(() => {
+        seconds--;
+        const m = Math.floor(seconds / 60);
+        const s = seconds % 60;
+        el.textContent = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+
+        if (seconds <= 60)  el.className = 'timer-display warning';
+        if (seconds <= 0) {
+          clearInterval(timers[id]);
+          delete timers[id];
+          el.textContent = '00:00';
+          el.className = 'timer-display done';
+        }
+      }, 1000);
+    }
   </script>
-  <script src="../assets/js/fiap-zoom.js"></script>
-  <script src="../assets/js/fiap-print.js"></script>
 </body>
 </html>
