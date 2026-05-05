@@ -1,0 +1,26 @@
+{
+  "name": "fiap-2026-1-perf",
+  "version": "1.0.0",
+  "description": "Laboratório de testes de carga - FIAP 3SIZ Aula 11",
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "start": "node src/server.js",
+    "seed": "node src/db/seed.js",
+    "test": "node --test tests/",
+    "reset": "rm -f database.sqlite && npm run seed"
+  },
+  "dependencies": {
+    "express": "^4.21.0",
+    "sequelize": "^6.37.0",
+    "sqlite3": "^5.1.7",
+    "@faker-js/faker": "^9.0.0"
+  },
+  "devDependencies": {
+    "supertest": "^7.0.0"
+  },
+  "license": "UNLICENSED",
+  "private": true
+}
