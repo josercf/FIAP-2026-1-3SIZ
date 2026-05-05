@@ -580,7 +580,7 @@ npm install &amp;&amp; npm start</code></pre>
         <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header">
         <div class="slide-title-area"><div class="accent-bar"></div><h2>Anatomia de um script k6</h2></div>
 
-        <pre style="font-size:0.62em; background:#1E1E2C; color:#E0E0E0; padding:14px 18px; border-radius:8px; line-height:1.55;"><code><span style="color:#888;">// k6/baseline.js</span>
+        <pre style="font-size:0.62em; background:#1E1E2C; color:#E0E0E0; padding:14px 18px; border-radius:8px; line-height:1.55;"><span style="color:#888;">// k6/baseline.js</span>
 <span style="color:#F39C12;">import</span> http <span style="color:#F39C12;">from</span> <span style="color:#00A859;">'k6/http'</span>;
 <span style="color:#F39C12;">import</span> { check, sleep } <span style="color:#F39C12;">from</span> <span style="color:#00A859;">'k6'</span>;
 
@@ -604,7 +604,7 @@ npm install &amp;&amp; npm start</code></pre>
   <span style="color:#888;">// 4) Checks — assertions soft (não param o teste, contam taxa de sucesso)</span>
   check(res, { <span style="color:#00A859;">'status 200'</span>: (r) =&gt; r.status === <span style="color:#ED145B;">200</span> });
   sleep(<span style="color:#ED145B;">1</span>);  <span style="color:#888;">// 5) sleep — espaça requisições, simula usuário real</span>
-}</code></pre>
+}</pre>
 
         <div style="margin-top:0.6em; padding:0.6em 0.9em; background:#fdedec; border-left:4px solid #ED145B; border-radius:0 6px 6px 0;">
           <p style="margin:0; font-size:0.8em;"><em><strong>stages</strong> = ramp-up + steady + ramp-down configurável. Cada VU executa <strong>default function</strong> em loop até o teste acabar.</em></p>
@@ -622,7 +622,7 @@ npm install &amp;&amp; npm start</code></pre>
           <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header">
           <div class="slide-title-area"><div class="accent-bar"></div><h2>Iteração 1 — Cenário</h2></div>
           <p style="font-size:0.85em;">Endpoint <code>GET /users/:id/profile</code> retorna o perfil + um <em>integrity hash</em> assinado.</p>
-          <pre style="font-size:0.66em; background:#1E1E2C; color:#E0E0E0; padding:10px 14px; border-radius:6px; line-height:1.5;"><code><span style="color:#888;">// src/routes/users.js (trecho)</span>
+          <pre style="font-size:0.66em; background:#1E1E2C; color:#E0E0E0; padding:10px 14px; border-radius:6px; line-height:1.5;"><span style="color:#888;">// src/routes/users.js (trecho)</span>
 <span style="color:#F39C12;">const</span> user = <span style="color:#F39C12;">await</span> User.findByPk(req.params.id);
 <span style="color:#F39C12;">if</span> (!user) <span style="color:#F39C12;">return</span> res.status(<span style="color:#ED145B;">404</span>).json(...);
 
@@ -630,7 +630,7 @@ npm install &amp;&amp; npm start</code></pre>
   .pbkdf2Sync(payload, <span style="color:#00A859;">'fiap-salt'</span>, <span style="color:#ED145B;">100_000</span>, <span style="color:#ED145B;">32</span>, <span style="color:#00A859;">'sha512'</span>)
   .toString(<span style="color:#00A859;">'hex'</span>);
 
-res.json({ ...user.toJSON(), integrity });</code></pre>
+res.json({ ...user.toJSON(), integrity });</pre>
           <p style="margin-top:0.7em; font-size:0.85em; padding:0.6em 0.9em; background:#fdedec; border-left:4px solid #ED145B; border-radius:0 6px 6px 0;"><strong>Pergunta:</strong> Antes de medir — qual a sua hipótese sobre o que esse endpoint vai mostrar sob carga?</p>
           <div class="slide-footer"><div class="footer-bar">11 - Testes de Carga</div><div class="footer-page">21</div></div>
         </section>
@@ -687,10 +687,10 @@ res.json({ ...user.toJSON(), integrity });</code></pre>
           <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header">
           <div class="slide-title-area"><div class="accent-bar"></div><h2>Iteração 1 — Fix &amp; Remedição</h2></div>
           <div style="display:flex; gap:18px; align-items:flex-start;">
-            <pre style="flex:1.4; font-size:0.6em; background:#1E1E2C; color:#E0E0E0; padding:10px 12px; border-radius:6px; line-height:1.5; margin:0;"><code><span style="color:#C0392B;">- crypto.pbkdf2Sync(payload, salt, 100_000, 32, 'sha512')</span>
+            <pre style="flex:1.4; font-size:0.6em; background:#1E1E2C; color:#E0E0E0; padding:10px 12px; border-radius:6px; line-height:1.5; margin:0;"><span style="color:#C0392B;">- crypto.pbkdf2Sync(payload, salt, 100_000, 32, 'sha512')</span>
 <span style="color:#00A859;">+ import { promisify } from 'node:util';</span>
 <span style="color:#00A859;">+ const pbkdf2 = promisify(crypto.pbkdf2);</span>
-<span style="color:#00A859;">+ await pbkdf2(payload, salt, 100_000, 32, 'sha512')</span></code></pre>
+<span style="color:#00A859;">+ await pbkdf2(payload, salt, 100_000, 32, 'sha512')</span></pre>
             <svg viewBox="0 0 240 160" style="flex:1; max-width:35%;" aria-label="Comparativo antes/depois">
               <line x1="20" y1="140" x2="230" y2="140" stroke="#1E1E2C"/>
               <line x1="20" y1="140" x2="20" y2="20" stroke="#1E1E2C"/>
@@ -728,7 +728,7 @@ res.json({ ...user.toJSON(), integrity });</code></pre>
           <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header">
           <div class="slide-title-area"><div class="accent-bar"></div><h2>Iteração 2 — Cenário</h2></div>
           <p style="font-size:0.85em;">Endpoint <code>GET /orders</code> retorna pedidos com seus itens aninhados. Funciona bem em dev (10 pedidos)... mas em produção (5.000 pedidos) <em>algo não bate</em>.</p>
-          <pre style="font-size:0.66em; background:#1E1E2C; color:#E0E0E0; padding:10px 14px; border-radius:6px; line-height:1.5;"><code><span style="color:#888;">// src/routes/orders.js (trecho)</span>
+          <pre style="font-size:0.66em; background:#1E1E2C; color:#E0E0E0; padding:10px 14px; border-radius:6px; line-height:1.5;"><span style="color:#888;">// src/routes/orders.js (trecho)</span>
 <span style="color:#F39C12;">const</span> orders = <span style="color:#F39C12;">await</span> Order.findAll({ limit: <span style="color:#ED145B;">50</span> });
 
 <span style="color:#F39C12;">const</span> result = [];
@@ -738,7 +738,7 @@ res.json({ ...user.toJSON(), integrity });</code></pre>
   });
   result.push({ ...order.toJSON(), items });
 }
-res.json(result);</code></pre>
+res.json(result);</pre>
           <p style="margin-top:0.7em; font-size:0.85em; padding:0.6em 0.9em; background:#fdedec; border-left:4px solid #ED145B; border-radius:0 6px 6px 0;"><strong>Pergunta:</strong> Quantas queries esse endpoint dispara para retornar 50 pedidos?</p>
           <div class="slide-footer"><div class="footer-bar">11 - Testes de Carga</div><div class="footer-page">22</div></div>
         </section>
@@ -799,7 +799,7 @@ res.json(result);</code></pre>
           <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header">
           <div class="slide-title-area"><div class="accent-bar"></div><h2>Iteração 2 — Fix &amp; Remedição</h2></div>
           <div style="display:flex; gap:18px; align-items:flex-start;">
-            <pre style="flex:1.4; font-size:0.6em; background:#1E1E2C; color:#E0E0E0; padding:10px 12px; border-radius:6px; line-height:1.5; margin:0;"><code><span style="color:#C0392B;">- const orders = await Order.findAll({ limit: 50 });</span>
+            <pre style="flex:1.4; font-size:0.6em; background:#1E1E2C; color:#E0E0E0; padding:10px 12px; border-radius:6px; line-height:1.5; margin:0;"><span style="color:#C0392B;">- const orders = await Order.findAll({ limit: 50 });</span>
 <span style="color:#C0392B;">- for (const order of orders) {</span>
 <span style="color:#C0392B;">-   const items = await OrderItem.findAll({</span>
 <span style="color:#C0392B;">-     where: { orderId: order.id }</span>
@@ -809,7 +809,7 @@ res.json(result);</code></pre>
 <span style="color:#00A859;">+ const orders = await Order.findAll({</span>
 <span style="color:#00A859;">+   limit: 50,</span>
 <span style="color:#00A859;">+   include: [{ model: OrderItem, as: 'items' }]</span>
-<span style="color:#00A859;">+ });</span></code></pre>
+<span style="color:#00A859;">+ });</span></pre>
             <svg viewBox="0 0 240 160" style="flex:1; max-width:35%;" aria-label="Comparativo antes/depois N+1">
               <line x1="20" y1="140" x2="230" y2="140" stroke="#1E1E2C"/>
               <line x1="20" y1="140" x2="20" y2="20" stroke="#1E1E2C"/>
