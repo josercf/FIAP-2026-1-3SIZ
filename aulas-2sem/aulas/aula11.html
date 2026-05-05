@@ -543,7 +543,398 @@ sudo apt update && sudo apt install k6</code></pre>
         <div class="slide-footer"><div class="footer-bar">11 - Testes de Carga</div><div class="footer-page">18</div></div>
       </section>
 
-      <!-- TODO: slides 19–26 nas próximas tasks -->
+      <!-- ==================== 19. LABORATÓRIO fiap-2026-1-perf ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header">
+        <div class="slide-title-area"><div class="accent-bar"></div><h2>Laboratório — <code>fiap-2026-1-perf</code></h2></div>
+
+        <div style="display:flex; gap:25px; align-items:flex-start;">
+          <div style="flex:1; font-size:0.8em;">
+            <p style="margin:0 0 0.5em;"><strong>Stack:</strong> Node 20 + Express + Sequelize + SQLite</p>
+            <p style="margin:0 0 0.5em;"><strong>Cenário:</strong> e-commerce simplificado com 3 endpoints e 3 gargalos plantados de propósito.</p>
+            <p style="margin:0.6em 0 0.3em;"><strong>Setup em 3 comandos:</strong></p>
+            <pre style="font-size:0.7em; background:#1E1E2C; color:#E0E0E0; padding:8px 12px; border-radius:6px; line-height:1.4;"><code>git clone https://github.com/josercf/fiap-2026-1-perf.git
+cd fiap-2026-1-perf
+npm install &amp;&amp; npm start</code></pre>
+            <p style="margin:0.6em 0 0; font-size:0.75em; color:#666;">Primeira execução: seed automático de 1.000 usuários, 200 produtos, 5.000 pedidos (~30s).</p>
+          </div>
+          <div style="flex:0.9; font-size:0.7em; font-family:'JetBrains Mono', monospace; background:#FAFAFA; padding:12px; border-radius:8px; border:1px solid #E0E0E0; line-height:1.5;">
+            <strong style="color:#ED145B;">fiap-2026-1-perf/</strong><br>
+            ├── src/<br>
+            │ &nbsp; ├── server.js<br>
+            │ &nbsp; ├── routes/ &nbsp;<span style="color:#888;">// 4 endpoints</span><br>
+            │ &nbsp; └── db/ &nbsp; &nbsp; &nbsp; <span style="color:#888;">// Sequelize + seed</span><br>
+            ├── k6/ &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;<span style="color:#888;">// 4 scripts</span><br>
+            ├── tests/ &nbsp; &nbsp; &nbsp; <span style="color:#888;">// node:test</span><br>
+            └── docs/ &nbsp; &nbsp; &nbsp; &nbsp;<span style="color:#888;">// gabaritos</span>
+          </div>
+        </div>
+
+        <div class="slide-footer"><div class="footer-bar">11 - Testes de Carga</div><div class="footer-page">19</div></div>
+      </section>
+
+      <!-- ==================== 20. ANATOMIA DE UM SCRIPT K6 ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header">
+        <div class="slide-title-area"><div class="accent-bar"></div><h2>Anatomia de um script k6</h2></div>
+
+        <pre style="font-size:0.62em; background:#1E1E2C; color:#E0E0E0; padding:14px 18px; border-radius:8px; line-height:1.55;"><code><span style="color:#888;">// k6/baseline.js</span>
+<span style="color:#F39C12;">import</span> http <span style="color:#F39C12;">from</span> <span style="color:#00A859;">'k6/http'</span>;
+<span style="color:#F39C12;">import</span> { check, sleep } <span style="color:#F39C12;">from</span> <span style="color:#00A859;">'k6'</span>;
+
+<span style="color:#888;">// 1) Configuração — ramp-up + steady + ramp-down</span>
+<span style="color:#F39C12;">export const</span> options = {
+  stages: [
+    { duration: <span style="color:#00A859;">'30s'</span>, target: <span style="color:#ED145B;">10</span> },  <span style="color:#888;">// ramp-up</span>
+    { duration: <span style="color:#00A859;">'1m'</span>,  target: <span style="color:#ED145B;">10</span> },  <span style="color:#888;">// steady</span>
+    { duration: <span style="color:#00A859;">'30s'</span>, target: <span style="color:#ED145B;">0</span>  },  <span style="color:#888;">// ramp-down</span>
+  ],
+  <span style="color:#888;">// 2) Thresholds — gates pass/fail do teste</span>
+  thresholds: {
+    http_req_failed:   [<span style="color:#00A859;">'rate&lt;0.01'</span>],
+    http_req_duration: [<span style="color:#00A859;">'p(95)&lt;200'</span>],
+  },
+};
+
+<span style="color:#888;">// 3) Função padrão — executada a cada iteração de cada VU</span>
+<span style="color:#F39C12;">export default function</span> () {
+  <span style="color:#F39C12;">const</span> res = http.get(<span style="color:#00A859;">'http://localhost:3000/health'</span>);
+  <span style="color:#888;">// 4) Checks — assertions soft (não param o teste, contam taxa de sucesso)</span>
+  check(res, { <span style="color:#00A859;">'status 200'</span>: (r) =&gt; r.status === <span style="color:#ED145B;">200</span> });
+  sleep(<span style="color:#ED145B;">1</span>);  <span style="color:#888;">// 5) sleep — espaça requisições, simula usuário real</span>
+}</code></pre>
+
+        <div style="margin-top:0.6em; padding:0.6em 0.9em; background:#fdedec; border-left:4px solid #ED145B; border-radius:0 6px 6px 0;">
+          <p style="margin:0; font-size:0.8em;"><em><strong>stages</strong> = ramp-up + steady + ramp-down configurável. Cada VU executa <strong>default function</strong> em loop até o teste acabar.</em></p>
+        </div>
+
+        <div class="slide-footer"><div class="footer-bar">11 - Testes de Carga</div><div class="footer-page">20</div></div>
+      </section>
+
+      <!-- ==================== 21. ITERAÇÃO 1 — SYNC I/O ==================== -->
+      <section>
+
+        <!-- 21a. Cenário -->
+        <section class="content-slide">
+          <div class="top-bar"></div>
+          <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header">
+          <div class="slide-title-area"><div class="accent-bar"></div><h2>Iteração 1 — Cenário</h2></div>
+          <p style="font-size:0.85em;">Endpoint <code>GET /users/:id/profile</code> retorna o perfil + um <em>integrity hash</em> assinado.</p>
+          <pre style="font-size:0.66em; background:#1E1E2C; color:#E0E0E0; padding:10px 14px; border-radius:6px; line-height:1.5;"><code><span style="color:#888;">// src/routes/users.js (trecho)</span>
+<span style="color:#F39C12;">const</span> user = <span style="color:#F39C12;">await</span> User.findByPk(req.params.id);
+<span style="color:#F39C12;">if</span> (!user) <span style="color:#F39C12;">return</span> res.status(<span style="color:#ED145B;">404</span>).json(...);
+
+<span style="color:#F39C12;">const</span> integrity = crypto
+  .pbkdf2Sync(payload, <span style="color:#00A859;">'fiap-salt'</span>, <span style="color:#ED145B;">100_000</span>, <span style="color:#ED145B;">32</span>, <span style="color:#00A859;">'sha512'</span>)
+  .toString(<span style="color:#00A859;">'hex'</span>);
+
+res.json({ ...user.toJSON(), integrity });</code></pre>
+          <p style="margin-top:0.7em; font-size:0.85em; padding:0.6em 0.9em; background:#fdedec; border-left:4px solid #ED145B; border-radius:0 6px 6px 0;"><strong>Pergunta:</strong> Antes de medir — qual a sua hipótese sobre o que esse endpoint vai mostrar sob carga?</p>
+          <div class="slide-footer"><div class="footer-bar">11 - Testes de Carga</div><div class="footer-page">21</div></div>
+        </section>
+
+        <!-- 21b. Baseline -->
+        <section class="content-slide">
+          <div class="top-bar"></div>
+          <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header">
+          <div class="slide-title-area"><div class="accent-bar"></div><h2>Iteração 1 — Baseline</h2></div>
+          <p style="font-size:0.85em;">Rodar o teste focado:</p>
+          <pre style="font-size:0.7em; background:#1E1E2C; color:#E0E0E0; padding:8px 14px; border-radius:6px;"><code>k6 run k6/sync-io.js</code></pre>
+          <img src="../assets/img/aula11-iteracao1-baseline.png"
+               alt="Output do k6 baseline iteração 1"
+               style="width:80%; margin-top:0.6em; border-radius:8px; border:1px solid #ddd;"
+               onerror="this.outerHTML='&lt;div style=&quot;background:#1E1E2C;color:#E0E0E0;font-family:monospace;font-size:0.62em;padding:12px;border-radius:8px;line-height:1.5;width:80%;&quot;&gt;     http_req_duration..............: avg=1.2s min=85ms med=120ms<br>       { expected_response:true }: &lt;strong style=&quot;color:#F39C12&quot;&gt;p(95)=3.4s p(99)=8.1s&lt;/strong&gt;<br>     http_req_failed................: 0.00%   ✓ 0 ✗ 1124<br>     &lt;strong style=&quot;color:#ED145B&quot;&gt;http_reqs......................: 1124 9.3/s&lt;/strong&gt;<br>     vus............................: 50&lt;/div&gt;'">
+          <p style="margin-top:0.6em; font-size:0.78em;">📌 <strong>Anote:</strong> P50 ≈ 120ms · P95 ≈ 3,4s · P99 ≈ 8s · throughput ≈ 9 RPS (com 50 VUs!).</p>
+          <div class="slide-footer"><div class="footer-bar">11 - Testes de Carga</div><div class="footer-page">21</div></div>
+        </section>
+
+        <!-- 21c. Diagnóstico -->
+        <section class="content-slide">
+          <div class="top-bar"></div>
+          <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header">
+          <div class="slide-title-area"><div class="accent-bar"></div><h2>Iteração 1 — Diagnóstico</h2></div>
+          <div style="display:flex; gap:20px; align-items:center;">
+            <svg viewBox="0 0 320 200" style="width:55%;" aria-label="Curvas P50, P99 e throughput sob carga">
+              <line x1="30" y1="170" x2="310" y2="170" stroke="#1E1E2C"/>
+              <line x1="30" y1="170" x2="30" y2="20" stroke="#1E1E2C"/>
+              <text x="170" y="188" font-size="9" fill="#1E1E2C" text-anchor="middle">VUs →</text>
+              <!-- P50 plana -->
+              <polyline points="30,140 100,138 170,140 240,142 300,140" fill="none" stroke="#00A859" stroke-width="2.5"/>
+              <text x="305" y="138" font-size="9" fill="#00A859" font-weight="700">P50</text>
+              <!-- P99 explode -->
+              <polyline points="30,150 100,120 170,80 240,40 300,25" fill="none" stroke="#C0392B" stroke-width="2.5"/>
+              <text x="305" y="22" font-size="9" fill="#C0392B" font-weight="700">P99</text>
+              <!-- throughput plateau -->
+              <polyline points="30,160 80,130 130,115 180,112 230,112 280,112" fill="none" stroke="#ED145B" stroke-width="2.5" stroke-dasharray="4"/>
+              <text x="285" y="108" font-size="9" fill="#ED145B" font-weight="700">RPS</text>
+            </svg>
+            <div style="flex:1; font-size:0.78em;">
+              <p style="margin:0 0 0.5em;"><strong style="color:#00A859;">P50 estável</strong>: a maioria das requisições continua rápida.</p>
+              <p style="margin:0 0 0.5em;"><strong style="color:#C0392B;">P99 explode</strong>: a cauda sente requisições enfileiradas atrás de outra bloqueando.</p>
+              <p style="margin:0 0 0.7em;"><strong style="color:#ED145B;">Throughput plateau</strong>: adicionar mais VUs <em>não</em> aumenta RPS.</p>
+              <p style="margin:0; padding:0.5em 0.8em; background:#fdedec; border-left:4px solid #C0392B; border-radius:0 6px 6px 0;"><strong>Diagnóstico:</strong> assinatura clássica de <em>event loop bloqueado</em> por operação síncrona.</p>
+            </div>
+          </div>
+          <p style="margin-top:0.6em; font-size:0.78em;">→ Suspeito: <code>crypto.pbkdf2Sync</code> com 100k iterações (~120ms por chamada).</p>
+          <div class="slide-footer"><div class="footer-bar">11 - Testes de Carga</div><div class="footer-page">21</div></div>
+        </section>
+
+        <!-- 21d. Fix + remedição -->
+        <section class="content-slide">
+          <div class="top-bar"></div>
+          <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header">
+          <div class="slide-title-area"><div class="accent-bar"></div><h2>Iteração 1 — Fix &amp; Remedição</h2></div>
+          <div style="display:flex; gap:18px; align-items:flex-start;">
+            <pre style="flex:1.4; font-size:0.6em; background:#1E1E2C; color:#E0E0E0; padding:10px 12px; border-radius:6px; line-height:1.5; margin:0;"><code><span style="color:#C0392B;">- crypto.pbkdf2Sync(payload, salt, 100_000, 32, 'sha512')</span>
+<span style="color:#00A859;">+ import { promisify } from 'node:util';</span>
+<span style="color:#00A859;">+ const pbkdf2 = promisify(crypto.pbkdf2);</span>
+<span style="color:#00A859;">+ await pbkdf2(payload, salt, 100_000, 32, 'sha512')</span></code></pre>
+            <svg viewBox="0 0 240 160" style="flex:1; max-width:35%;" aria-label="Comparativo antes/depois">
+              <line x1="20" y1="140" x2="230" y2="140" stroke="#1E1E2C"/>
+              <line x1="20" y1="140" x2="20" y2="20" stroke="#1E1E2C"/>
+              <!-- Antes: barras altas -->
+              <rect x="35" y="55" width="22" height="85" fill="#C0392B"/>
+              <text x="46" y="50" font-size="8" text-anchor="middle" fill="#1E1E2C">3,4s</text>
+              <text x="46" y="155" font-size="8" text-anchor="middle" fill="#666">P95 antes</text>
+              <rect x="65" y="30" width="22" height="110" fill="#C0392B" opacity="0.85"/>
+              <text x="76" y="25" font-size="8" text-anchor="middle" fill="#1E1E2C">8s</text>
+              <text x="76" y="155" font-size="8" text-anchor="middle" fill="#666">P99 antes</text>
+              <!-- Depois: barras curtas verdes -->
+              <rect x="135" y="125" width="22" height="15" fill="#00A859"/>
+              <text x="146" y="120" font-size="8" text-anchor="middle" fill="#1E1E2C">220ms</text>
+              <text x="146" y="155" font-size="8" text-anchor="middle" fill="#666">P95 fix</text>
+              <rect x="165" y="118" width="22" height="22" fill="#00A859" opacity="0.85"/>
+              <text x="176" y="113" font-size="8" text-anchor="middle" fill="#1E1E2C">450ms</text>
+              <text x="176" y="155" font-size="8" text-anchor="middle" fill="#666">P99 fix</text>
+              <text x="120" y="15" font-size="9" fill="#1E1E2C" text-anchor="middle" font-weight="700">~15× P99</text>
+            </svg>
+          </div>
+          <img src="../assets/img/aula11-iteracao1-fix.png" alt="Output do k6 após fix"
+               style="width:65%; margin-top:0.5em; border-radius:6px; border:1px solid #ddd;"
+               onerror="this.style.display='none'">
+          <div class="slide-footer"><div class="footer-bar">11 - Testes de Carga</div><div class="footer-page">21</div></div>
+        </section>
+
+      </section>
+
+      <!-- ==================== 22. ITERAÇÃO 2 — N+1 ==================== -->
+      <section>
+
+        <!-- 22a. Cenário -->
+        <section class="content-slide">
+          <div class="top-bar"></div>
+          <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header">
+          <div class="slide-title-area"><div class="accent-bar"></div><h2>Iteração 2 — Cenário</h2></div>
+          <p style="font-size:0.85em;">Endpoint <code>GET /orders</code> retorna pedidos com seus itens aninhados. Funciona bem em dev (10 pedidos)... mas em produção (5.000 pedidos) <em>algo não bate</em>.</p>
+          <pre style="font-size:0.66em; background:#1E1E2C; color:#E0E0E0; padding:10px 14px; border-radius:6px; line-height:1.5;"><code><span style="color:#888;">// src/routes/orders.js (trecho)</span>
+<span style="color:#F39C12;">const</span> orders = <span style="color:#F39C12;">await</span> Order.findAll({ limit: <span style="color:#ED145B;">50</span> });
+
+<span style="color:#F39C12;">const</span> result = [];
+<span style="color:#F39C12;">for</span> (<span style="color:#F39C12;">const</span> order <span style="color:#F39C12;">of</span> orders) {
+  <span style="color:#F39C12;">const</span> items = <span style="color:#F39C12;">await</span> OrderItem.findAll({
+    where: { orderId: order.id }
+  });
+  result.push({ ...order.toJSON(), items });
+}
+res.json(result);</code></pre>
+          <p style="margin-top:0.7em; font-size:0.85em; padding:0.6em 0.9em; background:#fdedec; border-left:4px solid #ED145B; border-radius:0 6px 6px 0;"><strong>Pergunta:</strong> Quantas queries esse endpoint dispara para retornar 50 pedidos?</p>
+          <div class="slide-footer"><div class="footer-bar">11 - Testes de Carga</div><div class="footer-page">22</div></div>
+        </section>
+
+        <!-- 22b. Baseline -->
+        <section class="content-slide">
+          <div class="top-bar"></div>
+          <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header">
+          <div class="slide-title-area"><div class="accent-bar"></div><h2>Iteração 2 — Baseline</h2></div>
+          <pre style="font-size:0.7em; background:#1E1E2C; color:#E0E0E0; padding:8px 14px; border-radius:6px;"><code>k6 run k6/n-plus-one.js</code></pre>
+          <img src="../assets/img/aula11-iteracao2-baseline.png"
+               alt="Output do k6 baseline iteração 2"
+               style="width:80%; margin-top:0.6em; border-radius:8px; border:1px solid #ddd;"
+               onerror="this.outerHTML='&lt;div style=&quot;background:#1E1E2C;color:#E0E0E0;font-family:monospace;font-size:0.62em;padding:12px;border-radius:8px;line-height:1.5;width:80%;&quot;&gt;     http_req_duration..............: avg=1.6s med=1.5s<br>       { expected_response:true }: &lt;strong style=&quot;color:#F39C12&quot;&gt;p(95)=2.8s p(99)=4.2s&lt;/strong&gt;<br>     http_req_failed................: 0.30%<br>     &lt;strong style=&quot;color:#ED145B&quot;&gt;http_reqs......................: 1342 11/s&lt;/strong&gt;<br>     vus............................: 30&lt;/div&gt;'">
+          <p style="margin-top:0.6em; font-size:0.78em;">📌 Throughput baixo (~11 RPS com 30 VUs), latência média alta. Habilitando log do Sequelize: <strong>51 SELECTs por requisição</strong>.</p>
+          <div class="slide-footer"><div class="footer-bar">11 - Testes de Carga</div><div class="footer-page">22</div></div>
+        </section>
+
+        <!-- 22c. Diagnóstico -->
+        <section class="content-slide">
+          <div class="top-bar"></div>
+          <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header">
+          <div class="slide-title-area"><div class="accent-bar"></div><h2>Iteração 2 — Diagnóstico</h2></div>
+          <div style="display:flex; gap:20px; align-items:center;">
+            <svg viewBox="0 0 280 200" style="width:50%;" aria-label="Diagrama N+1: 1 query mãe + N queries filhas">
+              <!-- query mãe -->
+              <rect x="20" y="20" width="240" height="28" fill="#ED145B" stroke="white" stroke-width="2"/>
+              <text x="140" y="38" font-size="11" fill="white" text-anchor="middle" font-weight="700">1 × SELECT FROM orders</text>
+              <!-- 50 queries filhas (representadas como 6 + "..." para caber) -->
+              <g>
+                <rect x="20" y="60" width="35" height="20" fill="#F39C12" stroke="white" stroke-width="1.5"><animate attributeName="opacity" values="0.5;1;0.5" dur="1.5s" repeatCount="indefinite" begin="0s"/></rect>
+                <rect x="58" y="60" width="35" height="20" fill="#F39C12" stroke="white" stroke-width="1.5"><animate attributeName="opacity" values="0.5;1;0.5" dur="1.5s" repeatCount="indefinite" begin="0.1s"/></rect>
+                <rect x="96" y="60" width="35" height="20" fill="#F39C12" stroke="white" stroke-width="1.5"><animate attributeName="opacity" values="0.5;1;0.5" dur="1.5s" repeatCount="indefinite" begin="0.2s"/></rect>
+                <rect x="134" y="60" width="35" height="20" fill="#F39C12" stroke="white" stroke-width="1.5"><animate attributeName="opacity" values="0.5;1;0.5" dur="1.5s" repeatCount="indefinite" begin="0.3s"/></rect>
+                <rect x="172" y="60" width="35" height="20" fill="#F39C12" stroke="white" stroke-width="1.5"><animate attributeName="opacity" values="0.5;1;0.5" dur="1.5s" repeatCount="indefinite" begin="0.4s"/></rect>
+                <text x="225" y="74" font-size="14" fill="#F39C12" font-weight="700">…×50</text>
+              </g>
+              <text x="140" y="100" font-size="11" fill="#1E1E2C" text-anchor="middle">SELECT FROM order_items WHERE orderId = ?</text>
+              <!-- total -->
+              <rect x="60" y="125" width="160" height="40" fill="#C0392B"/>
+              <text x="140" y="143" font-size="11" fill="white" text-anchor="middle" font-weight="700">Total</text>
+              <text x="140" y="158" font-size="14" fill="white" text-anchor="middle" font-weight="800">51 queries</text>
+              <text x="140" y="185" font-size="9" fill="#666" text-anchor="middle">por requisição</text>
+            </svg>
+            <div style="flex:1; font-size:0.78em;">
+              <p style="margin:0 0 0.4em;"><strong>1 query mãe:</strong> busca os 50 pedidos.</p>
+              <p style="margin:0 0 0.4em;"><strong>N queries filhas:</strong> uma por pedido, buscando seus itens.</p>
+              <p style="margin:0 0 0.6em;">Cada query custa ~25ms de round-trip + parsing. <strong>50 × 25ms = 1,25s</strong> só de overhead — antes mesmo de processar dados.</p>
+              <p style="margin:0; padding:0.5em 0.8em; background:#fdedec; border-left:4px solid #C0392B; border-radius:0 6px 6px 0;">Conhecido como <strong>N+1</strong>. Pitfall clássico de qualquer ORM.</p>
+            </div>
+          </div>
+          <div class="slide-footer"><div class="footer-bar">11 - Testes de Carga</div><div class="footer-page">22</div></div>
+        </section>
+
+        <!-- 22d. Fix + remedição -->
+        <section class="content-slide">
+          <div class="top-bar"></div>
+          <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header">
+          <div class="slide-title-area"><div class="accent-bar"></div><h2>Iteração 2 — Fix &amp; Remedição</h2></div>
+          <div style="display:flex; gap:18px; align-items:flex-start;">
+            <pre style="flex:1.4; font-size:0.6em; background:#1E1E2C; color:#E0E0E0; padding:10px 12px; border-radius:6px; line-height:1.5; margin:0;"><code><span style="color:#C0392B;">- const orders = await Order.findAll({ limit: 50 });</span>
+<span style="color:#C0392B;">- for (const order of orders) {</span>
+<span style="color:#C0392B;">-   const items = await OrderItem.findAll({</span>
+<span style="color:#C0392B;">-     where: { orderId: order.id }</span>
+<span style="color:#C0392B;">-   });</span>
+<span style="color:#C0392B;">-   result.push({ ...order.toJSON(), items });</span>
+<span style="color:#C0392B;">- }</span>
+<span style="color:#00A859;">+ const orders = await Order.findAll({</span>
+<span style="color:#00A859;">+   limit: 50,</span>
+<span style="color:#00A859;">+   include: [{ model: OrderItem, as: 'items' }]</span>
+<span style="color:#00A859;">+ });</span></code></pre>
+            <svg viewBox="0 0 240 160" style="flex:1; max-width:35%;" aria-label="Comparativo antes/depois N+1">
+              <line x1="20" y1="140" x2="230" y2="140" stroke="#1E1E2C"/>
+              <line x1="20" y1="140" x2="20" y2="20" stroke="#1E1E2C"/>
+              <!-- Antes -->
+              <rect x="35" y="55" width="22" height="85" fill="#C0392B"/>
+              <text x="46" y="50" font-size="8" text-anchor="middle">2,8s</text>
+              <text x="46" y="155" font-size="8" text-anchor="middle" fill="#666">P95</text>
+              <rect x="68" y="105" width="22" height="35" fill="#C0392B" opacity="0.6"/>
+              <text x="79" y="100" font-size="8" text-anchor="middle">11/s</text>
+              <text x="79" y="155" font-size="8" text-anchor="middle" fill="#666">RPS</text>
+              <!-- Depois -->
+              <rect x="135" y="130" width="22" height="10" fill="#00A859"/>
+              <text x="146" y="125" font-size="8" text-anchor="middle">90ms</text>
+              <text x="146" y="155" font-size="8" text-anchor="middle" fill="#666">P95</text>
+              <rect x="168" y="35" width="22" height="105" fill="#00A859" opacity="0.85"/>
+              <text x="179" y="30" font-size="8" text-anchor="middle">220/s</text>
+              <text x="179" y="155" font-size="8" text-anchor="middle" fill="#666">RPS</text>
+              <text x="120" y="15" font-size="9" text-anchor="middle" font-weight="700">20× RPS · 30× P95</text>
+            </svg>
+          </div>
+          <img src="../assets/img/aula11-iteracao2-fix.png" alt="Output do k6 após fix N+1"
+               style="width:65%; margin-top:0.5em; border-radius:6px; border:1px solid #ddd;"
+               onerror="this.style.display='none'">
+          <div class="slide-footer"><div class="footer-bar">11 - Testes de Carga</div><div class="footer-page">22</div></div>
+        </section>
+
+      </section>
+
+      <!-- ==================== 23. QUIZ 3 — INTERPRETAÇÃO APLICADA ==================== -->
+      <section class="quiz-slide content-slide"
+               data-correct="b"
+               data-quiz-id="q3-interpretacao"
+               data-quiz-feedback="Throughput plateau + P99 explodindo enquanto P50 mantém é assinatura clássica de saturação por bloqueio. Mais VUs ficam enfileirados, não atendidos.">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header">
+        <div class="slide-title-area"><div class="accent-bar"></div><h2>Quiz 3 — Interpretação aplicada</h2></div>
+        <p style="font-size:0.82em;">Você roda um teste com ramp-up de 0→200 VUs. O output mostra:</p>
+        <pre style="font-size:0.7em; background:#1E1E2C; color:#E0E0E0; padding:8px 14px; border-radius:6px;"><code>http_reqs         80/s   (estagnado, mesmo aumentando VUs)
+http_req_duration p(50)=300ms  p(99)=12s</code></pre>
+        <p style="font-size:0.82em;">Qual o sintoma mais provável?</p>
+        <ul class="quiz-options">
+          <label><input type="radio" name="q3" value="a"> Falta de cache</label>
+          <label><input type="radio" name="q3" value="b"> Recurso bloqueante (event loop, lock, sync I/O) saturado</label>
+          <label><input type="radio" name="q3" value="c"> Banco de dados sem índice</label>
+          <label><input type="radio" name="q3" value="d"> Rede congestionada</label>
+        </ul>
+        <div class="quiz-feedback"></div>
+        <div class="slide-footer"><div class="footer-bar">11 - Testes de Carga</div><div class="footer-page">23</div></div>
+      </section>
+
+      <!-- ==================== 24. QUIZ 4 — HOT PATH ==================== -->
+      <section class="quiz-slide content-slide"
+               data-correct="b"
+               data-quiz-id="q4-hotpath"
+               data-quiz-feedback="Hot path = onde a maioria do tráfego passa. Otimizar 1% nele rende mais que 50% nos outros 38 juntos. Pareto aplicado a performance.">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header">
+        <div class="slide-title-area"><div class="accent-bar"></div><h2>Quiz 4 — Hot Path</h2></div>
+        <p style="font-size:0.82em;">Sua app tem 40 endpoints. Logs do APM mostram que <code>GET /products</code> recebe <strong>78%</strong> das requisições, <code>POST /checkout</code> recebe 8%, e os outros 38 dividem 14%. Você tem <strong>1 dia</strong> para testes de carga antes do Black Friday. Por onde começar?</p>
+        <ul class="quiz-options">
+          <label><input type="radio" name="q4" value="a"> Rodar k6 contra todos os 40 endpoints igualmente</label>
+          <label><input type="radio" name="q4" value="b"> <code>GET /products</code> (hot path — 78% do tráfego)</label>
+          <label><input type="radio" name="q4" value="c"> <code>POST /checkout</code> (mais crítico para receita)</label>
+          <label><input type="radio" name="q4" value="d"> Os 38 endpoints restantes (somam 14% e podem ter bugs)</label>
+        </ul>
+        <div class="quiz-feedback"></div>
+        <div class="slide-footer"><div class="footer-bar">11 - Testes de Carga</div><div class="footer-page">24</div></div>
+      </section>
+
+      <!-- ==================== 25. DESAFIO — CACHE EM HOT PATH ==================== -->
+      <section class="content-slide" style="background:linear-gradient(135deg, #fff 0%, #fdedec 100%);">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header">
+        <div class="slide-title-area"><div class="accent-bar"></div><h2>🎯 Desafio (casa) — Cache em Hot Path</h2></div>
+        <p style="font-size:0.85em;"><code>GET /products</code> é o hot path do app (78% do tráfego). Catálogo muda raramente. <strong>Sem cache</strong>, cada requisição vai ao DB.</p>
+
+        <div style="display:flex; gap:20px; margin-top:0.5em;">
+          <div style="flex:1; padding:0.8em 1em; background:white; border:1px solid #ddd; border-radius:8px;">
+            <h3 style="margin:0 0 0.4em; font-size:0.85em; color:#ED145B;">Tarefa</h3>
+            <ol style="font-size:0.72em; margin:0; padding-left:1.2em;">
+              <li>Rodar baseline: <code>k6 run k6/products-cache.js</code> · anotar P50/P95/P99/RPS</li>
+              <li>Implementar cache em <code>src/routes/products.js</code> com TTL 60s<br>(<code>node-cache</code> ou <code>Map</code>+<code>Date.now()</code>)</li>
+              <li>Re-rodar e capturar antes/depois</li>
+            </ol>
+          </div>
+          <div style="flex:1; padding:0.8em 1em; background:white; border:1px solid #ddd; border-radius:8px;">
+            <h3 style="margin:0 0 0.4em; font-size:0.85em; color:#00A859;">Entregável</h3>
+            <ul style="font-size:0.72em; margin:0; padding-left:1.2em;">
+              <li>Fork do <code>fiap-2026-1-perf</code></li>
+              <li>PR com a alteração</li>
+              <li>2 screenshots do output do k6 (antes/depois)</li>
+              <li>Postar link no Teams da disciplina</li>
+            </ul>
+          </div>
+        </div>
+
+        <div style="margin-top:0.7em; padding:0.6em 0.9em; background:#eafaf1; border-left:4px solid #00A859; border-radius:0 6px 6px 0;">
+          <p style="margin:0; font-size:0.78em;"><strong>Dica:</strong> ganho esperado é <em>massivo</em> (P95 ~800ms → ~5ms; RPS ~50 → ~5000). Se ficar 10× só, refletir: o cache está hiteando? TTL adequado?</p>
+        </div>
+
+        <p style="margin-top:0.5em; font-size:0.7em; color:#666;">Roteiro completo: <code>fiap-2026-1-perf/docs/desafio-cache.md</code></p>
+
+        <div class="slide-footer"><div class="footer-bar">11 - Testes de Carga</div><div class="footer-page">25</div></div>
+      </section>
+
+      <!-- ==================== 26. CONSIDERAÇÕES FINAIS ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header">
+        <div class="slide-title-area"><div class="accent-bar"></div><h2>Considerações finais</h2></div>
+
+        <ul style="font-size:0.83em;">
+          <li><strong>Forma da curva &gt; valor absoluto.</strong> Mesmo hardware diferente, o padrão de saturação é o que importa.</li>
+          <li><strong>P99 antes da média.</strong> A cauda é onde mora a frustração do usuário.</li>
+          <li><strong>Identificar hot path antes de otimizar qualquer coisa.</strong> Pareto aplicado a performance.</li>
+          <li><strong>k6 no CI/CD.</strong> Thresholds viram <em>gates de PR</em>: <code>p(95)&lt;500ms</code> bloqueia merge se regredir.</li>
+          <li><strong>Próximos passos:</strong> k6 Cloud / k6 Operator (k8s) para escala distribuída · profiling do servidor (V8 inspector, flame graphs) · APM (Datadog, NewRelic).</li>
+        </ul>
+
+        <div style="margin-top:0.8em; padding:0.7em 1em; background:#1E1E2C; color:white; border-radius:8px; font-size:0.85em;">
+          <strong>Frase de fim:</strong> <em>"Você não conhece o seu sistema até medi-lo sob carga. E ele não está pronto para produção até essa medição passar."</em>
+        </div>
+
+        <div class="slide-footer"><div class="footer-bar">11 - Testes de Carga</div><div class="footer-page">26</div></div>
+      </section>
 
       <!-- ==================== 27. DÚVIDAS ==================== -->
       <section class="content-slide">
