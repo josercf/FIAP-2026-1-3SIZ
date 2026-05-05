@@ -16,12 +16,12 @@
   <div class="reveal">
     <div class="slides">
 
-      <!-- ==================== SLIDE: CAPA FIAP ==================== -->
+      <!-- ==================== 1. CAPA ==================== -->
       <section class="cover-slide">
         <img src="../assets/img/fiap-logo-graduacao.png" alt="FIAP Graduação" class="fiap-logo-full">
       </section>
 
-      <!-- ==================== SLIDE: TÍTULO DA AULA ==================== -->
+      <!-- ==================== 2. TÍTULO ==================== -->
       <section class="title-slide">
         <div class="top-bar"></div>
         <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header">
@@ -35,258 +35,494 @@
         <div class="lesson-bar">11 - Testes de Carga</div>
       </section>
 
-      <!-- ==================== SLIDE: AGENDA ==================== -->
+      <!-- ==================== 3. AGENDA ==================== -->
       <section class="content-slide">
         <div class="top-bar"></div>
         <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header">
-        <div class="slide-title-area">
-          <div class="accent-bar"></div>
-          <h2>Agenda</h2>
-        </div>
-
+        <div class="slide-title-area"><div class="accent-bar"></div><h2>Agenda</h2></div>
         <table>
-          <thead>
-            <tr><th>Bloco</th><th>Horário</th><th>Conteúdo</th></tr>
-          </thead>
+          <thead><tr><th>Bloco</th><th>Horário</th><th>Conteúdo</th></tr></thead>
           <tbody>
-            <tr><td><strong>Bloco 1</strong></td><td>19h30 – 21h00</td><td>Tipos de Teste de Performance, Métricas Fundamentais, Ferramenta K6 e Caso Real</td></tr>
+            <tr><td><strong>Bloco 1</strong></td><td>19h30 – 21h00</td><td>Fundamentos: tipos de teste, métricas, ramp-up/down, hot path, instalação k6</td></tr>
             <tr><td><strong>Intervalo</strong></td><td>21h00 – 21h20</td><td>☕ Pausa</td></tr>
-            <tr><td><strong>Bloco 2</strong></td><td>21h20 – 22h45</td><td>Exercício prático com K6 + Quiz interativo</td></tr>
+            <tr><td><strong>Bloco 2</strong></td><td>21h20 – 22h45</td><td>Laboratório guiado: 2 iterações de otimização + desafio de casa</td></tr>
           </tbody>
         </table>
-
-        <div class="slide-footer">
-          <div class="footer-bar">11 - Testes de Carga</div>
-          <div class="footer-page">3</div>
-        </div>
+        <div class="slide-footer"><div class="footer-bar">11 - Testes de Carga</div><div class="footer-page">3</div></div>
       </section>
 
-      <!-- ==================== SLIDE: SEÇÃO BLOCO 1 ==================== -->
+      <!-- ==================== 4. SECTION BLOCO 1 ==================== -->
       <section class="section-slide">
         <div class="top-bar"></div>
         <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header">
         <div class="accent-bar"></div>
-        <h2>Bloco 1<br>Tipos de Teste de Performance e Métricas</h2>
-        <div class="slide-footer">
-          <div class="footer-bar">11 - Testes de Carga</div>
-          <div class="footer-page">4</div>
-        </div>
+        <h2>Bloco 1<br>Fundamentos de Testes de Carga</h2>
+        <div class="slide-footer"><div class="footer-bar">11 - Testes de Carga</div><div class="footer-page">4</div></div>
       </section>
 
-      <!-- ==================== SLIDE: TIPOS DE TESTE DE PERFORMANCE ==================== -->
+      <!-- ==================== 5. POR QUE TESTAR CARGA? ==================== -->
       <section class="content-slide">
         <div class="top-bar"></div>
         <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header">
-        <div class="slide-title-area">
-          <div class="accent-bar"></div>
-          <h2>Tipos de Teste de Performance</h2>
-        </div>
+        <div class="slide-title-area"><div class="accent-bar"></div><h2>Por que testar carga?</h2></div>
 
-        <ul>
-          <li><strong>Teste de Carga:</strong> Avaliar o comportamento do sistema sob carga esperada.</li>
-          <li><strong>Teste de Stress:</strong> Avaliar limites máximos e falhas do sistema.</li>
-          <li><strong>Teste Spike:</strong> Impacto de picos abruptos de carga.</li>
-          <li><strong>Teste Soak / Endurance:</strong> Avaliar estabilidade com carga prolongada.</li>
+        <p style="font-size:0.9em">Toda Black Friday, sistemas que passam o ano <em>aparentemente</em> saudáveis caem em horas:</p>
+        <ul style="font-size:0.85em">
+          <li><strong>Conexões ao banco</strong> esgotam: filas, timeouts, 503</li>
+          <li><strong>Memory leaks</strong> que demoram horas para aparecer estouram a JVM/Node</li>
+          <li><strong>Thread/event loop starvation</strong> deixa o app vivo mas inerte</li>
+          <li><strong>Caches frios</strong> e conexões TLS recém-abertas multiplicam latência</li>
         </ul>
 
-        <div class="slide-footer">
-          <div class="footer-bar">11 - Testes de Carga</div>
-          <div class="footer-page">5</div>
+        <div style="margin-top:1.2em; padding:1em 1.4em; background:#fdedec; border-left:5px solid #ED145B; border-radius:0 8px 8px 0;">
+          <p style="margin:0; font-size:0.9em; font-weight:600; color:#1E1E2C;">Como descobrir <em>antes</em> do dia D — e não junto com os clientes?</p>
         </div>
+
+        <div class="slide-footer"><div class="footer-bar">11 - Testes de Carga</div><div class="footer-page">5</div></div>
       </section>
 
-      <!-- ==================== SLIDE: MÉTRICAS FUNDAMENTAIS ==================== -->
+      <!-- ==================== 6. TIPOS DE TESTE ==================== -->
       <section class="content-slide">
         <div class="top-bar"></div>
         <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header">
-        <div class="slide-title-area">
-          <div class="accent-bar"></div>
-          <h2>Métricas Fundamentais de Performance</h2>
+        <div class="slide-title-area"><div class="accent-bar"></div><h2>Tipos de teste de performance</h2></div>
+
+        <div style="display:grid; grid-template-columns:repeat(4, 1fr); gap:14px; margin-top:0.5em;">
+
+          <div style="border:2px solid #ED145B; border-radius:10px; padding:10px; background:white;">
+            <h3 style="margin:0 0 6px; font-size:0.85em; color:#ED145B;">Load</h3>
+            <svg viewBox="0 0 100 60" style="width:100%; height:auto;" aria-label="Curva load: sobe e mantém">
+              <line x1="5" y1="55" x2="95" y2="55" stroke="#ccc" stroke-width="0.5"/>
+              <line x1="5" y1="55" x2="5" y2="5" stroke="#ccc" stroke-width="0.5"/>
+              <polyline points="5,55 25,20 75,20 95,55" fill="none" stroke="#ED145B" stroke-width="2"/>
+              <text x="50" y="64" font-size="6" text-anchor="middle" fill="#666">tempo</text>
+            </svg>
+            <p style="font-size:0.65em; margin:6px 0 0; color:#1E1E2C;">Carga <em>esperada</em> sustentada. Mede regime estacionário.</p>
+          </div>
+
+          <div style="border:2px solid #ED145B; border-radius:10px; padding:10px; background:white;">
+            <h3 style="margin:0 0 6px; font-size:0.85em; color:#ED145B;">Stress</h3>
+            <svg viewBox="0 0 100 60" style="width:100%; height:auto;" aria-label="Curva stress: rampa contínua">
+              <line x1="5" y1="55" x2="95" y2="55" stroke="#ccc" stroke-width="0.5"/>
+              <line x1="5" y1="55" x2="5" y2="5" stroke="#ccc" stroke-width="0.5"/>
+              <polyline points="5,55 95,8" fill="none" stroke="#ED145B" stroke-width="2"/>
+              <text x="50" y="64" font-size="6" text-anchor="middle" fill="#666">tempo</text>
+            </svg>
+            <p style="font-size:0.65em; margin:6px 0 0; color:#1E1E2C;">Sobe até <em>quebrar</em>. Descobre limite máximo.</p>
+          </div>
+
+          <div style="border:2px solid #ED145B; border-radius:10px; padding:10px; background:white;">
+            <h3 style="margin:0 0 6px; font-size:0.85em; color:#ED145B;">Spike</h3>
+            <svg viewBox="0 0 100 60" style="width:100%; height:auto;" aria-label="Curva spike: pulo abrupto">
+              <line x1="5" y1="55" x2="95" y2="55" stroke="#ccc" stroke-width="0.5"/>
+              <line x1="5" y1="55" x2="5" y2="5" stroke="#ccc" stroke-width="0.5"/>
+              <polyline points="5,55 40,55 42,8 70,8 72,55 95,55" fill="none" stroke="#ED145B" stroke-width="2"/>
+              <text x="50" y="64" font-size="6" text-anchor="middle" fill="#666">tempo</text>
+            </svg>
+            <p style="font-size:0.65em; margin:6px 0 0; color:#1E1E2C;">Pico <em>abrupto</em>. Simula flash sale, viral, deploy.</p>
+          </div>
+
+          <div style="border:2px solid #ED145B; border-radius:10px; padding:10px; background:white;">
+            <h3 style="margin:0 0 6px; font-size:0.85em; color:#ED145B;">Soak</h3>
+            <svg viewBox="0 0 100 60" style="width:100%; height:auto;" aria-label="Curva soak: longa duração">
+              <line x1="5" y1="55" x2="95" y2="55" stroke="#ccc" stroke-width="0.5"/>
+              <line x1="5" y1="55" x2="5" y2="5" stroke="#ccc" stroke-width="0.5"/>
+              <polyline points="5,55 15,30 90,30 95,55" fill="none" stroke="#ED145B" stroke-width="2"/>
+              <text x="50" y="64" font-size="6" text-anchor="middle" fill="#666">tempo (horas)</text>
+            </svg>
+            <p style="font-size:0.65em; margin:6px 0 0; color:#1E1E2C;">Carga moderada por <em>horas</em>. Detecta vazamento, fadiga.</p>
+          </div>
+
         </div>
 
-        <table>
+        <div class="slide-footer"><div class="footer-bar">11 - Testes de Carga</div><div class="footer-page">6</div></div>
+      </section>
+
+      <!-- ==================== 7. RAMP-UP / STEADY / RAMP-DOWN ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header">
+        <div class="slide-title-area"><div class="accent-bar"></div><h2>Anatomia da carga: ramp-up · steady · ramp-down</h2></div>
+
+        <div style="display:flex; gap:20px; align-items:center;">
+          <svg viewBox="0 0 400 180" style="width:60%; height:auto;" aria-label="Diagrama ramp-up steady ramp-down">
+            <!-- eixos -->
+            <line x1="30" y1="160" x2="380" y2="160" stroke="#1E1E2C" stroke-width="1"/>
+            <line x1="30" y1="160" x2="30" y2="20" stroke="#1E1E2C" stroke-width="1"/>
+            <text x="15" y="90" font-size="10" fill="#1E1E2C" transform="rotate(-90 15 90)">VUs</text>
+            <text x="200" y="178" font-size="10" fill="#1E1E2C" text-anchor="middle">tempo</text>
+
+            <!-- curva: ramp-up linear, steady plano, ramp-down linear -->
+            <polyline points="30,160 130,40 280,40 380,160"
+                      fill="none" stroke="#ED145B" stroke-width="3"/>
+
+            <!-- linhas verticais separadoras -->
+            <line x1="130" y1="160" x2="130" y2="40" stroke="#888" stroke-width="0.5" stroke-dasharray="3"/>
+            <line x1="280" y1="160" x2="280" y2="40" stroke="#888" stroke-width="0.5" stroke-dasharray="3"/>
+
+            <!-- labels das fases -->
+            <text x="80" y="100" font-size="11" fill="#ED145B" font-weight="700" text-anchor="middle">ramp-up</text>
+            <text x="205" y="35" font-size="11" fill="#1E1E2C" font-weight="700" text-anchor="middle">steady</text>
+            <text x="330" y="100" font-size="11" fill="#ED145B" font-weight="700" text-anchor="middle">ramp-down</text>
+
+            <!-- marcador animado percorrendo a curva -->
+            <circle r="4" fill="#00A859">
+              <animateMotion dur="6s" repeatCount="indefinite"
+                             path="M30,160 L130,40 L280,40 L380,160"/>
+            </circle>
+          </svg>
+
+          <div style="flex:1; font-size:0.78em;">
+            <p style="margin:0 0 0.7em;"><strong style="color:#ED145B;">Ramp-up</strong> — sobe gradual.<br>
+              <em>Por quê?</em> Aquece caches, JIT, conexões, evita falso positivo de cold-start.</p>
+            <p style="margin:0 0 0.7em;"><strong style="color:#1E1E2C;">Steady</strong> — carga constante.<br>
+              <em>Por quê?</em> Aqui se medem P95/P99 confiáveis — o sistema atingiu regime estacionário.</p>
+            <p style="margin:0;"><strong style="color:#ED145B;">Ramp-down</strong> — desce gradual.<br>
+              <em>Por quê?</em> Detecta recursos não liberados (conexões abertas, memória não devolvida).</p>
+          </div>
+        </div>
+
+        <div class="slide-footer"><div class="footer-bar">11 - Testes de Carga</div><div class="footer-page">7</div></div>
+      </section>
+
+      <!-- ==================== 8. MÉTRICA: THROUGHPUT ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header">
+        <div class="slide-title-area"><div class="accent-bar"></div><h2>Métrica 1 — Throughput (RPS)</h2></div>
+
+        <div style="display:flex; gap:25px; align-items:center; margin-top:0.4em;">
+          <div style="flex:1; font-size:0.82em;">
+            <p><strong>Definição:</strong> requisições processadas por segundo.</p>
+            <p><strong>Fórmula:</strong> <code>requests / segundos</code></p>
+            <p><strong>Quando importa:</strong> capacidade total — quantos clientes simultâneos seu sistema atende?</p>
+            <div style="margin-top:1em; padding:0.8em 1em; background:#eafaf1; border-left:4px solid #00A859; border-radius:0 8px 8px 0;">
+              <p style="margin:0; font-size:0.95em;"><em>Throughput é <strong>capacidade</strong>; latência é <strong>experiência</strong>.</em></p>
+            </div>
+          </div>
+          <svg viewBox="0 0 240 120" style="width:40%; height:auto;" aria-label="100 RPS x 60s = 6000 reqs">
+            <rect x="10" y="40" width="220" height="40" fill="#ED145B" opacity="0.15" stroke="#ED145B" stroke-width="2"/>
+            <text x="120" y="35" font-size="11" fill="#1E1E2C" text-anchor="middle">100 RPS × 60s</text>
+            <text x="120" y="65" font-size="22" fill="#ED145B" text-anchor="middle" font-weight="800">6.000 reqs</text>
+            <text x="120" y="100" font-size="9" fill="#666" text-anchor="middle">no k6: <tspan font-family="monospace">http_reqs</tspan></text>
+          </svg>
+        </div>
+
+        <div class="slide-footer"><div class="footer-bar">11 - Testes de Carga</div><div class="footer-page">8</div></div>
+      </section>
+
+      <!-- ==================== 9. MÉTRICA: LATÊNCIA E PERCENTIS ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header">
+        <div class="slide-title-area"><div class="accent-bar"></div><h2>Métrica 2 — Latência: P50 · P95 · P99</h2></div>
+
+        <div style="display:flex; gap:20px; align-items:flex-start; margin-top:0.3em;">
+          <svg viewBox="0 0 360 200" style="width:55%; height:auto;" aria-label="Histograma de latência com P50 P95 P99">
+            <!-- eixos -->
+            <line x1="30" y1="170" x2="350" y2="170" stroke="#1E1E2C"/>
+            <line x1="30" y1="170" x2="30" y2="20" stroke="#1E1E2C"/>
+            <text x="190" y="188" font-size="10" fill="#1E1E2C" text-anchor="middle">latência →</text>
+
+            <!-- barras do histograma (forma assimétrica com cauda longa) -->
+            <rect x="35"  y="120" width="14" height="50" fill="#ED145B" opacity="0.5"/>
+            <rect x="50"  y="60"  width="14" height="110" fill="#ED145B" opacity="0.7"/>
+            <rect x="65"  y="40"  width="14" height="130" fill="#ED145B" opacity="0.9"/>
+            <rect x="80"  y="55"  width="14" height="115" fill="#ED145B" opacity="0.8"/>
+            <rect x="95"  y="80"  width="14" height="90" fill="#ED145B" opacity="0.7"/>
+            <rect x="110" y="105" width="14" height="65" fill="#ED145B" opacity="0.6"/>
+            <rect x="125" y="125" width="14" height="45" fill="#ED145B" opacity="0.5"/>
+            <rect x="140" y="140" width="14" height="30" fill="#ED145B" opacity="0.4"/>
+            <rect x="160" y="148" width="14" height="22" fill="#ED145B" opacity="0.4"/>
+            <rect x="180" y="152" width="14" height="18" fill="#ED145B" opacity="0.35"/>
+            <rect x="200" y="157" width="14" height="13" fill="#ED145B" opacity="0.3"/>
+            <rect x="225" y="160" width="14" height="10" fill="#ED145B" opacity="0.3"/>
+            <rect x="255" y="163" width="14" height="7"  fill="#ED145B" opacity="0.25"/>
+            <rect x="290" y="165" width="14" height="5"  fill="#ED145B" opacity="0.2"/>
+            <rect x="325" y="166" width="14" height="4"  fill="#ED145B" opacity="0.2"/>
+
+            <!-- linhas verticais P50, P95, P99 -->
+            <line x1="80" y1="170" x2="80" y2="15" stroke="#00A859" stroke-width="2" stroke-dasharray="4"/>
+            <text x="80" y="13" font-size="11" fill="#00A859" text-anchor="middle" font-weight="700">P50</text>
+
+            <line x1="200" y1="170" x2="200" y2="15" stroke="#F39C12" stroke-width="2" stroke-dasharray="4"/>
+            <text x="200" y="13" font-size="11" fill="#F39C12" text-anchor="middle" font-weight="700">P95</text>
+
+            <line x1="295" y1="170" x2="295" y2="15" stroke="#C0392B" stroke-width="2" stroke-dasharray="4"/>
+            <text x="295" y="13" font-size="11" fill="#C0392B" text-anchor="middle" font-weight="700">P99</text>
+          </svg>
+
+          <div style="flex:1; font-size:0.78em;">
+            <p style="margin:0 0 0.5em;"><strong style="color:#00A859;">P50 (mediana)</strong> — metade das requisições é mais rápida que isso. <em>Não conta a história inteira.</em></p>
+            <p style="margin:0 0 0.5em;"><strong style="color:#F39C12;">P95</strong> — 95% terminam em até esse tempo. 5% sentem mais.</p>
+            <p style="margin:0 0 0.5em;"><strong style="color:#C0392B;">P99</strong> — 1 em 100 requisições. <strong>O usuário que tweeta sobre a sua app.</strong></p>
+            <div style="margin-top:0.8em; padding:0.6em 0.9em; background:#fdedec; border-left:4px solid #C0392B; border-radius:0 6px 6px 0;">
+              <p style="margin:0; font-size:0.92em;"><em>A média esconde a cauda. O P99 conta a verdade da pior experiência real.</em></p>
+            </div>
+          </div>
+        </div>
+
+        <div class="slide-footer"><div class="footer-bar">11 - Testes de Carga</div><div class="footer-page">9</div></div>
+      </section>
+
+      <!-- ==================== 10. MÉTRICA: ERROR RATE ==================== -->
+      <section class="content-slide">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header">
+        <div class="slide-title-area"><div class="accent-bar"></div><h2>Métrica 3 — Error Rate</h2></div>
+
+        <p style="font-size:0.85em;">Percentual de requisições que <strong>falharam</strong>. O que conta como falha?</p>
+        <ul style="font-size:0.8em;">
+          <li>HTTP <code>5xx</code> (server error)</li>
+          <li>Timeout (cliente desistiu antes da resposta)</li>
+          <li>Body inválido ou inesperado (validar com <code>check()</code> no k6)</li>
+          <li>HTTP <code>4xx</code> em fluxos onde não deveriam aparecer</li>
+        </ul>
+
+        <table style="margin-top:0.6em; font-size:0.78em;">
+          <thead>
+            <tr><th>Faixa</th><th>Significado</th><th>Ação</th></tr>
+          </thead>
           <tbody>
-            <tr><td><strong>Throughput / RPS (Requests per Second)</strong></td><td>Quantidade de requisições processadas por segundo.</td></tr>
-            <tr><td><strong>Latência P50 / P95 / P99</strong></td><td>Tempo máximo para responder a X% das requisições (medianas e percentis).</td></tr>
-            <tr><td><strong>Error Rate</strong></td><td>Percentual de requisições que falharam.</td></tr>
-            <tr><td><strong>Saturação</strong></td><td>Nível de utilização de recursos (CPU, memória, conexões).</td></tr>
+            <tr><td><strong style="color:#00A859;">&lt; 0,1%</strong></td><td>Saudável</td><td>Continuar monitorando</td></tr>
+            <tr><td><strong style="color:#F39C12;">0,1% – 1%</strong></td><td>Atenção</td><td>Investigar erros, identificar padrão</td></tr>
+            <tr><td><strong style="color:#E67E22;">1% – 5%</strong></td><td>Crítico</td><td>Provavelmente saturação ou bug; agir hoje</td></tr>
+            <tr><td><strong style="color:#C0392B;">&gt; 5%</strong></td><td>Degradação aberta</td><td>Rollback, escalar, abrir incidente</td></tr>
           </tbody>
         </table>
 
-        <div class="slide-footer">
-          <div class="footer-bar">11 - Testes de Carga</div>
-          <div class="footer-page">6</div>
-        </div>
+        <p style="margin-top:0.6em; font-size:0.78em; color:#666;">No k6: <code>http_req_failed</code> — threshold típico: <code>['rate&lt;0.01']</code></p>
+
+        <div class="slide-footer"><div class="footer-bar">11 - Testes de Carga</div><div class="footer-page">10</div></div>
       </section>
 
-      <!-- ==================== SLIDE: FERRAMENTA K6 ==================== -->
+      <!-- ==================== 11. MÉTRICA: SATURAÇÃO ==================== -->
       <section class="content-slide">
         <div class="top-bar"></div>
         <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header">
-        <div class="slide-title-area">
-          <div class="accent-bar"></div>
-          <h2>Ferramenta K6 para Testes de Carga</h2>
+        <div class="slide-title-area"><div class="accent-bar"></div><h2>Métrica 4 — Saturação</h2></div>
+
+        <div style="display:flex; gap:25px; align-items:center;">
+          <div style="flex:1; font-size:0.82em;">
+            <p><strong>Definição</strong> (Brendan Gregg, USE Method):<br>
+              <em>Demanda além da capacidade que o recurso pode atender no momento.</em></p>
+            <p><strong>Recursos típicos a observar:</strong></p>
+            <ul style="font-size:0.95em;">
+              <li>CPU (cores ocupadas)</li>
+              <li>Memória (RAM, heap)</li>
+              <li><strong style="color:#ED145B;">Event loop lag</strong> (Node)</li>
+              <li>Connection pool do DB</li>
+              <li>Threads (em runtimes thread-based)</li>
+            </ul>
+            <p style="font-size:0.78em; color:#666;">k6 mede do <em>lado do cliente</em>. Saturação real é vista no servidor (APM, Prometheus, top, etc.).</p>
+          </div>
+          <svg viewBox="0 0 200 220" style="width:30%; height:auto;" aria-label="Capacidade enchendo e transbordando">
+            <!-- container -->
+            <rect x="50" y="20" width="100" height="180" fill="none" stroke="#1E1E2C" stroke-width="2"/>
+            <!-- nível -->
+            <rect x="50" y="60" width="100" height="140" fill="#ED145B" opacity="0.7">
+              <animate attributeName="y" values="80;40;20;30;40" dur="4s" repeatCount="indefinite"/>
+              <animate attributeName="height" values="120;160;180;170;160" dur="4s" repeatCount="indefinite"/>
+            </rect>
+            <!-- gota transbordando -->
+            <circle cx="100" cy="15" r="3" fill="#C0392B">
+              <animate attributeName="cy" values="15;5;25" dur="2s" repeatCount="indefinite"/>
+              <animate attributeName="opacity" values="0;1;0" dur="2s" repeatCount="indefinite"/>
+            </circle>
+            <text x="100" y="215" font-size="10" fill="#1E1E2C" text-anchor="middle" font-weight="700">capacidade</text>
+          </svg>
         </div>
 
-        <p>K6 é uma ferramenta open source da Grafana Labs para testes de performance e carga.</p>
-        <ul>
-          <li>Scripts em JavaScript para definir cenários de teste.</li>
-          <li>Suporte a ramp-up, ramp-down e testes contínuos.</li>
-          <li>Integração com Grafana para visualização de métricas.</li>
-        </ul>
-
-        <div style="margin-top:1em;">
-          <img src="../assets/img/k6-logo.png" alt="K6 Logo" style="width:150px;">
-        </div>
-
-        <div class="slide-footer">
-          <div class="footer-bar">11 - Testes de Carga</div>
-          <div class="footer-page">7</div>
-        </div>
+        <div class="slide-footer"><div class="footer-bar">11 - Testes de Carga</div><div class="footer-page">11</div></div>
       </section>
 
-      <!-- ==================== SLIDE: CASO REAL ==================== -->
+      <!-- ==================== 12. COMO LER O RELATÓRIO DO K6 ==================== -->
       <section class="content-slide">
         <div class="top-bar"></div>
         <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header">
-        <div class="slide-title-area">
-          <div class="accent-bar"></div>
-          <h2>Caso Real: Black Friday e Sistemas em Colapso</h2>
+        <div class="slide-title-area"><div class="accent-bar"></div><h2>Como ler um relatório do k6</h2></div>
+
+        <div style="display:flex; gap:18px; align-items:flex-start;">
+          <div style="flex:1.4;">
+            <img src="../assets/img/k6-output-anatomy.png"
+                 alt="Output anotado de execução do k6"
+                 style="width:100%; border-radius:8px; border:1px solid #ddd;"
+                 onerror="this.outerHTML='&lt;div style=&quot;background:#1E1E2C;color:#E0E0E0;font-family:monospace;font-size:0.65em;padding:12px;border-radius:8px;line-height:1.4;&quot;&gt;     ✓ status 200<br>     ✓ has integrity<br><br>     checks.........................: 100.00% ✓ 5982 ✗ 0<br>     <strong style=&quot;color:#F39C12&quot;&gt;data_received...................: 4.8 MB  80 kB/s&lt;/strong&gt;<br>     data_sent.......................: 580 kB  9.7 kB/s<br>     <strong style=&quot;color:#00A859&quot;&gt;http_req_duration...............: avg=145ms min=12ms med=120ms&lt;/strong&gt;<br>       <strong style=&quot;color:#F39C12&quot;&gt;{ expected_response:true }: avg=145ms p(95)=510ms p(99)=2.1s&lt;/strong&gt;<br>     <strong style=&quot;color:#C0392B&quot;&gt;http_req_failed.................: 0.00%   ✓ 0 ✗ 5982&lt;/strong&gt;<br>     <strong style=&quot;color:#ED145B&quot;&gt;http_reqs.......................: 5982    99.7/s&lt;/strong&gt;<br>     iteration_duration..............: avg=1.15s min=1.01s med=1.12s<br>     iterations......................: 5982    99.7/s<br>     <strong style=&quot;color:#00A859&quot;&gt;vus.............................: 50      min=0 max=50&lt;/strong&gt;<br>     vus_max.........................: 50<br>&lt;/div&gt;'">
+          </div>
+          <div style="flex:1; font-size:0.7em;">
+            <p style="margin:0 0 0.4em;"><strong style="color:#ED145B;">http_reqs</strong> — total + RPS médio. <em>Sua taxa de produção.</em></p>
+            <p style="margin:0 0 0.4em;"><strong style="color:#00A859;">http_req_duration</strong> com <strong>p(95) / p(99)</strong> — latência percentilada. <em>Olhe aqui antes da média.</em></p>
+            <p style="margin:0 0 0.4em;"><strong style="color:#C0392B;">http_req_failed</strong> — taxa de falha. <em>Threshold típico: &lt;1%.</em></p>
+            <p style="margin:0 0 0.4em;"><strong>iteration_duration</strong> — tempo total de uma iteração (req + sleep). <em>Útil para entender ritmo do VU.</em></p>
+            <p style="margin:0;"><strong>vus / vus_max</strong> — quantos usuários virtuais ativos. <em>Confirma que o ramp-up rodou.</em></p>
+          </div>
         </div>
 
-        <p>Todo ano no período da Black Friday, sistemas sofrem com picos intensos de acessos, revelando gargalos típicos:</p>
-        <ul>
-          <li><strong>Conexões ao Banco de Dados:</strong> Limites máximos causam filas e erros.</li>
-          <li><strong>Memory Leaks:</strong> Consumo crescente de memória pode causar travamentos.</li>
-          <li><strong>Thread Starvation:</strong> Threads bloqueadas impedem processamento eficiente.</li>
-        </ul>
-
-        <p>Esses problemas causam lentidão, erros e indisponibilidade, afetando vendas e reputação.</p>
-
-        <div class="slide-footer">
-          <div class="footer-bar">11 - Testes de Carga</div>
-          <div class="footer-page">8</div>
-        </div>
+        <div class="slide-footer"><div class="footer-bar">11 - Testes de Carga</div><div class="footer-page">12</div></div>
       </section>
 
-      <!-- ==================== SLIDE: EXEMPLO JAVA/Spring Boot ==================== -->
+      <!-- ==================== 13. HOT PATH ==================== -->
       <section class="content-slide">
         <div class="top-bar"></div>
         <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header">
-        <div class="slide-title-area">
-          <div class="accent-bar"></div>
-          <h2>Exemplo: Monitoramento de Métricas em Spring Boot</h2>
+        <div class="slide-title-area"><div class="accent-bar"></div><h2>Hot Path — onde otimizar primeiro</h2></div>
+
+        <div style="display:flex; gap:25px; align-items:center;">
+          <div style="flex:1.1; font-size:0.8em;">
+            <p><strong>Hot path</strong> = caminho de código que recebe a maior parte do tráfego.</p>
+            <p style="margin:0.6em 0;"><strong>Como identificar:</strong></p>
+            <ul style="font-size:0.95em; margin:0;">
+              <li>APM / observabilidade (NewRelic, Datadog, Application Insights)</li>
+              <li>Logs agregados por endpoint</li>
+              <li>Pareto: 20% dos endpoints atendem 80% das requisições</li>
+            </ul>
+            <div style="margin-top:1em; padding:0.7em 1em; background:#eafaf1; border-left:4px solid #00A859; border-radius:0 6px 6px 0;">
+              <p style="margin:0; font-size:0.95em;"><em>Ganhar 1% de performance no <strong>hot path</strong> rende mais que 50% nos endpoints frios.</em></p>
+            </div>
+          </div>
+
+          <svg viewBox="0 0 240 200" style="width:38%; height:auto;" aria-label="Distribuição de tráfego entre endpoints">
+            <!-- "treemap" simplificado -->
+            <rect x="10" y="10" width="160" height="180" fill="#ED145B" stroke="white" stroke-width="2"/>
+            <text x="90" y="95" font-size="14" fill="white" text-anchor="middle" font-weight="700">/products</text>
+            <text x="90" y="115" font-size="22" fill="white" text-anchor="middle" font-weight="800">78%</text>
+
+            <rect x="170" y="10" width="60" height="80" fill="#F39C12" stroke="white" stroke-width="2"/>
+            <text x="200" y="42" font-size="9" fill="white" text-anchor="middle" font-weight="700">/checkout</text>
+            <text x="200" y="60" font-size="14" fill="white" text-anchor="middle" font-weight="800">8%</text>
+
+            <rect x="170" y="90" width="60" height="100" fill="#888" stroke="white" stroke-width="2"/>
+            <text x="200" y="135" font-size="8" fill="white" text-anchor="middle">38 outros</text>
+            <text x="200" y="152" font-size="14" fill="white" text-anchor="middle" font-weight="800">14%</text>
+          </svg>
         </div>
 
-        <pre><code class="language-java">
-// Configuração de métrica customizada em Spring Boot Actuator
-@Bean
-public Timer requestTimer(MeterRegistry registry) {
-    return Timer.builder("http.server.requests.latency")
-        .publishPercentiles(0.5, 0.95, 0.99)
-        .register(registry);
-}
-        </code></pre>
-
-        <p>Permite medir latências P50, P95 e P99 para identificar gargalos.</p>
-
-        <div class="slide-footer">
-          <div class="footer-bar">11 - Testes de Carga</div>
-          <div class="footer-page">9</div>
-        </div>
+        <div class="slide-footer"><div class="footer-bar">11 - Testes de Carga</div><div class="footer-page">13</div></div>
       </section>
 
-      <!-- ==================== SLIDE: EXEMPLO .NET/C# ==================== -->
+      <!-- ==================== 14. K6 + INSTALAÇÃO ==================== -->
       <section class="content-slide">
         <div class="top-bar"></div>
         <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header">
-        <div class="slide-title-area">
-          <div class="accent-bar"></div>
-          <h2>Exemplo: Captura de Métricas com .NET Core</h2>
+        <div class="slide-title-area"><div class="accent-bar"></div><h2>k6 — instalação passo a passo</h2></div>
+
+        <p style="font-size:0.78em; margin:0 0 0.5em;">
+          k6 é a ferramenta open-source da Grafana Labs para testes de performance. Roda como binário nativo (Go) — não precisa de Node nem JVM. Testes são escritos em JavaScript.
+        </p>
+
+        <div style="display:grid; grid-template-columns:repeat(3, 1fr); gap:14px; margin-top:0.5em;">
+
+          <div style="border:2px solid #1E1E2C; border-radius:10px; padding:10px; background:white;">
+            <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
+              <svg viewBox="0 0 24 24" width="22" height="22" aria-label="Windows">
+                <rect x="2" y="3" width="9" height="9" fill="#0078D4"/>
+                <rect x="13" y="3" width="9" height="9" fill="#0078D4"/>
+                <rect x="2" y="13" width="9" height="9" fill="#0078D4"/>
+                <rect x="13" y="13" width="9" height="9" fill="#0078D4"/>
+              </svg>
+              <h3 style="margin:0; font-size:0.85em; color:#0078D4;">Windows</h3>
+            </div>
+            <pre style="font-size:0.55em; background:#1E1E2C; color:#E0E0E0; padding:6px 8px; border-radius:4px; margin:0; overflow:hidden;"><code>winget install k6 --source winget</code></pre>
+            <p style="font-size:0.6em; margin:6px 0 0; color:#666;">Alternativa: <code>choco install k6</code></p>
+            <img src="../assets/img/k6-install-windows.png" alt="winget install k6 output"
+                 style="width:100%; margin-top:6px; border-radius:4px;"
+                 onerror="this.style.display='none'">
+          </div>
+
+          <div style="border:2px solid #1E1E2C; border-radius:10px; padding:10px; background:white;">
+            <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
+              <svg viewBox="0 0 24 24" width="22" height="22" aria-label="macOS">
+                <path d="M17.5 12.5c0-2 1-3.5 2-4.5-1-1.5-2.5-2-4-2-2 0-3 1-4 1s-2-1-4-1c-3 0-5 2-5 5.5 0 4 3 8.5 5 8.5 1 0 1.5-1 3.5-1s2.5 1 3.5 1c2 0 4-3.5 4-3.5-2.5-1-3-3-3-4z" fill="#1E1E2C"/>
+                <path d="M14 4c0 1.5-1 2.5-2 2.5-.1-1.5 1-2.5 2-2.5z" fill="#1E1E2C"/>
+              </svg>
+              <h3 style="margin:0; font-size:0.85em; color:#1E1E2C;">macOS</h3>
+            </div>
+            <pre style="font-size:0.6em; background:#1E1E2C; color:#E0E0E0; padding:6px 8px; border-radius:4px; margin:0;"><code>brew install k6</code></pre>
+            <p style="font-size:0.6em; margin:6px 0 0; color:#666;">Requer Homebrew (<code>brew.sh</code>)</p>
+            <img src="../assets/img/k6-install-macos.png" alt="brew install k6 output"
+                 style="width:100%; margin-top:6px; border-radius:4px;"
+                 onerror="this.style.display='none'">
+          </div>
+
+          <div style="border:2px solid #1E1E2C; border-radius:10px; padding:10px; background:white;">
+            <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
+              <svg viewBox="0 0 24 24" width="22" height="22" aria-label="Linux">
+                <circle cx="12" cy="12" r="10" fill="#F39C12"/>
+                <ellipse cx="9" cy="10" rx="1.5" ry="2" fill="white"/>
+                <ellipse cx="15" cy="10" rx="1.5" ry="2" fill="white"/>
+                <circle cx="9" cy="10.5" r="0.8" fill="#1E1E2C"/>
+                <circle cx="15" cy="10.5" r="0.8" fill="#1E1E2C"/>
+              </svg>
+              <h3 style="margin:0; font-size:0.85em; color:#F39C12;">Linux (Debian/Ubuntu)</h3>
+            </div>
+            <pre style="font-size:0.5em; background:#1E1E2C; color:#E0E0E0; padding:6px 8px; border-radius:4px; margin:0; line-height:1.3;"><code>sudo gpg --keyserver hkp://keyserver.ubuntu.com:80 \
+  --recv-keys C5AD17C747E3415A...
+echo "deb [signed-by=...] https://dl.k6.io/deb stable main" \
+  | sudo tee /etc/apt/sources.list.d/k6.list
+sudo apt update && sudo apt install k6</code></pre>
+            <img src="../assets/img/k6-install-linux.png" alt="apt install k6 output"
+                 style="width:100%; margin-top:6px; border-radius:4px;"
+                 onerror="this.style.display='none'">
+          </div>
+
         </div>
 
-        <pre><code class="language-csharp">
-// Middleware para medir tempo de requisição
-app.Use(async (context, next) =&gt; {
-    var stopwatch = Stopwatch.StartNew();
-    await next();
-    stopwatch.Stop();
-    var latency = stopwatch.ElapsedMilliseconds;
-    // Log ou envio para sistema de monitoramento
-});
-        </code></pre>
-
-        <p>Monitorar latência e erros ajuda a identificar saturação e falhas.</p>
-
-        <div class="slide-footer">
-          <div class="footer-bar">11 - Testes de Carga</div>
-          <div class="footer-page">10</div>
+        <div style="margin-top:0.6em; padding:0.6em 0.9em; background:#eafaf1; border-left:4px solid #00A859; border-radius:0 6px 6px 0; display:flex; align-items:center; gap:14px;">
+          <strong style="color:#1E8449; font-size:0.78em;">Validação:</strong>
+          <pre style="margin:0; font-size:0.65em; background:#1E1E2C; color:#E0E0E0; padding:4px 10px; border-radius:4px;"><code>k6 version</code></pre>
+          <span style="font-size:0.7em; color:#1E8449;">→ deve imprimir <code>k6 v0.x.x</code></span>
         </div>
+
+        <div class="slide-footer"><div class="footer-bar">11 - Testes de Carga</div><div class="footer-page">14</div></div>
       </section>
 
-      <!-- ==================== SLIDE: EXEMPLO NODE.JS ==================== -->
-      <section class="content-slide">
+      <!-- ==================== 15. QUIZ 1 — TIPOS DE TESTE ==================== -->
+      <section class="quiz-slide content-slide"
+               data-correct="b"
+               data-quiz-id="q1-tipos"
+               data-quiz-feedback="Spike test simula picos abruptos. Stress test mediria limites máximos sustentados; soak mede estabilidade ao longo de horas.">
         <div class="top-bar"></div>
         <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header">
-        <div class="slide-title-area">
-          <div class="accent-bar"></div>
-          <h2>Exemplo: Script Básico K6 em Node.js (JS)</h2>
-        </div>
+        <div class="slide-title-area"><div class="accent-bar"></div><h2>Quiz 1 — Tipos de teste</h2></div>
 
-        <pre><code class="language-js">
-// k6 script para teste de carga simples
-import http from 'k6/http';
-import { sleep } from 'k6';
-
-export let options = {
-  stages: [
-    { duration: '1m', target: 20 },
-    { duration: '3m', target: 50 },
-    { duration: '1m', target: 0 },
-  ],
-};
-
-export default function () {
-  http.get('https://api.exemplo.com/endpoint');
-  sleep(1);
-}
-        </code></pre>
-
-        <p>Define ramp-up e ramp-down para simular carga progressiva.</p>
-
-        <div class="slide-footer">
-          <div class="footer-bar">11 - Testes de Carga</div>
-          <div class="footer-page">11</div>
-        </div>
-      </section>
-
-      <!-- ==================== SLIDE: QUIZ 1 ==================== -->
-      <section class="quiz-slide content-slide" data-correct="P95" data-quiz-id="quiz1">
-        <div class="top-bar"></div>
-        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header">
-        <div class="slide-title-area">
-          <div class="accent-bar"></div>
-          <h2>Quiz: Métricas de Latência</h2>
-        </div>
-
-        <p>Qual métrica indica o tempo máximo que 95% das requisições levam para serem processadas?</p>
+        <p style="font-size:0.85em;">Sua plataforma de e-commerce vai lançar um <strong>flash sale com 50% de desconto às 20h00 em ponto</strong>. Você quer validar se o sistema aguenta o pico súbito de tráfego que se forma no minuto do lançamento. Qual teste aplicar?</p>
 
         <ul class="quiz-options">
-          <li>P50</li>
-          <li>P95</li>
-          <li>P99</li>
-          <li>Throughput</li>
+          <label><input type="radio" name="q1" value="a"> Soak test</label>
+          <label><input type="radio" name="q1" value="b"> Spike test</label>
+          <label><input type="radio" name="q1" value="c"> Smoke test</label>
+          <label><input type="radio" name="q1" value="d"> Stress test</label>
         </ul>
 
         <div class="quiz-feedback"></div>
-
-        <div class="slide-footer">
-          <div class="footer-bar">11 - Testes de Carga</div>
-          <div class="footer-page">12</div>
-        </div>
+        <div class="slide-footer"><div class="footer-bar">11 - Testes de Carga</div><div class="footer-page">15</div></div>
       </section>
 
-      <!-- ==================== SLIDE: SEÇÃO INTERVALO ==================== -->
+      <!-- ==================== 16. QUIZ 2 — PERCENTIS ==================== -->
+      <section class="quiz-slide content-slide"
+               data-correct="b"
+               data-quiz-id="q2-percentis"
+               data-quiz-feedback="P95=820ms = '95% terminam em até 820ms'. P99 conta a cauda — 1 em 100 sente >4s, e isso é o usuário que reclama.">
+        <div class="top-bar"></div>
+        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header">
+        <div class="slide-title-area"><div class="accent-bar"></div><h2>Quiz 2 — Latência e percentis</h2></div>
+
+        <p style="font-size:0.85em;">Seu k6 reporta:</p>
+        <pre style="font-size:0.7em; background:#1E1E2C; color:#E0E0E0; padding:8px 14px; border-radius:6px;"><code>http_req_duration  p(95)=820ms  p(99)=4200ms</code></pre>
+        <p style="font-size:0.85em;">O que isso significa para o usuário?</p>
+
+        <ul class="quiz-options">
+          <label><input type="radio" name="q2" value="a"> A média das requisições leva 820ms</label>
+          <label><input type="radio" name="q2" value="b"> 5% das requisições passam de 820ms; 1% passa de 4,2s</label>
+          <label><input type="radio" name="q2" value="c"> 95% das requisições levam 820ms</label>
+          <label><input type="radio" name="q2" value="d"> O sistema tem 4,2s de latência fixa</label>
+        </ul>
+
+        <div class="quiz-feedback"></div>
+        <div class="slide-footer"><div class="footer-bar">11 - Testes de Carga</div><div class="footer-page">16</div></div>
+      </section>
+
+      <!-- ==================== 17. INTERVALO ==================== -->
       <section class="break-slide">
         <div class="top-bar"></div>
         <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header">
@@ -295,199 +531,30 @@ export default function () {
           <p>21h00 – 21h20</p>
           <p>☕ Aproveite para descansar e recarregar</p>
         </div>
-        <div class="slide-footer">
-          <div class="footer-bar">11 - Testes de Carga</div>
-          <div class="footer-page">13</div>
-        </div>
+        <div class="slide-footer"><div class="footer-bar">11 - Testes de Carga</div><div class="footer-page">17</div></div>
       </section>
 
-      <!-- ==================== SLIDE: SEÇÃO BLOCO 2 ==================== -->
+      <!-- ==================== 18. SECTION BLOCO 2 ==================== -->
       <section class="section-slide">
         <div class="top-bar"></div>
         <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header">
         <div class="accent-bar"></div>
-        <h2>Bloco 2<br>Exercício Prático e Quiz</h2>
-        <div class="slide-footer">
-          <div class="footer-bar">11 - Testes de Carga</div>
-          <div class="footer-page">14</div>
-        </div>
+        <h2>Bloco 2<br>Otimização Iterativa de uma API Real</h2>
+        <div class="slide-footer"><div class="footer-bar">11 - Testes de Carga</div><div class="footer-page">18</div></div>
       </section>
 
-      <!-- ==================== SLIDE: EXERCÍCIO HANDS-ON ==================== -->
-      <section class="exercise-slide content-slide">
-        <div class="top-bar"></div>
-        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header">
-        <div class="slide-title-area">
-          <div class="accent-bar"></div>
-          <h2>Exercício: Criar Script K6 para Teste de Carga Progressivo</h2>
-        </div>
+      <!-- TODO: slides 19–26 nas próximas tasks -->
 
-        <div class="exercise-container">
-          <h3>Passos:</h3>
-          <ol class="exercise-steps">
-            <li>Escreva um script K6 em JavaScript para testar a API <code>https://api.exemplo.com/data</code>.</li>
-            <li>Implemente um ramp-up progressivo de 0 a 50 usuários virtuais em 3 minutos.</li>
-            <li>Execute o teste localmente usando <code>k6 run script.js</code>.</li>
-            <li>Analise os resultados no terminal, observando latências P95 e taxa de erros.</li>
-            <li>Identifique possíveis gargalos baseados nos dados coletados.</li>
-          </ol>
-          <p><strong>Dica:</strong> Use o exemplo básico de script K6 apresentado no slide anterior como base.</p>
-        </div>
-
-        <div class="slide-footer">
-          <div class="footer-bar">11 - Testes de Carga</div>
-          <div class="footer-page">15</div>
-        </div>
-      </section>
-
-      <!-- ==================== SLIDE: EXEMPLO DE SCRIPT K6 ==================== -->
+      <!-- ==================== 27. DÚVIDAS ==================== -->
       <section class="content-slide">
         <div class="top-bar"></div>
         <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header">
-        <div class="slide-title-area">
-          <div class="accent-bar"></div>
-          <h2>Exemplo de Script K6 para Exercício</h2>
-        </div>
-
-        <pre><code class="language-js">
-// script.js
-import http from 'k6/http';
-import { sleep } from 'k6';
-
-export let options = {
-  stages: [
-    { duration: '3m', target: 50 }, // ramp-up para 50 usuários
-  ],
-};
-
-export default function () {
-  http.get('https://api.exemplo.com/data');
-  sleep(1);
-}
-        </code></pre>
-
-        <div class="slide-footer">
-          <div class="footer-bar">11 - Testes de Carga</div>
-          <div class="footer-page">16</div>
-        </div>
+        <div class="slide-title-area"><div class="accent-bar"></div><h2>Dúvidas ou Curiosidades?</h2></div>
+        <div style="display:flex; align-items:center; justify-content:center; flex:1; font-size:4em; color: var(--fiap-dark); font-weight:800; opacity:0.15; margin-top:40px;">?</div>
+        <div class="slide-footer"><div class="footer-bar">11 - Testes de Carga</div><div class="footer-page">27</div></div>
       </section>
 
-      <!-- ==================== SLIDE: QUIZ 2 ==================== -->
-      <section class="quiz-slide content-slide" data-correct="Teste de Stress" data-quiz-id="quiz2">
-        <div class="top-bar"></div>
-        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header">
-        <div class="slide-title-area">
-          <div class="accent-bar"></div>
-          <h2>Quiz: Diferença entre Teste de Carga e Stress</h2>
-        </div>
-
-        <p>Qual a principal diferença entre um teste de carga e um teste de stress?</p>
-
-        <ul class="quiz-options">
-          <li>Teste de Carga avalia limites máximos; Teste de Stress avalia carga normal.</li>
-          <li>Teste de Stress avalia limites máximos; Teste de Carga avalia carga esperada.</li>
-          <li>Ambos são iguais e usados para o mesmo propósito.</li>
-          <li>Teste de Carga é só para medir latência, Teste de Stress só para erros.</li>
-        </ul>
-
-        <div class="quiz-feedback"></div>
-
-        <div class="slide-footer">
-          <div class="footer-bar">11 - Testes de Carga</div>
-          <div class="footer-page">17</div>
-        </div>
-      </section>
-
-      <!-- ==================== SLIDE: QUIZ 3 ==================== -->
-      <section class="quiz-slide content-slide" data-correct="P99" data-quiz-id="quiz3">
-        <div class="top-bar"></div>
-        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header">
-        <div class="slide-title-area">
-          <div class="accent-bar"></div>
-          <h2>Quiz: Percentil de Latência mais Crítico</h2>
-        </div>
-
-        <p>Qual percentil de latência geralmente é mais crítico para identificar problemas graves de performance?</p>
-
-        <ul class="quiz-options">
-          <li>P50</li>
-          <li>P75</li>
-          <li>P95</li>
-          <li>P99</li>
-        </ul>
-
-        <div class="quiz-feedback"></div>
-
-        <div class="slide-footer">
-          <div class="footer-bar">11 - Testes de Carga</div>
-          <div class="footer-page">18</div>
-        </div>
-      </section>
-
-      <!-- ==================== SLIDE: CONSIDERAÇÕES FINAIS SOBRE TESTES DE CARGA ==================== -->
-      <section class="content-slide">
-        <div class="top-bar"></div>
-        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header">
-        <div class="slide-title-area">
-          <div class="accent-bar"></div>
-          <h2>Considerações Finais</h2>
-        </div>
-
-        <ul>
-          <li>Testes de carga são essenciais para garantir a escalabilidade e estabilidade.</li>
-          <li>Monitorar métricas chave ajuda a antecipar problemas antes do ambiente produtivo.</li>
-          <li>Automatizar testes e integrar com CI/CD melhora a qualidade contínua.</li>
-          <li>Ferramentas como K6 e Grafana facilitam análise e visualização dos resultados.</li>
-        </ul>
-
-        <div class="slide-footer">
-          <div class="footer-bar">11 - Testes de Carga</div>
-          <div class="footer-page">19</div>
-        </div>
-      </section>
-
-      <!-- ==================== SLIDE: CASO REAL - SOLUÇÕES ==================== -->
-      <section class="content-slide">
-        <div class="top-bar"></div>
-        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header">
-        <div class="slide-title-area">
-          <div class="accent-bar"></div>
-          <h2>Caso Real: Soluções para Gargalos Black Friday</h2>
-        </div>
-
-        <ul>
-          <li><strong>Connection Pooling:</strong> Otimizar conexões ao banco com pools dimensionados.</li>
-          <li><strong>Monitoramento de Memory Leaks:</strong> Usar ferramentas de profiling e alertas.</li>
-          <li><strong>Thread Management:</strong> Ajustar thread pools e evitar bloqueios desnecessários.</li>
-          <li><strong>Escalabilidade Horizontal:</strong> Distribuir carga em múltiplas instâncias.</li>
-        </ul>
-
-        <div class="slide-footer">
-          <div class="footer-bar">11 - Testes de Carga</div>
-          <div class="footer-page">20</div>
-        </div>
-      </section>
-
-      <!-- ==================== SLIDE: DÚVIDAS E CONTATO ==================== -->
-      <section class="content-slide">
-        <div class="top-bar"></div>
-        <img src="../assets/img/fiap-logo-simple.png" alt="FIAP" class="fiap-logo-header">
-        <div class="slide-title-area">
-          <div class="accent-bar"></div>
-          <h2>Dúvidas ou Curiosidades?</h2>
-        </div>
-
-        <div style="display:flex; align-items:center; justify-content:center; flex:1; font-size:4em; color: var(--fiap-dark); font-weight:800; opacity:0.15; margin-top:40px;">
-          ?
-        </div>
-
-        <div class="slide-footer">
-          <div class="footer-bar">11 - Testes de Carga</div>
-          <div class="footer-page">21</div>
-        </div>
-      </section>
-
-      <!-- ==================== SLIDE: ENCERRAMENTO ==================== -->
+      <!-- ==================== 28. ENCERRAMENTO ==================== -->
       <section class="end-slide">
         <img src="../assets/img/fiap-logo-graduacao.png" alt="FIAP Graduação" style="max-width:350px;">
         <div class="copyright">
